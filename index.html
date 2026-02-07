@@ -6,71 +6,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* ===== BODY + ANIMATED BACKGROUND ===== */
 body{
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#1a0026,#330033);
-  text-align:center;
   margin:0;
+  text-align:center;
   color:white;
+  min-height:100vh;
+
+  background: linear-gradient(
+    -45deg,
+    #1a001a,
+    #330033,
+    #ff1fa3,
+    #ff66cc
+  );
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease infinite;
 }
 
+@keyframes gradientBG {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== HEADER ===== */
 header{
-  padding:30px;
+  padding:25px;
 }
 
+/* ===== LOGO ===== */
 .logo{
   width:140px;
   border-radius:50%;
-  box-shadow:0 0 15px #ff4da6;
+  box-shadow:0 0 25px #ff4da6;
 }
 
-h2{
-  color:#ff66cc;
-}
-
+/* ===== CARD ===== */
 .card{
-  background:rgba(255, 0, 128, 0.12);
+  background:rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
   margin:15px auto;
-  padding:18px;
-  border-radius:14px;
+  padding:15px;
+  border-radius:12px;
   width:90%;
-  max-width:420px;
-  box-shadow:0 0 12px #ff3399;
+  max-width:450px;
+  box-shadow:0 0 15px rgba(255,105,180,0.4);
 }
 
+/* ===== LINKS ===== */
 a{
   text-decoration:none;
+  color:#ff99cc;
   font-weight:bold;
-  color:#ff99dd;
 }
 
+/* ===== BUTTON ===== */
 button{
-  padding:9px 18px;
-  margin:6px;
+  padding:8px 15px;
+  margin:5px;
   cursor:pointer;
-  border:none;
-  border-radius:20px;
-  background:linear-gradient(135deg,#ff1a8c,#ff66cc);
+  background:#ff4da6;
   color:white;
+  border:none;
+  border-radius:8px;
   font-weight:bold;
+  animation:pulse 2s infinite;
 }
 
-button:hover{
-  opacity:0.85;
+@keyframes pulse{
+  0%{ box-shadow:0 0 0 0 rgba(255,77,166,0.6); }
+  70%{ box-shadow:0 0 0 15px rgba(255,77,166,0); }
+  100%{ box-shadow:0 0 0 0 rgba(255,77,166,0); }
 }
 
+/* ===== COMMENT ===== */
 textarea{
   width:85%;
   padding:7px;
   border-radius:8px;
   border:none;
+  outline:none;
 }
 
+/* ===== FOOTER ===== */
 footer{
-  background:#1a001a;
-  padding:12px;
-  font-size:14px;
-  color:#ff80bf;
+  background:#000;
+  padding:10px;
+  font-size:13px;
+  margin-top:20px;
 }
 </style>
 </head>
@@ -80,67 +105,95 @@ footer{
 <header>
   <img src="logo.png" class="logo"><br>
   <h2>Dhannjay Uphade 🇮🇳</h2>
+  <p>Official Creator Website</p>
 </header>
 
 <div class="card">
-▶️ YouTube Channel<br>
+▶️ <b>YouTube</b><br>
 <a href="https://youtube.com/@dhannjayuphade?si=Q0mvh2G7m3D2idyX" target="_blank">
 Visit Channel
-</a><br><br>
-<button onclick="subscribe()">🔔 Subscribe</button>
+</a><br>
+<button onclick="subscribe()">Subscribe</button>
 </div>
 
 <div class="card">
-📸 Instagram<br>
+📸 <b>Instagram</b><br>
 <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
-Follow on Instagram
+Follow
 </a>
 </div>
 
 <div class="card">
-👻 Snapchat<br>
+👻 <b>Snapchat</b><br>
 <a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
-Add on Snapchat
+Add
 </a>
 </div>
 
 <div class="card">
-🌟 Suvichar<br>
-<a href="https://dhannjayuphade.github.io/suvichar/" target="_blank">
-Read Suvichar
-</a>
+🌟 <b>Suvichar</b><br>
+<a href="suvichar/">Read Suvichar</a>
 </div>
 
 <div class="card">
 ❤️ Likes: <span id="like">0</span>
-👎 Dislikes: <span id="dislike">0</span><br><br>
+&nbsp;&nbsp;
+👎 Dislikes: <span id="dislike">0</span><br>
 <button onclick="like()">Like</button>
 <button onclick="dislike()">Dislike</button>
 </div>
 
 <div class="card">
-💬 Comment<br>
-<textarea id="comment" rows="3"></textarea><br>
+💬 <b>Comment</b><br>
+<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
 <button onclick="addComment()">Post</button>
 <p id="showComment"></p>
 </div>
 
 <footer>
-© 2026 Dhannjay Uphade | Official Website
+© 2026 Dhannjay Uphade
 </footer>
 
 <script>
-let l=0,d=0;
-function like(){ l++; document.getElementById("like").innerText=l; }
-function dislike(){ d++; document.getElementById("dislike").innerText=d; }
-function addComment(){
- let c=document.getElementById("comment").value;
- document.getElementById("showComment").innerText="Comment: "+c;
+/* ===== LIKE / DISLIKE PERMANENT SAVE ===== */
+let likeCount = localStorage.getItem("like_count");
+let dislikeCount = localStorage.getItem("dislike_count");
+
+if(likeCount === null) likeCount = 0;
+if(dislikeCount === null) dislikeCount = 0;
+
+likeCount = parseInt(likeCount);
+dislikeCount = parseInt(dislikeCount);
+
+document.getElementById("like").innerText = likeCount;
+document.getElementById("dislike").innerText = dislikeCount;
+
+function like(){
+  likeCount++;
+  document.getElementById("like").innerText = likeCount;
+  localStorage.setItem("like_count", likeCount);
 }
+
+function dislike(){
+  dislikeCount++;
+  document.getElementById("dislike").innerText = dislikeCount;
+  localStorage.setItem("dislike_count", dislikeCount);
+}
+
+/* ===== COMMENT ===== */
+function addComment(){
+  let c = document.getElementById("comment").value;
+  if(c.trim() !== ""){
+    document.getElementById("showComment").innerText = "Comment: " + c;
+    document.getElementById("comment").value = "";
+  }
+}
+
+/* ===== SUBSCRIBE DEMO ===== */
 function subscribe(){
- alert("Thanks for supporting 💖");
+  alert("Thank you for subscribing ❤️");
 }
 </script>
 
 </body>
-</html>
+  </html>
