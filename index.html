@@ -83,11 +83,10 @@ footer{
   margin-top:20px;
 }
 
-/* ===== NOTIFICATION POPUP ===== */
+/* ===== POPUP ===== */
 .notify{
   position:fixed;
-  top:20px;
-  left:50%;
+  top:20px; left:50%;
   transform:translateX(-50%);
   background:rgba(255,255,255,0.2);
   backdrop-filter:blur(8px);
@@ -97,17 +96,35 @@ footer{
   z-index:9999;
   animation:slideDown 1s ease;
 }
-.notify h3{margin:5px 0;color:#ffccff;}
-.notify p{margin:3px 0;font-size:14px;}
-.closeBtn{
-  position:absolute;
-  top:5px;
-  right:10px;
-  cursor:pointer;
-}
+.closeBtn{position:absolute;top:5px;right:10px;cursor:pointer;}
 @keyframes slideDown{
   from{opacity:0;top:-60px;}
   to{opacity:1;top:20px;}
+}
+
+/* ===== SUVICHAR SPECIAL ===== */
+.suvichar-card{
+  border:2px solid #ff66cc;
+  box-shadow:0 0 30px rgba(255,102,204,0.9);
+  animation:glowBox 3s infinite alternate;
+}
+@keyframes glowBox{
+  from{ box-shadow:0 0 15px rgba(255,102,204,0.5); }
+  to{ box-shadow:0 0 35px rgba(255,102,204,1); }
+}
+.suvichar-text{
+  font-size:18px;
+  margin:15px 0;
+  padding:15px;
+  background:rgba(0,0,0,0.3);
+  border-radius:12px;
+  line-height:1.6;
+}
+.suvichar-btn{
+  font-size:16px;
+  padding:10px 25px;
+  background:linear-gradient(45deg,#ff1fa3,#ff66cc);
+  border-radius:30px;
 }
 </style>
 </head>
@@ -148,9 +165,19 @@ footer{
 </a>
 </div>
 
-<div class="card">
-🌟 <b>Suvichar</b><br>
-<a href="suvichar/">Read Suvichar</a>
+<!-- ===== SUVICHAR ALL FEATURES ===== -->
+<div class="card suvichar-card">
+  🌟 <h3>Daily Suvichar</h3>
+  <div id="suvicharText" class="suvichar-text">
+    स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.
+  </div>
+  ❤️ Likes: <span id="suvLike">0</span><br>
+  <button onclick="likeSuvichar()">Like</button>
+  <button onclick="shareSuvichar()">Share</button>
+  <br><br>
+  <a href="suvichar/">
+    <button class="suvichar-btn">Read More Suvichar ✨</button>
+  </a>
 </div>
 
 <div class="card">
@@ -175,41 +202,25 @@ footer{
 <footer>© 2026 Dhannjay Uphade</footer>
 
 <script>
-/* ===== POPUP AUTO HIDE ===== */
-function closeNotify(){
-  document.getElementById("notifyBox").style.display="none";
-}
+/* ===== POPUP ===== */
+function closeNotify(){ document.getElementById("notifyBox").style.display="none"; }
 setTimeout(closeNotify,6000);
 
 /* ===== LIKE / DISLIKE SAVE ===== */
-let likeCount=localStorage.getItem("like_count")||0;
-let dislikeCount=localStorage.getItem("dislike_count")||0;
-likeCount=parseInt(likeCount);
-dislikeCount=parseInt(dislikeCount);
+let likeCount=parseInt(localStorage.getItem("like_count")||0);
+let dislikeCount=parseInt(localStorage.getItem("dislike_count")||0);
 document.getElementById("like").innerText=likeCount;
 document.getElementById("dislike").innerText=dislikeCount;
-
-function like(){
-  likeCount++;
-  document.getElementById("like").innerText=likeCount;
-  localStorage.setItem("like_count",likeCount);
-}
-function dislike(){
-  dislikeCount++;
-  document.getElementById("dislike").innerText=dislikeCount;
-  localStorage.setItem("dislike_count",dislikeCount);
-}
+function like(){ likeCount++; localStorage.setItem("like_count",likeCount); document.getElementById("like").innerText=likeCount; }
+function dislike(){ dislikeCount++; localStorage.setItem("dislike_count",dislikeCount); document.getElementById("dislike").innerText=dislikeCount; }
 
 /* ===== COMMENT ===== */
 function addComment(){
   let c=document.getElementById("comment").value;
-  if(c.trim()!==""){
-    document.getElementById("showComment").innerText="Comment: "+c;
-    document.getElementById("comment").value="";
-  }
+  if(c.trim()!==""){ document.getElementById("showComment").innerText="Comment: "+c; document.getElementById("comment").value=""; }
 }
 
-/* ===== SHARE ===== */
+/* ===== SHARE WEBSITE ===== */
 function shareSite(){
   let url="https://dhannjayuphade.github.io/";
   let text="🔥 Dhannjay Uphade Official Website पाहा 👇";
@@ -217,10 +228,27 @@ function shareSite(){
 }
 
 /* ===== SUBSCRIBE DEMO ===== */
-function subscribe(){
-  alert("Thank you for subscribing ❤️");
+function subscribe(){ alert("Thank you for subscribing ❤️"); }
+
+/* ===== SUVICHAR ALL ===== */
+const suvichars=[
+ "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
+ "परिश्रमाशिवाय यश मिळत नाही.",
+ "आजचा संघर्ष उद्याच्या यशाची तयारी असते.",
+ "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा.",
+ "अपयशातूनच यशाचा मार्ग जातो."
+];
+let day=new Date().getDate();
+document.getElementById("suvicharText").innerText=suvichars[day % suvichars.length];
+
+let suvLike=parseInt(localStorage.getItem("suv_like")||0);
+document.getElementById("suvLike").innerText=suvLike;
+function likeSuvichar(){ suvLike++; localStorage.setItem("suv_like",suvLike); document.getElementById("suvLike").innerText=suvLike; }
+function shareSuvichar(){
+  let text=document.getElementById("suvicharText").innerText;
+  window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
 }
 </script>
 
 </body>
-  </html>
+</html>
