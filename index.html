@@ -13,28 +13,18 @@ body{
   text-align:center;
   color:white;
   min-height:100vh;
-
-  background: linear-gradient(
-    -45deg,
-    #1a001a,
-    #330033,
-    #ff1fa3,
-    #ff66cc
-  );
-  background-size: 400% 400%;
-  animation: gradientBG 12s ease infinite;
+  background: linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
+  background-size:400% 400%;
+  animation:gradientBG 12s ease infinite;
 }
-
-@keyframes gradientBG {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes gradientBG{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 /* ===== HEADER ===== */
-header{
-  padding:25px;
-}
+header{padding:25px;}
 
 /* ===== LOGO ===== */
 .logo{
@@ -46,7 +36,7 @@ header{
 /* ===== CARD ===== */
 .card{
   background:rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
+  backdrop-filter:blur(6px);
   margin:15px auto;
   padding:15px;
   border-radius:12px;
@@ -56,16 +46,12 @@ header{
 }
 
 /* ===== LINKS ===== */
-a{
-  text-decoration:none;
-  color:#ff99cc;
-  font-weight:bold;
-}
+a{color:#ffccff;text-decoration:none;font-weight:bold;}
 
 /* ===== BUTTON ===== */
 button{
-  padding:8px 15px;
-  margin:5px;
+  padding:8px 18px;
+  margin:6px;
   cursor:pointer;
   background:#ff4da6;
   color:white;
@@ -74,11 +60,10 @@ button{
   font-weight:bold;
   animation:pulse 2s infinite;
 }
-
 @keyframes pulse{
-  0%{ box-shadow:0 0 0 0 rgba(255,77,166,0.6); }
-  70%{ box-shadow:0 0 0 15px rgba(255,77,166,0); }
-  100%{ box-shadow:0 0 0 0 rgba(255,77,166,0); }
+  0%{box-shadow:0 0 0 0 rgba(255,77,166,.6);}
+  70%{box-shadow:0 0 0 15px rgba(255,77,166,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,77,166,0);}
 }
 
 /* ===== COMMENT ===== */
@@ -97,10 +82,45 @@ footer{
   font-size:13px;
   margin-top:20px;
 }
+
+/* ===== NOTIFICATION POPUP ===== */
+.notify{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(8px);
+  padding:15px 25px;
+  border-radius:15px;
+  box-shadow:0 0 25px #ff4da6;
+  z-index:9999;
+  animation:slideDown 1s ease;
+}
+.notify h3{margin:5px 0;color:#ffccff;}
+.notify p{margin:3px 0;font-size:14px;}
+.closeBtn{
+  position:absolute;
+  top:5px;
+  right:10px;
+  cursor:pointer;
+}
+@keyframes slideDown{
+  from{opacity:0;top:-60px;}
+  to{opacity:1;top:20px;}
+}
 </style>
 </head>
 
 <body>
+
+<!-- ===== POPUP ===== -->
+<div id="notifyBox" class="notify">
+  <span class="closeBtn" onclick="closeNotify()">✖</span>
+  <h3>🙏 Welcome</h3>
+  <p>Dhannjay Uphade Official Website</p>
+  <p>Subscribe • Follow • Share ❤️</p>
+</div>
 
 <header>
   <img src="logo.png" class="logo"><br>
@@ -110,23 +130,21 @@ footer{
 
 <div class="card">
 ▶️ <b>YouTube</b><br>
-<a href="https://youtube.com/@dhannjayuphade?si=Q0mvh2G7m3D2idyX" target="_blank">
-Visit Channel
-</a><br>
+<a href="https://youtube.com/@dhannjayuphade?si=Q0mvh2G7m3D2idyX" target="_blank">Visit Channel</a><br>
 <button onclick="subscribe()">Subscribe</button>
 </div>
 
 <div class="card">
 📸 <b>Instagram</b><br>
 <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
-Follow
+<button>Follow</button>
 </a>
 </div>
 
 <div class="card">
 👻 <b>Snapchat</b><br>
 <a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
-Add
+<button>Follow</button>
 </a>
 </div>
 
@@ -136,9 +154,13 @@ Add
 </div>
 
 <div class="card">
+📤 <b>Share Website</b><br>
+<button onclick="shareSite()">Share on WhatsApp</button>
+</div>
+
+<div class="card">
 ❤️ Likes: <span id="like">0</span>
-&nbsp;&nbsp;
-👎 Dislikes: <span id="dislike">0</span><br>
+&nbsp;&nbsp;👎 Dislikes: <span id="dislike">0</span><br>
 <button onclick="like()">Like</button>
 <button onclick="dislike()">Dislike</button>
 </div>
@@ -150,43 +172,48 @@ Add
 <p id="showComment"></p>
 </div>
 
-<footer>
-© 2026 Dhannjay Uphade
-</footer>
+<footer>© 2026 Dhannjay Uphade</footer>
 
 <script>
-/* ===== LIKE / DISLIKE PERMANENT SAVE ===== */
-let likeCount = localStorage.getItem("like_count");
-let dislikeCount = localStorage.getItem("dislike_count");
+/* ===== POPUP AUTO HIDE ===== */
+function closeNotify(){
+  document.getElementById("notifyBox").style.display="none";
+}
+setTimeout(closeNotify,6000);
 
-if(likeCount === null) likeCount = 0;
-if(dislikeCount === null) dislikeCount = 0;
-
-likeCount = parseInt(likeCount);
-dislikeCount = parseInt(dislikeCount);
-
-document.getElementById("like").innerText = likeCount;
-document.getElementById("dislike").innerText = dislikeCount;
+/* ===== LIKE / DISLIKE SAVE ===== */
+let likeCount=localStorage.getItem("like_count")||0;
+let dislikeCount=localStorage.getItem("dislike_count")||0;
+likeCount=parseInt(likeCount);
+dislikeCount=parseInt(dislikeCount);
+document.getElementById("like").innerText=likeCount;
+document.getElementById("dislike").innerText=dislikeCount;
 
 function like(){
   likeCount++;
-  document.getElementById("like").innerText = likeCount;
-  localStorage.setItem("like_count", likeCount);
+  document.getElementById("like").innerText=likeCount;
+  localStorage.setItem("like_count",likeCount);
 }
-
 function dislike(){
   dislikeCount++;
-  document.getElementById("dislike").innerText = dislikeCount;
-  localStorage.setItem("dislike_count", dislikeCount);
+  document.getElementById("dislike").innerText=dislikeCount;
+  localStorage.setItem("dislike_count",dislikeCount);
 }
 
 /* ===== COMMENT ===== */
 function addComment(){
-  let c = document.getElementById("comment").value;
-  if(c.trim() !== ""){
-    document.getElementById("showComment").innerText = "Comment: " + c;
-    document.getElementById("comment").value = "";
+  let c=document.getElementById("comment").value;
+  if(c.trim()!==""){
+    document.getElementById("showComment").innerText="Comment: "+c;
+    document.getElementById("comment").value="";
   }
+}
+
+/* ===== SHARE ===== */
+function shareSite(){
+  let url="https://dhannjayuphade.github.io/";
+  let text="🔥 Dhannjay Uphade Official Website पाहा 👇";
+  window.open("https://wa.me/?text="+encodeURIComponent(text+" "+url),"_blank");
 }
 
 /* ===== SUBSCRIBE DEMO ===== */
