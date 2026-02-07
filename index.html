@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<h1>welcome </h1>
 <html lang="mr">
 <head>
 <meta charset="UTF-8">
@@ -25,8 +26,6 @@ body{
 
 /* ===== HEADER ===== */
 header{padding:25px;}
-
-/* ===== LOGO ===== */
 .logo{
   width:140px;
   border-radius:50%;
@@ -120,12 +119,32 @@ footer{
   border-radius:12px;
   line-height:1.6;
 }
-.suvichar-btn{
-  font-size:16px;
-  padding:10px 25px;
-  background:linear-gradient(45deg,#ff1fa3,#ff66cc);
-  border-radius:30px;
+
+/* ===== GLOWING SUVICHAR BUTTON ===== */
+.glow-suvichar-btn{
+  font-size:18px;
+  padding:12px 30px;
+  border:none;
+  border-radius:40px;
+  color:white;
+  cursor:pointer;
+  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
+  background-size:300% 300%;
+  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
+  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
+  margin:5px;
 }
+@keyframes glowMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+@keyframes glowPulse{
+  0%{box-shadow:0 0 10px #ff4da6;}
+  50%{box-shadow:0 0 35px #ff66cc;}
+  100%{box-shadow:0 0 10px #ff4da6;}
+}
+.glow-suvichar-btn:hover{transform:scale(1.08);}
 </style>
 </head>
 
@@ -165,18 +184,19 @@ footer{
 </a>
 </div>
 
-<!-- ===== SUVICHAR ALL FEATURES ===== -->
+<!-- ===== SUVICHAR ALL-IN-ONE ===== -->
 <div class="card suvichar-card">
   🌟 <h3>Daily Suvichar</h3>
   <div id="suvicharText" class="suvichar-text">
     स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.
   </div>
-  ❤️ Likes: <span id="suvLike">0</span><br>
-  <button onclick="likeSuvichar()">Like</button>
-  <button onclick="shareSuvichar()">Share</button>
+  ❤️ Likes: <span id="suvLike">0</span><br><br>
+
+  <button class="glow-suvichar-btn" onclick="likeSuvichar()">❤️ Like</button>
+  <button class="glow-suvichar-btn" onclick="shareSuvichar()">📤 Share</button>
   <br><br>
   <a href="suvichar/">
-    <button class="suvichar-btn">Read More Suvichar ✨</button>
+    <button class="glow-suvichar-btn">✨ Read More Suvichar ✨</button>
   </a>
 </div>
 
@@ -251,4 +271,4 @@ function shareSuvichar(){
 </script>
 
 </body>
-</html>
+  </html>
