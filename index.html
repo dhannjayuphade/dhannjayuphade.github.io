@@ -4,17 +4,143 @@
 <meta charset="UTF-8">
 <title>Dhannjay Uphade | Official Website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#1a0026,#330033);
+  text-align:center;
+  margin:0;
+  color:white;
+}
+
+header{
+  padding:30px;
+}
+
+.logo{
+  width:140px;
+  border-radius:50%;
+  box-shadow:0 0 15px #ff4da6;
+}
+
+h2{
+  color:#ff66cc;
+}
+
+.card{
+  background:rgba(255, 0, 128, 0.12);
+  margin:15px auto;
+  padding:18px;
+  border-radius:14px;
+  width:90%;
+  max-width:420px;
+  box-shadow:0 0 12px #ff3399;
+}
+
+a{
+  text-decoration:none;
+  font-weight:bold;
+  color:#ff99dd;
+}
+
+button{
+  padding:9px 18px;
+  margin:6px;
+  cursor:pointer;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(135deg,#ff1a8c,#ff66cc);
+  color:white;
+  font-weight:bold;
+}
+
+button:hover{
+  opacity:0.85;
+}
+
+textarea{
+  width:85%;
+  padding:7px;
+  border-radius:8px;
+  border:none;
+}
+
+footer{
+  background:#1a001a;
+  padding:12px;
+  font-size:14px;
+  color:#ff80bf;
+}
+</style>
 </head>
 
 <body>
-<h1>🙏 Welcome</h1>
-<p>मी Dhannjay Uphade</p>
 
-<ul>
-  <li><a href="about.html">About Me</a></li>
-  <li><a href="contact.html">Contact</a></li>
-  <li><a href="suvichar/">🌟 Suvichar</a></li>
-</ul>
+<header>
+  <img src="logo.png" class="logo">
+  <h2>Dhannjay Uphade 🇮🇳</h2>
+</header>
+
+<div class="card">
+▶️ YouTube Channel<br>
+<a href="https://youtube.com/@dhannjayuphade?si=Q0mvh2G7m3D2idyX" target="_blank">
+Visit Channel
+</a><br><br>
+<button onclick="subscribe()">🔔 Subscribe</button>
+</div>
+
+<div class="card">
+📸 Instagram<br>
+<a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
+Follow on Instagram
+</a>
+</div>
+
+<div class="card">
+👻 Snapchat<br>
+<a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
+Add on Snapchat
+</a>
+</div>
+
+<div class="card">
+🌟 Suvichar<br>
+<a href="https://dhannjayuphade.github.io/suvichar/" target="_blank">
+Read Suvichar
+</a>
+</div>
+
+<div class="card">
+❤️ Likes: <span id="like">0</span>
+👎 Dislikes: <span id="dislike">0</span><br><br>
+<button onclick="like()">Like</button>
+<button onclick="dislike()">Dislike</button>
+</div>
+
+<div class="card">
+💬 Comment<br>
+<textarea id="comment" rows="3"></textarea><br>
+<button onclick="addComment()">Post</button>
+<p id="showComment"></p>
+</div>
+
+<footer>
+© 2026 Dhannjay Uphade | Official Website
+</footer>
+
+<script>
+let l=0,d=0;
+function like(){ l++; document.getElementById("like").innerText=l; }
+function dislike(){ d++; document.getElementById("dislike").innerText=d; }
+function addComment(){
+ let c=document.getElementById("comment").value;
+ document.getElementById("showComment").innerText="Comment: "+c;
+}
+function subscribe(){
+ alert("Thanks for supporting 💖");
+}
+</script>
 
 </body>
 </html>
