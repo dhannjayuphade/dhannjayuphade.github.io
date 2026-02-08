@@ -226,12 +226,115 @@ footer{
 <button onclick="dislike()">Dislike</button>
 </div>
 
+<!-- ===== COMMENT CARD ===== -->
 <div class="card">
-💬 <b>Comment</b><br>
+💬 <b>Comments</b><br>
 <textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
 <button onclick="addComment()">Post</button>
-<p id="showComment"></p>
+<div id="commentList"></div>
 </div>
+
+<style>
+.card{
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  margin:15px auto;
+  padding:15px;
+  border-radius:12px;
+  width:90%;
+  max-width:450px;
+  box-shadow:0 0 15px rgba(255,105,180,0.4);
+  color:white;
+  position:relative;
+}
+textarea{
+  width:85%;
+  padding:7px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+button{
+  padding:8px 18px;
+  margin:6px;
+  cursor:pointer;
+  background:#ff4da6;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+}
+.comment-item{
+  background: rgba(0,0,0,0.3);
+  padding:8px;
+  margin:6px 0;
+  border-radius:8px;
+  position:relative;
+}
+.react-btn{
+  cursor:pointer;
+  margin-left:5px;
+  font-size:16px;
+}
+.heart{
+  position:absolute;
+  font-size:20px;
+  animation:floatUp 1s ease forwards;
+}
+@keyframes floatUp{
+  0%{transform:translateY(0); opacity:1;}
+  100%{transform:translateY(-40px) scale(1.2); opacity:0;}
+}
+</style>
+
+<script>
+// ===== Load comments =====
+function loadComments(){
+  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
+  let html = "";
+  comments.forEach((c, idx) => {
+    html += `<div class="comment-item" id="comment-${idx}">
+      💬 ${c.text} 
+      <span class="react-btn" onclick="react(${idx}, '❤️')">❤️ ${c.heart}</span>
+      <span class="react-btn" onclick="react(${idx}, '👍')">👍 ${c.thumb}</span>
+      <span class="react-btn" onclick="react(${idx}, '👎')">👎 ${c.down}</span>
+    </div>`;
+  });
+  document.getElementById("commentList").innerHTML = html;
+}
+
+// ===== Add comment =====
+function addComment(){
+  let cText = document.getElementById("comment").value.trim();
+  if(cText !== ""){
+    let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
+    comments.push({text:cText, heart:0, thumb:0, down:0});
+    localStorage.setItem("all_comments", JSON.stringify(comments));
+    document.getElementById("comment").value="";
+    loadComments();
+  }
+}
+
+// ===== React to comment =====
+function react(idx,type){
+  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
+  let item = document.getElementById(`comment-${idx}`);
+  let heartEl = document.createElement("span");
+  heartEl.className = "heart";
+  heartEl.innerText = type;
+  item.appendChild(heartEl);
+  setTimeout(()=>{ item.removeChild(heartEl); },1000);
+
+  if(type==='❤️'){ comments[idx].heart++; }
+  else if(type==='👍'){ comments[idx].thumb++; }
+  else if(type==='👎'){ comments[idx].down++; }
+  localStorage.setItem("all_comments", JSON.stringify(comments));
+  loadComments();
+}
+
+// ===== Initial load =====
+loadComments();
+</script>
 
 <footer>© 2026 Dhannjay Uphade</footer>
 
