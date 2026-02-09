@@ -2,7 +2,7 @@
 <html lang="mr">
 <head>
 <meta charset="UTF-8">
-<title>Dhannjay Uphade | Suvichar</title>
+<title>Dhannjay Uphade official creator website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -131,11 +131,40 @@ footer{
 <body>
 
 <header>
+  <h> welcome </h>
   <img src="logo.png" class="logo"><br>
   <h2>Dhannjay Uphade 🇮🇳</h2>
-  <p>Daily Suvichar</p>
+  <p>official creator website</p>
 </header>
 
+  <!-- ===== YOUTUBE CHANNELS ===== -->
+
+<div class="card">
+  ▶️ <b>YouTube – Official Channel</b><br>
+  <a href="https://youtube.com/@dhannjayuphade?si=Naj449CiB-WCo7Ea" target="_blank">
+    <button>Subscribe</button>
+  </a>
+</div>
+
+<div class="card">
+  🎮 <b>YouTube – Gaming 2.0</b><br>
+  <a href="https://youtube.com/@dhannjaygaming2.0?si=k8BWvHs0wU2JVRle" target="_blank">
+    <button>Subscribe</button>
+  </a>
+</div>
+  <div class="card">
+  📸 <b>Instagram</b><br>
+  <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
+    <button>Follow</button>
+  </a>
+</div>
+
+<div class="card">
+  📧 <b>Email</b><br>
+  <a href="mailto:dhannjayuphade5@gmail.com">
+    <button>Send Email</button>
+  </a>
+</div>
 <!-- ===== SUVICHAR ===== -->
 <div class="card suvichar-card">
 🌟 <h3>Daily Suvichar</h3>
@@ -169,6 +198,14 @@ footer{
 </a>
 </div>
 
+  <!-- ===== WEBSITE SUBSCRIBE ===== -->
+<div class="card">
+  🔔 <b>Website Subscribe</b><br>
+  <p>नवीन अपडेट्ससाठी Subscribe करा</p>
+  <button onclick="subscribeSite()">Subscribe</button>
+  <p id="subStatus"></p>
+</div>
+
 <!-- ===== COMMENT ===== -->
 <div class="card">
 💬 <b>Comments</b><br>
@@ -176,6 +213,7 @@ footer{
 <button onclick="addComment()">Post</button>
 <div id="commentList"></div>
 </div>
+  
 
 <footer>© 2026 Dhannjay Uphade</footer>
 
@@ -220,6 +258,37 @@ function shareSuvichar(){
   window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
 }
 </script>
+  <script>
+function subscribeSite(){
+  if(!("Notification" in window)){
+    alert("तुमचा browser notifications support करत नाही");
+    return;
+  }
+
+  Notification.requestPermission().then(permission=>{
+    if(permission==="granted"){
+      localStorage.setItem("site_subscribed","yes");
+      document.getElementById("subStatus").innerText="✅ Subscribed Successfully!";
+      new Notification("🎉 Dhannjay Uphade Website",{
+        body:"तुम्ही website ला subscribe केलं आहे. Updates लवकरच येतील!"
+      });
+    }else{
+      alert("❌ Notification permission deny केली");
+    }
+  });
+}
+
+window.onload=function(){
+  if(localStorage.getItem("site_subscribed")==="yes"){
+    document.getElementById("subStatus").innerText="🔔 You are already subscribed";
+  }
+}
+    if(localStorage.getItem("site_subscribed")==="yes"){
+  new Notification("🆕 New Update!",{
+    body:"Website वर नवीन Suvichar / Feature add केलं आहे"
+  });
+    }
+  </script>
 
 </body>
 </html>
