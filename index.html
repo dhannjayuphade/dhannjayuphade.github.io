@@ -1,391 +1,111 @@
 <!DOCTYPE html>
-<h1>welcome </h1>
 <html lang="mr">
 <head>
 <meta charset="UTF-8">
-<title>Dhannjay Uphade | Official Website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhannjay Uhpade</title>
 
 <style>
-/* ===== BODY + ANIMATED BACKGROUND ===== */
 body{
-  font-family: Arial, sans-serif;
   margin:0;
-  text-align:center;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
-  min-height:100vh;
-  background: linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
-  background-size:400% 400%;
-  animation:gradientBG 12s ease infinite;
-}
-@keyframes gradientBG{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
 }
 
-/* ===== HEADER ===== */
-header{padding:25px;}
-.logo{
-  width:140px;
-  border-radius:50%;
-  box-shadow:0 0 25px #ff4da6;
-}
-
-/* ===== CARD ===== */
 .card{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
-  margin:15px auto;
+  background: rgba(255,255,255,0.1);
+  margin:15px;
   padding:15px;
-  border-radius:12px;
-  width:90%;
-  max-width:450px;
-  box-shadow:0 0 15px rgba(255,105,180,0.4);
+  border-radius:16px;
+  box-shadow:0 0 15px rgba(0,0,0,0.4);
 }
 
-/* ===== LINKS ===== */
-a{color:#ffccff;text-decoration:none;font-weight:bold;}
-
-/* ===== BUTTON ===== */
-button{
-  padding:8px 18px;
-  margin:6px;
-  cursor:pointer;
-  background:#ff4da6;
-  color:white;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,77,166,.6);}
-  70%{box-shadow:0 0 0 15px rgba(255,77,166,0);}
-  100%{box-shadow:0 0 0 0 rgba(255,77,166,0);}
-}
-
-/* ===== COMMENT ===== */
-textarea{
-  width:85%;
-  padding:7px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-}
-
-/* ===== FOOTER ===== */
-footer{
-  background:#000;
-  padding:10px;
-  font-size:13px;
-  margin-top:20px;
-}
-
-/* ===== POPUP ===== */
-.notify{
-  position:fixed;
-  top:20px; left:50%;
-  transform:translateX(-50%);
-  background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(8px);
-  padding:15px 25px;
-  border-radius:15px;
-  box-shadow:0 0 25px #ff4da6;
-  z-index:9999;
-  animation:slideDown 1s ease;
-}
-.closeBtn{position:absolute;top:5px;right:10px;cursor:pointer;}
-@keyframes slideDown{
-  from{opacity:0;top:-60px;}
-  to{opacity:1;top:20px;}
-}
-
-/* ===== SUVICHAR SPECIAL ===== */
-.suvichar-card{
-  border:2px solid #ff66cc;
-  box-shadow:0 0 30px rgba(255,102,204,0.9);
-  animation:glowBox 3s infinite alternate;
-}
-@keyframes glowBox{
-  from{ box-shadow:0 0 15px rgba(255,102,204,0.5); }
-  to{ box-shadow:0 0 35px rgba(255,102,204,1); }
-}
-.suvichar-text{
-  font-size:18px;
-  margin:15px 0;
-  padding:15px;
-  background:rgba(0,0,0,0.3);
-  border-radius:12px;
-  line-height:1.6;
-}
-
-/* ===== GLOWING SUVICHAR BUTTON ===== */
 .glow-suvichar-btn{
-  font-size:18px;
-  padding:12px 30px;
+  padding:10px 18px;
   border:none;
-  border-radius:40px;
-  color:white;
+  border-radius:25px;
+  background:#00ffd5;
+  color:black;
+  font-weight:bold;
   cursor:pointer;
-  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
-  background-size:300% 300%;
-  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
-  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
-  margin:5px;
+  box-shadow:0 0 10px #00ffd5;
 }
-@keyframes glowMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+
+.glow-suvichar-btn:hover{
+  box-shadow:0 0 20px #00ffd5;
 }
-@keyframes glowPulse{
-  0%{box-shadow:0 0 10px #ff4da6;}
-  50%{box-shadow:0 0 35px #ff66cc;}
-  100%{box-shadow:0 0 10px #ff4da6;}
+
+textarea{
+  width:100%;
+  border-radius:10px;
+  padding:8px;
+  border:none;
+  resize:none;
 }
-.glow-suvichar-btn:hover{transform:scale(1.08);}
+
+button{
+  margin-top:8px;
+  padding:8px 14px;
+  border-radius:20px;
+  border:none;
+  background:#ffdd00;
+  font-weight:bold;
+}
+
+.comment-box{
+  background:rgba(0,0,0,0.35);
+  padding:6px;
+  margin-top:6px;
+  border-radius:10px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== POPUP ===== -->
-<div id="notifyBox" class="notify">
-  <span class="closeBtn" onclick="closeNotify()">✖</span>
-  <h3>🙏 Welcome</h3>
-  <p>Dhannjay Uphade Official Website</p>
-  <p>Subscribe • Follow • Share ❤️</p>
-</div>
-
-<header>
-  <img src="logo.png" class="logo"><br>
-  <h2>Dhannjay Uphade 🇮🇳</h2>
-  <p>Official Creator Website</p>
-</header>
-
+<!-- GK QUIZ -->
 <div class="card">
-▶️ <b>YouTube</b><br>
-<a href="https://youtube.com/@dhannjayuphade?si=Q0mvh2G7m3D2idyX" target="_blank">Visit Channel</a><br>
-<button onclick="subscribe()">Subscribe</button>
-</div>
-
-<div class="card">
-📸 <b>Instagram</b><br>
-<a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
-<button>Follow</button>
-</a>
-</div>
-  <div class="card">
-📧 <b>Email</b><br>
-<a href="mailto:dhannjayuphade5@gmail.com">
-  <button class="glow-suvichar-btn">📩 Send Email</button>
-</a>
-  </div>
-
-<div class="card">
-👻 <b>Snapchat</b><br>
-<a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
-<button>Follow</button>
+🧠 <b>GK Quiz</b><br><br>
+तुमचा ज्ञान तपासा! Quiz सुरू करण्यासाठी क्लिक करा 👇<br><br>
+<a href="https://docs.google.com/forms/d/e/1FAIpQLScZVyLv5GxG3ir7z1QX4sZ9JjZ9VFiBbxFYjLSq8ekJKcTFFg/viewform" target="_blank">
+<button class="glow-suvichar-btn">Start Quiz ✨</button>
 </a>
 </div>
 
-  <div class="card">
-  🧠 <b>GK Quiz</b><br>
-  <p>तुमचा ज्ञान तपासा! Quiz भरायला खाली क्लिक करा:</p>
-  <a href="https://docs.google.com/forms/d/e/1FAIpQLScZVyLv5GxG3ir7z1QX4sZ9JjZ9VFiBbxFYjLSq8ekJKcTFFg/viewform" target="_blank">
-    <button class="glow-suvichar-btn">Start Quiz ✨</button>
-  </a>
-</
-
-<!-- ===== SUVICHAR ALL-IN-ONE ===== -->
-<div class="card suvichar-card">
-  🌟 <h3>Daily Suvichar</h3>
-  <div id="suvicharText" class="suvichar-text">
-    स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.
-  </div>
-  ❤️ Likes: <span id="suvLike">0</span><br><br>
-
-  <button class="glow-suvichar-btn" onclick="likeSuvichar()">❤️ Like</button>
-  <button class="glow-suvichar-btn" onclick="shareSuvichar()">📤 Share</button>
-  <br><br>
-  <a href="suvichar/">
-    <button class="glow-suvichar-btn">✨ Read More Suvichar ✨</button>
-  </a>
-</div>
-
+<!-- COMMENTS -->
 <div class="card">
-📤 <b>Share Website</b><br>
-<button onclick="shareSite()">Share on WhatsApp</button>
-</div>
-
-<div class="card">
-❤️ Likes: <span id="like">0</span>
-&nbsp;&nbsp;👎 Dislikes: <span id="dislike">0</span><br>
-<button onclick="like()">Like</button>
-<button onclick="dislike()">Dislike</button>
-</div>
-
-<!-- ===== COMMENT CARD ===== -->
-<div class="card">
-💬 <b>Comments</b><br>
-<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
+💬 <b>Comments</b><br><br>
+<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea>
 <button onclick="addComment()">Post</button>
 <div id="commentList"></div>
 </div>
 
-<style>
-.card{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
-  margin:15px auto;
-  padding:15px;
-  border-radius:12px;
-  width:90%;
-  max-width:450px;
-  box-shadow:0 0 15px rgba(255,105,180,0.4);
-  color:white;
-  position:relative;
-}
-textarea{
-  width:85%;
-  padding:7px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-}
-button{
-  padding:8px 18px;
-  margin:6px;
-  cursor:pointer;
-  background:#ff4da6;
-  color:white;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-}
-.comment-item{
-  background: rgba(0,0,0,0.3);
-  padding:8px;
-  margin:6px 0;
-  border-radius:8px;
-  position:relative;
-}
-.react-btn{
-  cursor:pointer;
-  margin-left:5px;
-  font-size:16px;
-}
-.heart{
-  position:absolute;
-  font-size:20px;
-  animation:floatUp 1s ease forwards;
-}
-@keyframes floatUp{
-  0%{transform:translateY(0); opacity:1;}
-  100%{transform:translateY(-40px) scale(1.2); opacity:0;}
-}
-</style>
-
 <script>
-// ===== Load comments =====
-function loadComments(){
-  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-  let html = "";
-  comments.forEach((c, idx) => {
-    html += `<div class="comment-item" id="comment-${idx}">
-      💬 ${c.text} 
-      <span class="react-btn" onclick="react(${idx}, '❤️')">❤️ ${c.heart}</span>
-      <span class="react-btn" onclick="react(${idx}, '👍')">👍 ${c.thumb}</span>
-      <span class="react-btn" onclick="react(${idx}, '👎')">👎 ${c.down}</span>
-    </div>`;
+let comments = JSON.parse(localStorage.getItem("comments")) || [];
+
+function showComments(){
+  let list=document.getElementById("commentList");
+  list.innerHTML="";
+  comments.forEach(c=>{
+    let div=document.createElement("div");
+    div.className="comment-box";
+    div.innerHTML="💬 "+c;
+    list.appendChild(div);
   });
-  document.getElementById("commentList").innerHTML = html;
 }
 
-// ===== Add comment =====
 function addComment(){
-  let cText = document.getElementById("comment").value.trim();
-  if(cText !== ""){
-    let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-    comments.push({text:cText, heart:0, thumb:0, down:0});
-    localStorage.setItem("all_comments", JSON.stringify(comments));
-    document.getElementById("comment").value="";
-    loadComments();
-  }
+  let text=document.getElementById("comment").value;
+  if(text.trim()=="") return;
+  comments.push(text);
+  localStorage.setItem("comments",JSON.stringify(comments));
+  document.getElementById("comment").value="";
+  showComments();
 }
 
-// ===== React to comment =====
-function react(idx,type){
-  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-  let item = document.getElementById(`comment-${idx}`);
-  let heartEl = document.createElement("span");
-  heartEl.className = "heart";
-  heartEl.innerText = type;
-  item.appendChild(heartEl);
-  setTimeout(()=>{ item.removeChild(heartEl); },1000);
-
-  if(type==='❤️'){ comments[idx].heart++; }
-  else if(type==='👍'){ comments[idx].thumb++; }
-  else if(type==='👎'){ comments[idx].down++; }
-  localStorage.setItem("all_comments", JSON.stringify(comments));
-  loadComments();
-}
-
-// ===== Initial load =====
-loadComments();
+showComments();
 </script>
 
-<footer>© 2026 Dhannjay Uphade</footer>
-
-<script>
-/* ===== POPUP ===== */
-function closeNotify(){ document.getElementById("notifyBox").style.display="none"; }
-setTimeout(closeNotify,6000);
-
-/* ===== LIKE / DISLIKE SAVE ===== */
-let likeCount=parseInt(localStorage.getItem("like_count")||0);
-let dislikeCount=parseInt(localStorage.getItem("dislike_count")||0);
-document.getElementById("like").innerText=likeCount;
-document.getElementById("dislike").innerText=dislikeCount;
-function like(){ likeCount++; localStorage.setItem("like_count",likeCount); document.getElementById("like").innerText=likeCount; }
-function dislike(){ dislikeCount++; localStorage.setItem("dislike_count",dislikeCount); document.getElementById("dislike").innerText=dislikeCount; }
-
-/* ===== COMMENT ===== */
-function addComment(){
-  let c=document.getElementById("comment").value;
-  if(c.trim()!==""){ document.getElementById("showComment").innerText="Comment: "+c; document.getElementById("comment").value=""; }
-}
-
-/* ===== SHARE WEBSITE ===== */
-function shareSite(){
-  let url="https://dhannjayuphade.github.io/";
-  let text="🔥 Dhannjay Uphade Official Website पाहा 👇";
-  window.open("https://wa.me/?text="+encodeURIComponent(text+" "+url),"_blank");
-}
-
-/* ===== SUBSCRIBE DEMO ===== */
-function subscribe(){ alert("Thank you for subscribing ❤️"); }
-
-/* ===== SUVICHAR ALL ===== */
-const suvichars=[
- "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
- "परिश्रमाशिवाय यश मिळत नाही.",
- "आजचा संघर्ष उद्याच्या यशाची तयारी असते.",
- "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा.",
- "अपयशातूनच यशाचा मार्ग जातो."
-];
-let day=new Date().getDate();
-document.getElementById("suvicharText").innerText=suvichars[day % suvichars.length];
-
-let suvLike=parseInt(localStorage.getItem("suv_like")||0);
-document.getElementById("suvLike").innerText=suvLike;
-function likeSuvichar(){ suvLike++; localStorage.setItem("suv_like",suvLike); document.getElementById("suvLike").innerText=suvLike; }
-function shareSuvichar(){
-  let text=document.getElementById("suvicharText").innerText;
-  window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
-}
-</script>
-<h1>Thank you 💕 </h1>
 </body>
-  </html>
+</html>
