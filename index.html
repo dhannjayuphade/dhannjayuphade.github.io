@@ -6,98 +6,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* ===== BODY + ANIMATED BACKGROUND ===== */
 body{
+  font-family: Arial, sans-serif;
   margin:0;
-  font-family:Arial, sans-serif;
   text-align:center;
   color:white;
-  background:linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
+  min-height:100vh;
+  background: linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
   background-size:400% 400%;
-  animation:bg 12s ease infinite;
+  animation:gradientBG 12s ease infinite;
 }
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+@keyframes gradientBG{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
-header{padding:25px}
+/* ===== HEADER ===== */
+header{padding:25px;}
 .logo{
-  width:130px;
+  width:140px;
   border-radius:50%;
   box-shadow:0 0 25px #ff4da6;
 }
 
+/* ===== CARD ===== */
 .card{
   background:rgba(255,255,255,0.15);
   backdrop-filter:blur(6px);
   margin:15px auto;
   padding:15px;
-  border-radius:14px;
+  border-radius:12px;
   width:90%;
   max-width:450px;
-  box-shadow:0 0 18px rgba(255,105,180,0.5);
+  box-shadow:0 0 15px rgba(255,105,180,0.4);
 }
 
+/* ===== LINKS ===== */
+a{color:#ffccff;text-decoration:none;font-weight:bold;}
+
+/* ===== BUTTON ===== */
 button{
-  padding:10px 22px;
+  padding:8px 18px;
   margin:6px;
   cursor:pointer;
-  border:none;
-  border-radius:30px;
-  font-weight:bold;
+  background:#ff4da6;
   color:white;
-  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
-  background-size:300% 300%;
-  animation:glow 3s infinite;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  animation:pulse 2s infinite;
 }
-@keyframes glow{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(255,77,166,.6);}
+  70%{box-shadow:0 0 0 15px rgba(255,77,166,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,77,166,0);}
 }
-button:hover{transform:scale(1.08)}
 
-.suvichar{
+/* ===== TEXTAREA ===== */
+textarea{
+  width:85%;
+  padding:7px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+
+/* ===== FOOTER ===== */
+footer{
+  background:#000;
+  padding:10px;
+  font-size:13px;
+  margin-top:20px;
+}
+
+/* ===== SUVICHAR SPECIAL ===== */
+.suvichar-card{
+  border:2px solid #ff66cc;
+  box-shadow:0 0 30px rgba(255,102,204,0.9);
+  animation:glowBox 3s infinite alternate;
+}
+@keyframes glowBox{
+  from{ box-shadow:0 0 15px rgba(255,102,204,0.5); }
+  to{ box-shadow:0 0 35px rgba(255,102,204,1); }
+}
+.suvichar-text{
   font-size:18px;
-  line-height:1.6;
+  margin:15px 0;
   padding:15px;
   background:rgba(0,0,0,0.3);
   border-radius:12px;
+  line-height:1.6;
 }
 
-textarea{
-  width:85%;
-  padding:8px;
-  border-radius:8px;
+/* ===== GLOWING SUVICHAR BUTTON ===== */
+.glow-suvichar-btn{
+  font-size:18px;
+  padding:12px 30px;
   border:none;
-}
-
-.comment{
-  background:rgba(0,0,0,0.3);
-  padding:8px;
-  border-radius:8px;
-  margin:6px 0;
-  position:relative;
-}
-.react{
+  border-radius:40px;
+  color:white;
   cursor:pointer;
-  margin-left:6px;
+  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
+  background-size:300% 300%;
+  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
+  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
+  margin:5px;
 }
-.heart{
-  position:absolute;
-  animation:float 1s forwards;
+@keyframes glowMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
-@keyframes float{
-  from{opacity:1; transform:translateY(0)}
-  to{opacity:0; transform:translateY(-40px)}
+@keyframes glowPulse{
+  0%{box-shadow:0 0 10px #ff4da6;}
+  50%{box-shadow:0 0 35px #ff66cc;}
+  100%{box-shadow:0 0 10px #ff4da6;}
 }
-
-footer{
-  background:black;
-  padding:10px;
-  font-size:13px;
-}
+.glow-suvichar-btn:hover{transform:scale(1.08);}
 </style>
 </head>
 
@@ -106,98 +133,92 @@ footer{
 <header>
   <img src="logo.png" class="logo"><br>
   <h2>Dhannjay Uphade 🇮🇳</h2>
+  <p>Daily Suvichar</p>
 </header>
 
 <!-- ===== SUVICHAR ===== -->
-<div class="card">
-<h3>🌟 Today’s Suvichar</h3>
-<div id="suvichar" class="suvichar"></div>
-❤️ Likes: <span id="likes">0</span><br><br>
-<button onclick="likeSuvichar()">❤️ Like</button>
-<button onclick="share()">📤 Share</button>
+<div class="card suvichar-card">
+🌟 <h3>Daily Suvichar</h3>
+<div id="suvicharText" class="suvichar-text">
+  स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.
 </div>
+❤️ Likes: <span id="suvLike">0</span><br><br>
 
-<!-- ===== COMMENTS ===== -->
-<div class="card">
-<h3>💬 Comments</h3>
-<textarea id="commentInput" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
-<button onclick="addComment()">Post</button>
-<div id="comments"></div>
-</div>
-
-<!-- ===== BACK HOME ===== -->
-<div class="card">
-<a href="https://dhannjayuphade.github.io/">
-<button>🏠 Back to Home</button>
+<button class="glow-suvichar-btn" onclick="likeSuvichar()">❤️ Like</button>
+<button class="glow-suvichar-btn" onclick="shareSuvichar()">📤 Share</button>
+<br><br>
+<a href="suvichar/">
+  <button class="glow-suvichar-btn">✨ Read More Suvichar ✨</button>
 </a>
+</div>
+
+<!-- ===== GK Quiz Form ===== -->
+<div class="card">
+🧠 <b>GK Quiz</b><br>
+<p>तुमचा ज्ञान तपासा! Quiz भरायला खाली क्लिक करा:</p>
+<a href="https://docs.google.com/forms/d/e/1FAIpQLScZVyLv5GxG3ir7z1QX4sZ9JjZ9VFiBbxFYjLSq8ekJKcTFFg/viewform" target="_blank">
+<button class="glow-suvichar-btn">Start Quiz ✨</button>
+</a>
+</div>
+
+<!-- ===== Back to Home ===== -->
+<div class="card">
+🏠 <b>Back to Main Website</b><br>
+<a href="https://dhannjayuphade.github.io/" target="_blank">
+  <button class="glow-suvichar-btn">🏠 Go to Home</button>
+</a>
+</div>
+
+<!-- ===== COMMENT ===== -->
+<div class="card">
+💬 <b>Comments</b><br>
+<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
+<button onclick="addComment()">Post</button>
+<div id="commentList"></div>
 </div>
 
 <footer>© 2026 Dhannjay Uphade</footer>
 
 <script>
+/* ===== COMMENT ===== */
+function loadComments(){
+  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
+  let html = "";
+  comments.forEach((c)=>{ html += `<p>💬 ${c}</p>`; });
+  document.getElementById("commentList").innerHTML = html;
+}
+
+function addComment(){
+  let c = document.getElementById("comment").value.trim();
+  if(c!==""){
+    let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
+    comments.push(c);
+    localStorage.setItem("all_comments",JSON.stringify(comments));
+    document.getElementById("comment").value="";
+    loadComments();
+  }
+}
+loadComments();
+
 /* ===== SUVICHAR ===== */
 const suvichars=[
  "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
  "परिश्रमाशिवाय यश मिळत नाही.",
- "आजचा संघर्ष उद्याच्या यशाची तयारी आहे.",
- "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा."
+ "आजचा संघर्ष उद्याच्या यशाची तयारी असते.",
+ "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा.",
+ "अपयशातूनच यशाचा मार्ग जातो."
 ];
-let day=new Date().getDate();
-document.getElementById("suvichar").innerText =
-  suvichars[day % suvichars.length];
+let day = new Date().getDate();
+document.getElementById("suvicharText").innerText = suvichars[day % suvichars.length];
 
-let likes=localStorage.getItem("likes")||0;
-document.getElementById("likes").innerText=likes;
-function likeSuvichar(){
-  likes++;
-  localStorage.setItem("likes",likes);
-  document.getElementById("likes").innerText=likes;
-}
-function share(){
-  let t=document.getElementById("suvichar").innerText;
-  window.open("https://wa.me/?text="+encodeURIComponent(t));
-}
+let suvLike = parseInt(localStorage.getItem("suv_like")||0);
+document.getElementById("suvLike").innerText = suvLike;
 
-/* ===== COMMENTS ===== */
-function loadComments(){
-  let data=JSON.parse(localStorage.getItem("comments")||"[]");
-  let html="";
-  data.forEach((c,i)=>{
-    html+=`
-    <div class="comment" id="c${i}">
-      ${c.text}
-      <span class="react" onclick="react(${i},'❤️')">❤️ ${c.h}</span>
-      <span class="react" onclick="react(${i},'👍')">👍 ${c.u}</span>
-      <span class="react" onclick="react(${i},'👎')">👎 ${c.d}</span>
-    </div>`;
-  });
-  document.getElementById("comments").innerHTML=html;
+function likeSuvichar(){ suvLike++; localStorage.setItem("suv_like",suvLike); document.getElementById("suvLike").innerText = suvLike; }
+function shareSuvichar(){
+  let text = document.getElementById("suvicharText").innerText;
+  window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
 }
-function addComment(){
-  let txt=document.getElementById("commentInput").value.trim();
-  if(!txt)return;
-  let data=JSON.parse(localStorage.getItem("comments")||"[]");
-  data.push({text:txt,h:0,u:0,d:0});
-  localStorage.setItem("comments",JSON.stringify(data));
-  document.getElementById("commentInput").value="";
-  loadComments();
-}
-function react(i,e){
-  let data=JSON.parse(localStorage.getItem("comments"));
-  if(e=="❤️")data[i].h++;
-  if(e=="👍")data[i].u++;
-  if(e=="👎")data[i].d++;
-  localStorage.setItem("comments",JSON.stringify(data));
-
-  let el=document.createElement("span");
-  el.className="heart";
-  el.innerText=e;
-  document.getElementById("c"+i).appendChild(el);
-  setTimeout(()=>el.remove(),1000);
-
-  loadComments();
-}
-loadComments();
 </script>
 
 </body>
