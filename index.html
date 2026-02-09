@@ -2,109 +2,202 @@
 <html lang="mr">
 <head>
 <meta charset="UTF-8">
+<title>Dhannjay Uphade | Suvichar</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dhannjay Uhpade</title>
 
 <style>
 body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  font-family:Arial, sans-serif;
+  text-align:center;
   color:white;
+  background:linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
+  background-size:400% 400%;
+  animation:bg 12s ease infinite;
+}
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+header{padding:25px}
+.logo{
+  width:130px;
+  border-radius:50%;
+  box-shadow:0 0 25px #ff4da6;
 }
 
 .card{
-  background: rgba(255,255,255,0.1);
-  margin:15px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  margin:15px auto;
   padding:15px;
-  border-radius:16px;
-  box-shadow:0 0 15px rgba(0,0,0,0.4);
-}
-
-.glow-suvichar-btn{
-  padding:10px 18px;
-  border:none;
-  border-radius:25px;
-  background:#00ffd5;
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 0 10px #00ffd5;
-}
-
-.glow-suvichar-btn:hover{
-  box-shadow:0 0 20px #00ffd5;
-}
-
-textarea{
-  width:100%;
-  border-radius:10px;
-  padding:8px;
-  border:none;
-  resize:none;
+  border-radius:14px;
+  width:90%;
+  max-width:450px;
+  box-shadow:0 0 18px rgba(255,105,180,0.5);
 }
 
 button{
-  margin-top:8px;
-  padding:8px 14px;
-  border-radius:20px;
+  padding:10px 22px;
+  margin:6px;
+  cursor:pointer;
   border:none;
-  background:#ffdd00;
+  border-radius:30px;
   font-weight:bold;
+  color:white;
+  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
+  background-size:300% 300%;
+  animation:glow 3s infinite;
+}
+@keyframes glow{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+button:hover{transform:scale(1.08)}
+
+.suvichar{
+  font-size:18px;
+  line-height:1.6;
+  padding:15px;
+  background:rgba(0,0,0,0.3);
+  border-radius:12px;
 }
 
-.comment-box{
-  background:rgba(0,0,0,0.35);
-  padding:6px;
-  margin-top:6px;
-  border-radius:10px;
+textarea{
+  width:85%;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+}
+
+.comment{
+  background:rgba(0,0,0,0.3);
+  padding:8px;
+  border-radius:8px;
+  margin:6px 0;
+  position:relative;
+}
+.react{
+  cursor:pointer;
+  margin-left:6px;
+}
+.heart{
+  position:absolute;
+  animation:float 1s forwards;
+}
+@keyframes float{
+  from{opacity:1; transform:translateY(0)}
+  to{opacity:0; transform:translateY(-40px)}
+}
+
+footer{
+  background:black;
+  padding:10px;
+  font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- GK QUIZ -->
+<header>
+  <img src="logo.png" class="logo"><br>
+  <h2>Dhannjay Uphade 🇮🇳</h2>
+</header>
+
+<!-- ===== SUVICHAR ===== -->
 <div class="card">
-🧠 <b>GK Quiz</b><br><br>
-तुमचा ज्ञान तपासा! Quiz सुरू करण्यासाठी क्लिक करा 👇<br><br>
-<a href="https://docs.google.com/forms/d/e/1FAIpQLScZVyLv5GxG3ir7z1QX4sZ9JjZ9VFiBbxFYjLSq8ekJKcTFFg/viewform" target="_blank">
-<button class="glow-suvichar-btn">Start Quiz ✨</button>
+<h3>🌟 Today’s Suvichar</h3>
+<div id="suvichar" class="suvichar"></div>
+❤️ Likes: <span id="likes">0</span><br><br>
+<button onclick="likeSuvichar()">❤️ Like</button>
+<button onclick="share()">📤 Share</button>
+</div>
+
+<!-- ===== COMMENTS ===== -->
+<div class="card">
+<h3>💬 Comments</h3>
+<textarea id="commentInput" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
+<button onclick="addComment()">Post</button>
+<div id="comments"></div>
+</div>
+
+<!-- ===== BACK HOME ===== -->
+<div class="card">
+<a href="https://dhannjayuphade.github.io/">
+<button>🏠 Back to Home</button>
 </a>
 </div>
 
-<!-- COMMENTS -->
-<div class="card">
-💬 <b>Comments</b><br><br>
-<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea>
-<button onclick="addComment()">Post</button>
-<div id="commentList"></div>
-</div>
+<footer>© 2026 Dhannjay Uphade</footer>
 
 <script>
-let comments = JSON.parse(localStorage.getItem("comments")) || [];
+/* ===== SUVICHAR ===== */
+const suvichars=[
+ "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
+ "परिश्रमाशिवाय यश मिळत नाही.",
+ "आजचा संघर्ष उद्याच्या यशाची तयारी आहे.",
+ "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा."
+];
+let day=new Date().getDate();
+document.getElementById("suvichar").innerText =
+  suvichars[day % suvichars.length];
 
-function showComments(){
-  let list=document.getElementById("commentList");
-  list.innerHTML="";
-  comments.forEach(c=>{
-    let div=document.createElement("div");
-    div.className="comment-box";
-    div.innerHTML="💬 "+c;
-    list.appendChild(div);
+let likes=localStorage.getItem("likes")||0;
+document.getElementById("likes").innerText=likes;
+function likeSuvichar(){
+  likes++;
+  localStorage.setItem("likes",likes);
+  document.getElementById("likes").innerText=likes;
+}
+function share(){
+  let t=document.getElementById("suvichar").innerText;
+  window.open("https://wa.me/?text="+encodeURIComponent(t));
+}
+
+/* ===== COMMENTS ===== */
+function loadComments(){
+  let data=JSON.parse(localStorage.getItem("comments")||"[]");
+  let html="";
+  data.forEach((c,i)=>{
+    html+=`
+    <div class="comment" id="c${i}">
+      ${c.text}
+      <span class="react" onclick="react(${i},'❤️')">❤️ ${c.h}</span>
+      <span class="react" onclick="react(${i},'👍')">👍 ${c.u}</span>
+      <span class="react" onclick="react(${i},'👎')">👎 ${c.d}</span>
+    </div>`;
   });
+  document.getElementById("comments").innerHTML=html;
 }
-
 function addComment(){
-  let text=document.getElementById("comment").value;
-  if(text.trim()=="") return;
-  comments.push(text);
-  localStorage.setItem("comments",JSON.stringify(comments));
-  document.getElementById("comment").value="";
-  showComments();
+  let txt=document.getElementById("commentInput").value.trim();
+  if(!txt)return;
+  let data=JSON.parse(localStorage.getItem("comments")||"[]");
+  data.push({text:txt,h:0,u:0,d:0});
+  localStorage.setItem("comments",JSON.stringify(data));
+  document.getElementById("commentInput").value="";
+  loadComments();
 }
+function react(i,e){
+  let data=JSON.parse(localStorage.getItem("comments"));
+  if(e=="❤️")data[i].h++;
+  if(e=="👍")data[i].u++;
+  if(e=="👎")data[i].d++;
+  localStorage.setItem("comments",JSON.stringify(data));
 
-showComments();
+  let el=document.createElement("span");
+  el.className="heart";
+  el.innerText=e;
+  document.getElementById("c"+i).appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+
+  loadComments();
+}
+loadComments();
 </script>
 
 </body>
