@@ -147,6 +147,23 @@ footer{
   100%{box-shadow:0 0 10px #ff4da6;}
 }
 .glow-suvichar-btn:hover{transform:scale(1.08);}
+    /* ===== GLOW EFFECT FOR SHARE CARD ===== */
+.share-card{
+  border-left:5px solid #ff4da6;
+  animation: shareGlow 2s infinite;
+}
+
+@keyframes shareGlow{
+  0%{
+    box-shadow:0 0 10px rgba(255,77,166,0.6);
+  }
+  50%{
+    box-shadow:0 0 30px rgba(255,102,204,1);
+  }
+  100%{
+    box-shadow:0 0 10px rgba(255,77,166,0.6);
+  }
+      }
 </style>
 </head>
 
@@ -223,12 +240,11 @@ footer{
 </a>
 </div>
 
-  <div class="action-card share-card" onclick="shareWebsite()">
-  <div class="icon">🔗</div>
-  <div class="text">
-    <h3>Share Website</h3>
-    <p>Website मित्रांशी share करा</p>
-  </div>
+  <div class="card">
+  🔗 <b>Share Website</b><br>
+  <button class="glow-share-btn" onclick="shareWebsite()">
+    Share
+  </button>
   </div>
   
   <!-- ===== WEBSITE SUBSCRIBE ===== -->
@@ -247,7 +263,7 @@ footer{
 <div id="commentList"></div>
 </div>
   
-
+<h1>Thank you 💕 </h1>
 <footer>© 2026 Dhannjay Uphade</footer>
 
 <script>
@@ -324,19 +340,18 @@ window.onload=function(){
   </script>
 
   <script>
-function shareWebsite() {
+function shareSite() {
   if (navigator.share) {
     navigator.share({
       title: 'Dhannjay Uphade Website',
-      text: 'ही website नक्की पहा 👇',
+      text: 'ही website बघा',
       url: 'https://dhannjayuphade.github.io/'
     });
   } else {
     navigator.clipboard.writeText('https://dhannjayuphade.github.io/');
-    alert("Website link copied!");
+    alert('Link copy झाला आहे');
   }
 }
   </script>
-
 </body>
 </html>
