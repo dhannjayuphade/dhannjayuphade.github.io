@@ -178,6 +178,24 @@ footer{
   margin:5px;
 }
 .glow-share-btn:hover{transform:scale(1.08);}
+
+    /* ===== WHATSAPP SHARE BUTTON STYLE ===== */
+.glow-share-btn{
+  font-size:18px;
+  padding:12px 30px;
+  border:none;
+  border-radius:40px;
+  color:white;
+  cursor:pointer;
+  background:linear-gradient(45deg,#25D366,#128C7E,#25D366);
+  background-size:300% 300%;
+  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
+  box-shadow:0 0 15px #25D366, 0 0 30px #25D366;
+  margin:5px;
+}
+.glow-share-btn:hover{
+  transform:scale(1.08);
+  }
 </style>
 </head>
 
@@ -246,6 +264,10 @@ footer{
 </a>
 </div>
 
+  <button class="glow-share-btn" onclick="whatsappShare()">
+  📲 Share on WhatsApp
+  </button>
+
 <!-- ===== Back to Home ===== -->
 <div class="card">
 🏠 <b>Back to Main Website</b><br>
@@ -254,12 +276,6 @@ footer{
 </a>
 </div>
 
-  <div class="card">
-  🔗 <b>Share Website</b><br>
-  <button class="glow-share-btn" onclick="sharesite()">
-    Share
-  </button>
-  </div>
   
   <!-- ===== WEBSITE SUBSCRIBE ===== -->
 <div class="card">
@@ -354,17 +370,10 @@ window.onload=function(){
   </script>
 
   <script>
-function shareSite() {
-  if (navigator.share) {
-    navigator.share({
-      title: 'Dhannjay Uphade Website',
-      text: 'ही website बघा',
-      url: 'https://dhannjayuphade.github.io/'
-    });
-  } else {
-    navigator.clipboard.writeText('https://dhannjayuphade.github.io/');
-    alert('Link copy झाला आहे');
-  }
+function whatsappShare(){
+  const text = " website  👇\nhttps://dhannjayuphade.github.io/";
+  const url = "https://wa.me/?text=" + encodeURIComponent(text);
+  window.open(url, "_blank");
 }
   </script>
 </body>
