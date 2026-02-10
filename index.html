@@ -164,6 +164,20 @@ footer{
     box-shadow:0 0 10px rgba(255,77,166,0.6);
   }
       }
+    .glow-share-btn{
+  font-size:18px;
+  padding:12px 30px;
+  border:none;
+  border-radius:40px;
+  color:white;
+  cursor:pointer;
+  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
+  background-size:300% 300%;
+  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
+  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
+  margin:5px;
+}
+.glow-share-btn:hover{transform:scale(1.08);}
 </style>
 </head>
 
@@ -242,7 +256,7 @@ footer{
 
   <div class="card">
   🔗 <b>Share Website</b><br>
-  <button class="glow-share-btn" onclick="shareWebsite()">
+  <button class="glow-share-btn" onclick="sharesite()">
     Share
   </button>
   </div>
