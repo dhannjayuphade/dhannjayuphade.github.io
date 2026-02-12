@@ -401,6 +401,17 @@ function whatsappShare(){
   const url = "https://wa.me/?text=" + encodeURIComponent(text);
   window.open(url, "_blank");
 }
+    <div style="text-align:center; margin-top:20px;">
+  <h3>👀 Total Visitors: <span id="visitor-count">Loading...</span></h3>
+</div>
+
+<script>
+fetch('https://api.countapi.xyz/hit/dhannjayuphade.github.io/visits')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('visitor-count').innerText = data.value;
+  });
+</script>
   </script>
 </body>
 </html>
