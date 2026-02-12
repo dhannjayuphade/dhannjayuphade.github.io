@@ -23,6 +23,21 @@ Go To My Website
 
 Add Your First User
 Your site will be set up once you are able to subscribe your first 
+
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script>
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "8b3c9ee5-fa61-4f72-9587-188e1fde0e2c",
+      notifyButton: {
+        enable: true,
+      },
+      allowLocalhostAsSecureOrigin: true
+    });
+  });
+</script>
+  
   <style>
 
     .action-card{
