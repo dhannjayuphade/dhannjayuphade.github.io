@@ -229,46 +229,49 @@ footer{
   </style>
 
 <style>
+
+/* Top Static Navbar */
 .navbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 30px;
-  background:linear-gradient(90deg,#ff9800,#ff5722);
+  padding:15px;
+  background:#111;
   color:white;
+  text-align:center;
+  font-weight:bold;
   position:sticky;
   top:0;
   z-index:1000;
-
-  animation: slideDown 0.8s ease-in-out;
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity:0;
-  }
-  to {
-    transform: translateY(0);
-    opacity:1;
-  }
+/* Moving Menu Bar */
+.moving-bar {
+  background:linear-gradient(90deg,#ff5722,#ff9800);
+  overflow:hidden;
+  white-space:nowrap;
 }
 
-.navbar .logo {
-  font-weight:bold;
-  font-size:20px;
+.moving-content {
+  display:inline-block;
+  padding:10px 0;
+  animation: scrollLeft 20s linear infinite;
 }
 
-.navbar .menu a {
+.moving-content a {
   color:white;
   text-decoration:none;
-  margin-left:20px;
-  transition:0.3s;
+  margin:0 30px;
+  font-weight:bold;
 }
 
-.navbar .menu a:hover {
-  color:#000;
+.moving-content a:hover {
+  color:black;
 }
+
+/* Animation */
+@keyframes scrollLeft {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
 </style>
 
 </head>
@@ -290,20 +293,17 @@ footer{
   </div>
 </div>
 <nav class="navbar">
-  <div class="logo">Dhannjay</div>
-  <div class="menu">
-    <a href="index.html">Home</a>
-    <a href="suvichar/">Suvichar</a>
-    <a href="#achievements">Achievements</a>
-    <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank">WhatsApp</a>
-  </div>
+  Dhannjay
 </nav>
-<style>
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-</style>
+  <div class="moving-bar">
+  <div class="moving-content">
+    <a href="index.html">🏠 Home</a>
+    <a href="suvichar/">📜 Suvichar</a>
+    <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">📷 Instagram</a>
+    <a href="https://youtube.com/@dhannjayuphade?si=jNJymHUFvh-r6lVq" target="_blank">▶ YouTube</a>
+    <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank">📱 WhatsApp</a>
+  </div>
+  </div>
   <button onclick="toggleDarkMode()" 
         style="position:fixed; top:15px; right:15px; padding:8px 12px; border:none; border-radius:20px; cursor:pointer;">
    🌙
@@ -329,6 +329,13 @@ footer{
     <button>Follow</button>
   </a>
 </div>
+
+  <div class="card">
+  📸 <b>join snap</b><br>
+  <a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
+    <button>join snap</button>
+  </a>
+  </div>
 
 <div class="card">
   📧 <b>Email</b><br>
