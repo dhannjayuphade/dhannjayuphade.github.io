@@ -227,6 +227,39 @@ footer{
   color:#4fc3f7;
 }
   </style>
+  <style>
+.navbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 30px;
+  background:#222;
+  color:white;
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.navbar .logo {
+  font-weight:bold;
+  font-size:18px;
+}
+
+.navbar .menu a {
+  color:white;
+  text-decoration:none;
+  margin-left:20px;
+  transition:0.3s;
+}
+
+.navbar .menu a:hover {
+  color:#ff9800;
+}
+
+.dark-mode .navbar {
+  background:#000;
+}
+  </style>
 </head>
 
 <body>
@@ -245,7 +278,15 @@ footer{
     🔥 New GK Quiz Live | 📢 Daily Suvichar Updated | 📱 Join WhatsApp Group
   </div>
 </div>
-
+<nav class="navbar">
+  <div class="logo">Dhannjay</div>
+  <div class="menu">
+    <a href="index.html">Home</a>
+    <a href="suvichar/">Suvichar</a>
+    <a href="#achievements">Achievements</a>
+    <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank">WhatsApp</a>
+  </div>
+</nav>
 <style>
 @keyframes scrollText {
   0% { transform: translateX(0); }
