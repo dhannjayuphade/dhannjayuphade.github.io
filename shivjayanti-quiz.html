@@ -41,22 +41,6 @@ button{
   color:black;
   border:12px solid #ff5722;
   text-align:center;
-  position:relative;
-}
-#certificate img{
-  width:100%;
-  height:180px;
-  object-fit:cover;
-}
-.signature{
-  position:absolute;
-  bottom:20px;
-  right:40px;
-  font-weight:bold;
-  color:#ff5722;
-}
-@media(max-width:768px){
-  #certificate{width:100%;}
 }
 #leaderboard{
   background:white;
@@ -65,26 +49,11 @@ button{
   margin-top:20px;
   border-radius:10px;
 }
-.fireworks{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-  display:none;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
-  background-size:20px 20px;
-  animation:spark 0.5s linear infinite;
-}
-@keyframes spark{
-  from{background-position:0 0;}
-  to{background-position:20px 20px;}
-}
 </style>
 </head>
 
 <body>
+  welcome 
 
 <h1>🚩 Shiv Jayanti Special Quiz 🚩</h1>
 
@@ -98,89 +67,118 @@ button{
 <h2 id="result"></h2>
 
 <div id="certificate">
-<img src="banner.jpg">
 <h2 style="color:#ff5722;">Certificate of Participation</h2>
 <p>This certificate is proudly presented to</p>
 <h1 id="certName"></h1>
 <p>For scoring <span id="certScore"></span>% in Shiv Jayanti Quiz</p>
 <p>Date: <span id="certDate"></span></p>
-<div class="signature">Dhannjay Uphade</div>
 </div>
 
-<div class="fireworks" id="fireworks"></div>
+<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download Certificate</button>
 
 <div id="leaderboard">
 <h3>🏆 Top 5 Scores</h3>
 <ul id="topScores"></ul>
 </div>
 
-<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">
-Download Certificate
-</button>
-
 <script>
 
-/* QUESTIONS */
+/* ================= QUESTIONS ================= */
+
 const questions = [
-
 {q:"Where was Shivaji Maharaj born?",options:["Raigad","Shivneri","Sinhagad","Pratapgad"],answer:1},
-{q:"Birth year of Shivaji Maharaj?",options:["1627","1630","1645","1650"],answer:1},
-{q:"Shivaji Maharaj born on?",options:["19 Feb 1630","1 Jan 1627","15 Aug 1640","26 Jan 1650"],answer:0},
-{q:"Mother of Shivaji Maharaj?",options:["Jijabai","Yesubai","Tarabai","Soyarabai"],answer:0},
-{q:"Father of Shivaji Maharaj?",options:["Shahaji","Sambhaji","Tanaji","Ramdas"],answer:0},
-{q:"Shivaji's childhood mentor?",options:["Dadoji Konddev","Ramdas","Tanaji","Baji Rao"],answer:0},
-{q:"Coronation year of Shivaji Maharaj?",options:["1674","1660","1680","1655"],answer:0},
-{q:"Title given at coronation?",options:["Maharaj","Chhatrapati","Raja","Samrat"],answer:1},
-{q:"Capital of Maratha Empire?",options:["Raigad","Pune","Satara","Kolhapur"],answer:0},
-{q:"First fort captured by Shivaji?",options:["Torna","Sinhagad","Raigad","Pratapgad"],answer:0},
+{q:"Birth year?",options:["1627","1630","1645","1650"],answer:1},
+{q:"Born on?",options:["19 Feb 1630","1 Jan 1627","15 Aug 1640","26 Jan 1650"],answer:0},
+{q:"Mother?",options:["Jijabai","Yesubai","Tarabai","Soyarabai"],answer:0},
+{q:"Father?",options:["Shahaji","Sambhaji","Tanaji","Ramdas"],answer:0},
+{q:"Coronation year?",options:["1674","1660","1680","1655"],answer:0},
+{q:"Title?",options:["Maharaj","Chhatrapati","Raja","Samrat"],answer:1},
+{q:"Capital?",options:["Raigad","Pune","Satara","Kolhapur"],answer:0},
+{q:"First fort?",options:["Torna","Sinhagad","Raigad","Pratapgad"],answer:0},
+{q:"Afzal Khan killed at?",options:["Pratapgad","Raigad","Torna","Panhala"],answer:0},
 {q:"Battle of Pratapgad year?",options:["1659","1670","1666","1645"],answer:0},
-{q:"Afzal Khan was killed at?",options:["Pratapgad","Raigad","Torna","Panhala"],answer:0},
-{q:"Fort Sinhagad earlier known as?",options:["Kondhana","Torna","Raigad","Panhala"],answer:0},
-{q:"Battle of Sinhagad fought by?",options:["Tanaji","Sambhaji","Ramdas","Shahaji"],answer:0},
-{q:"Shivaji escaped from which place?",options:["Agra","Delhi","Pune","Surat"],answer:0},
-{q:"Treaty of Purandar signed in?",options:["1665","1670","1650","1680"],answer:0},
-{q:"Shivaji's navy base?",options:["Sindhudurg","Raigad","Pune","Satara"],answer:0},
-{q:"Naval commander of Shivaji?",options:["Kanhoji Angre","Tanaji","Baji Rao","Dadoji"],answer:0},
-{q:"Shivaji Maharaj died in?",options:["1680","1674","1666","1690"],answer:0},
-{q:"Who succeeded Shivaji Maharaj?",options:["Sambhaji","Rajaram","Shahu","Balaji"],answer:0},
-{q:"Mughal emperor during Shivaji's time?",options:["Aurangzeb","Akbar","Shah Jahan","Babur"],answer:0},
-{q:"Shivaji promoted which language?",options:["Marathi","Hindi","Persian","Urdu"],answer:0},
-{q:"Shivaji respected which religion?",options:["All religions","Only Hindu","Only Muslim","None"],answer:0},
-{q:"Administrative system of Shivaji called?",options:["Ashta Pradhan","Panchayat","Sabha","Darbar"],answer:0},
-{q:"Revenue system introduced by Shivaji?",options:["Chauth","Jaziya","Zakat","Lagaan"],answer:0},
-{q:"Maratha army mainly used which strategy?",options:["Guerrilla warfare","Elephants","Only Navy","Heavy Cannons"],answer:0},
-{q:"Father Shahaji served under?",options:["Bijapur Sultanate","Mughals","British","Delhi Sultan"],answer:0},
-{q:"Which fort was built as capital?",options:["Raigad","Red Fort","Agra Fort","Golconda"],answer:0},
-{q:"Shivaji established strong?",options:["Navy","Airforce","Railway","British Army"],answer:0},
-{q:"Shivaji Maharaj is known as?",options:["Founder of Maratha Empire","Mughal King","British Officer","Delhi Sultan"],answer:0}
-
+{q:"Sinhagad earlier?",options:["Kondhana","Torna","Raigad","Panhala"],answer:0},
+{q:"Escaped from?",options:["Agra","Delhi","Pune","Surat"],answer:0},
+{q:"Treaty of Purandar?",options:["1665","1670","1650","1680"],answer:0},
+{q:"Navy base?",options:["Sindhudurg","Raigad","Pune","Satara"],answer:0},
+{q:"Naval commander?",options:["Kanhoji Angre","Tanaji","Baji Rao","Dadoji"],answer:0},
+{q:"Died in?",options:["1680","1674","1666","1690"],answer:0},
+{q:"Successor?",options:["Sambhaji","Rajaram","Shahu","Balaji"],answer:0},
+{q:"Mughal emperor?",options:["Aurangzeb","Akbar","Shah Jahan","Babur"],answer:0},
+{q:"Promoted language?",options:["Marathi","Hindi","Persian","Urdu"],answer:0},
+{q:"Respected religion?",options:["All religions","Only Hindu","Only Muslim","None"],answer:0},
+{q:"Administrative system?",options:["Ashta Pradhan","Panchayat","Sabha","Darbar"],answer:0},
+{q:"Revenue system?",options:["Chauth","Jaziya","Zakat","Lagaan"],answer:0},
+{q:"Army strategy?",options:["Guerrilla warfare","Elephants","Only Navy","Cannons"],answer:0},
+{q:"Shahaji served under?",options:["Bijapur Sultanate","Mughals","British","Delhi Sultan"],answer:0},
+{q:"Capital fort?",options:["Raigad","Red Fort","Agra Fort","Golconda"],answer:0},
+{q:"Strong established?",options:["Navy","Airforce","Railway","British Army"],answer:0},
+{q:"Known as?",options:["Founder of Maratha Empire","Mughal King","British Officer","Delhi Sultan"],answer:0},
+{q:"Childhood mentor?",options:["Dadoji Konddev","Ramdas","Tanaji","Baji Rao"],answer:0},
+{q:"Battle of Sinhagad fought by?",options:["Tanaji","Sambhaji","Ramdas","Shahaji"],answer:0}
 ];
-  
 
-/* SHOW QUESTIONS */
+/* ================= SHOW QUESTIONS ================= */
+
 const form=document.getElementById("quizForm");
+
 questions.forEach((item,index)=>{
   form.innerHTML+=`
   <div class="question">
-    <p>${index+1}. ${item.q}</p>
+    <p><strong>${index+1}. ${item.q}</strong></p>
     ${item.options.map((opt,i)=>`
       <label>
-      <input type="radio" name="q${index}" value="${i}"> ${opt}
+      <input type="radio" name="q${index}" value="${i}">
+      <span id="q${index}opt${i}">${opt}</span>
       </label><br>
     `).join("")}
+    <p id="answer${index}" style="font-weight:bold;"></p>
   </div>`;
 });
 
-/* SUBMIT */
+/* ================= SUBMIT ================= */
+
 function submitQuiz(){
+
   let score=0;
+  let wrong=0;
+
   questions.forEach((item,index)=>{
+
     const selected=document.querySelector(`input[name="q${index}"]:checked`);
-    if(selected && parseInt(selected.value)===item.answer){ score++; }
+    const correct=item.answer;
+
+    document.getElementById(`q${index}opt${correct}`).style.color="green";
+    document.getElementById(`q${index}opt${correct}`).style.fontWeight="bold";
+
+    if(selected){
+      if(parseInt(selected.value)===correct){
+        score++;
+      }else{
+        wrong++;
+        document.getElementById(`q${index}opt${selected.value}`).style.color="red";
+      }
+    }else{
+      wrong++;
+    }
+
+    document.getElementById(`answer${index}`).innerText=
+    "Correct Answer: "+item.options[correct];
+
   });
 
   let percentage=Math.round((score/questions.length)*100);
-  document.getElementById("result").innerText="Your Score: "+percentage+"%";
+
+  let performance="";
+  if(percentage>=80){ performance="🔥 Excellent!"; }
+  else if(percentage>=50){ performance="👍 Good Job!"; }
+  else{ performance="📚 Needs Improvement!"; }
+
+  document.getElementById("result").innerHTML=
+  `Score: ${percentage}% <br>
+   Correct: ${score} <br>
+   Wrong: ${wrong} <br>
+   ${performance}`;
 
   const name=document.getElementById("username").value;
 
@@ -192,12 +190,10 @@ function submitQuiz(){
 
   saveScore(name,percentage);
   displayLeaderboard();
-
-  document.getElementById("fireworks").style.display="block";
-  setTimeout(()=>{document.getElementById("fireworks").style.display="none";},3000);
 }
 
-/* SAVE SCORE */
+/* ================= LEADERBOARD ================= */
+
 function saveScore(name,percentage){
   let scores=JSON.parse(localStorage.getItem("quizScores"))||[];
   scores.push({name:name,score:percentage});
@@ -206,7 +202,6 @@ function saveScore(name,percentage){
   localStorage.setItem("quizScores",JSON.stringify(scores));
 }
 
-/* LEADERBOARD */
 function displayLeaderboard(){
   let scores=JSON.parse(localStorage.getItem("quizScores"))||[];
   let list=document.getElementById("topScores");
@@ -217,7 +212,8 @@ function displayLeaderboard(){
 }
 displayLeaderboard();
 
-/* PDF */
+/* ================= PDF ================= */
+
 function downloadPDF(){
   const { jsPDF }=window.jspdf;
   html2canvas(document.getElementById("certificate")).then(canvas=>{
@@ -229,6 +225,6 @@ function downloadPDF(){
 }
 
 </script>
-
+<h1>Thank you 💕 for participating </h1>
 </body>
   </html>
