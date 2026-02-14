@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shiv Jayanti Quiz</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+  font-family: Arial;
+  background:linear-gradient(135deg,#ff9933,#ff3300);
+  text-align:center;
+  padding:20px;
+  color:white;
+}
+
+.quiz-box{
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:15px;
+  max-width:600px;
+  margin:auto;
+}
+
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:#ff3300;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#certificate{
+  display:none;
+  background:white;
+  color:black;
+  padding:40px;
+  border:8px solid orange;
+  width:800px;
+  margin:auto;
+}
+</style>
+</head>
+<body>
+<h1>welcome<h1>
+<h2>🚩 Shiv Jayanti Quiz 🚩</h2>
+
+<div class="quiz-box" id="quizBox">
+
+<input type="text" id="username" placeholder="Enter Your Name"><br><br>
+
+<p>1) Shivaji Maharaj Birth Year?</p>
+<input type="radio" name="q1" value="1">1630<br>
+<input type="radio" name="q1" value="0">1620<br><br>
+
+<p>2) Mother Name?</p>
+<input type="radio" name="q2" value="1">Jijabai<br>
+<input type="radio" name="q2" value="0">Tarabai<br><br>
+
+<p>3) Capital of Swarajya?</p>
+<input type="radio" name="q3" value="1">Raigad<br>
+<input type="radio" name="q3" value="0">Pune<br><br>
+
+<button onclick="submitQuiz()">Submit Quiz</button>
+
+</div>
+
+<div id="certificate">
+<h1>🏆 Certificate of Achievement 🏆</h1>
+<p>This certificate is proudly presented to</p>
+<h2 id="certName"></h2>
+<h3 id="certScore"></h3>
+<br>
+<img src="signature.png" width="150"><br>
+<b>Authorized Signature</b>
+</div>
+
+<script>
+function submitQuiz(){
+  let name = document.getElementById("username").value;
+  if(name==""){
+    alert("Enter your name");
+    return;
+  }
+
+  let score = 0;
+  let answers = document.querySelectorAll('input[type="radio"]:checked');
+  answers.forEach(ans=>{
+    score += parseInt(ans.value);
+  });
+
+  if(answers.length < 3){
+    alert("Answer all questions");
+    return;
+  }
+
+  document.getElementById("quizBox").style.display="none";
+  document.getElementById("certificate").style.display="block";
+
+  document.getElementById("certName").innerText = name;
+  document.getElementById("certScore").innerText = "Score: "+score+" / 3";
+
+  generatePDF();
+}
+
+function generatePDF(){
+  const { jsPDF } = window.jspdf;
+  html2canvas(document.querySelector("#certificate")).then(canvas=>{
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("landscape","pt","a4");
+    pdf.addImage(imgData,"PNG",20,20,750,500);
+    pdf.save("ShivJayanti_Certificate.pdf");
+  });
+}
+</script>
+
+</body>
+  </html>
