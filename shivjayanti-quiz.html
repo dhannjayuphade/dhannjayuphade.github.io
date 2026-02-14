@@ -58,14 +58,13 @@ button{
 @media(max-width:768px){
   #certificate{width:100%;}
 }
-  #leaderboard{
+#leaderboard{
   background:white;
   color:black;
   padding:15px;
   margin-top:20px;
   border-radius:10px;
 }
-
 .fireworks{
   position:fixed;
   top:0;
@@ -75,18 +74,17 @@ button{
   pointer-events:none;
   display:none;
   background: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
-  background-size: 20px 20px;
-  animation: spark 0.5s linear infinite;
+  background-size:20px 20px;
+  animation:spark 0.5s linear infinite;
 }
-
 @keyframes spark{
   from{background-position:0 0;}
   to{background-position:20px 20px;}
-  }
+}
 </style>
 </head>
+
 <body>
-  <h1>website</h1>
 
 <h1>🚩 Shiv Jayanti Special Quiz 🚩</h1>
 
@@ -94,7 +92,6 @@ button{
 <input type="text" id="username"><br><br>
 
 <form id="quizForm"></form>
-
 <br>
 <button onclick="submitQuiz()">Submit Quiz</button>
 
@@ -107,74 +104,35 @@ button{
 <h1 id="certName"></h1>
 <p>For scoring <span id="certScore"></span>% in Shiv Jayanti Quiz</p>
 <p>Date: <span id="certDate"></span></p>
-
-<hr>
-
-<p><strong>Instagram:</strong> 
-<a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
-@dhannjayuphade
-</a></p>
-
-<p><strong>Website:</strong> 
-<a href="https://dhannjayuphade.github.io/" target="_blank">
-dhannjayuphade.github.io
-</a></p>
-
-<p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
-
 <div class="signature">Dhannjay Uphade</div>
 </div>
-  <div class="fireworks" id="fireworks"></div>
+
+<div class="fireworks" id="fireworks"></div>
 
 <div id="leaderboard">
 <h3>🏆 Top 5 Scores</h3>
 <ul id="topScores"></ul>
 </div>
 
-<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download Certificate</button>
+<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">
+Download Certificate
+</button>
 
 <script>
 
+/* QUESTIONS */
 const questions = [
 {q:"Where was Shivaji Maharaj born?",options:["Raigad","Shivneri","Sinhagad","Pratapgad"],answer:1},
 {q:"Birth year of Shivaji Maharaj?",options:["1627","1630","1645","1650"],answer:1},
 {q:"Mother of Shivaji Maharaj?",options:["Jijabai","Yesubai","Tarabai","Soyarabai"],answer:0},
-{q:"Father of Shivaji Maharaj?",options:["Shahaji","Sambhaji","Tanaji","Ramdas"],answer:0},
 {q:"Coronation year?",options:["1674","1660","1680","1655"],answer:0},
-{q:"Capital of Maratha Empire?",options:["Raigad","Pune","Satara","Kolhapur"],answer:0},
-{q:"Title given at coronation?",options:["Maharaj","Chhatrapati","Raja","Samrat"],answer:1},
-{q:"First fort captured?",options:["Torna","Sinhagad","Raigad","Pratapgad"],answer:0},
-{q:"Guru of Shivaji Maharaj?",options:["Ramdas","Tukaram","Eknath","Namdev"],answer:0},
-{q:"Afzal Khan was killed at?",options:["Pratapgad","Raigad","Torna","Panhala"],answer:0},
-{q:"Treaty of Purandar signed in?",options:["1665","1670","1650","1680"],answer:0},
-{q:"Shivaji escaped from?",options:["Agra","Delhi","Pune","Surat"],answer:0},
-{q:"Shivaji's navy base?",options:["Sindhudurg","Raigad","Pune","Satara"],answer:0},
-{q:"Battle of Pratapgad year?",options:["1659","1670","1666","1645"],answer:0},
-{q:"Shivaji died in?",options:["1680","1674","1666","1690"],answer:0},
-{q:"Shivaji Maharaj built which fort?",options:["Raigad","Red Fort","Agra Fort","Golconda"],answer:0},
-{q:"Who succeeded Shivaji?",options:["Sambhaji","Rajaram","Shahu","Balaji"],answer:0},
-{q:"Mughal emperor during Shivaji time?",options:["Aurangzeb","Akbar","Shah Jahan","Babur"],answer:0},
-{q:"Shivaji promoted which language?",options:["Marathi","Hindi","Persian","Urdu"],answer:0},
-{q:"Naval commander of Shivaji?",options:["Kanhoji Angre","Tanaji","Baji Rao","Dadoji"],answer:0},
-{q:"Shivaji respected which religion?",options:["All religions","Only Hindu","Only Muslim","None"],answer:0},
-{q:"Fort Sinhagad earlier called?",options:["Kondhana","Torna","Raigad","Panhala"],answer:0},
-{q:"Battle of Sinhagad fought by?",options:["Tanaji","Sambhaji","Ramdas","Shahaji"],answer:0},
-{q:"Shivaji's administrative system called?",options:["Ashta Pradhan","Panchayat","Sabha","Darbar"],answer:0},
-{q:"Revenue system introduced?",options:["Chauth","Jaziya","Zakat","Lagaan"],answer:0},
-{q:"Maratha army mainly used?",options:["Guerrilla warfare","Navy only","Elephants","Cannons"],answer:0},
-{q:"Shivaji born on?",options:["19 Feb 1630","1 Jan 1627","15 Aug 1640","26 Jan 1650"],answer:0},
-{q:"Father Shahaji served under?",options:["Bijapur Sultanate","Mughals","Delhi Sultan","British"],answer:0},
-{q:"Shivaji's childhood guide?",options:["Dadoji Konddev","Ramdas","Tanaji","Baji Rao"],answer:0},
-{q:"Shivaji promoted women's respect policy?",options:["Yes","No","Maybe","Unknown"],answer:0}
+{q:"Shivaji died in?",options:["1680","1674","1666","1690"],answer:0}
 ];
-  /* =======================
-   SHOW QUESTIONS
-======================= */
 
-const form = document.getElementById("quizForm");
-
+/* SHOW QUESTIONS */
+const form=document.getElementById("quizForm");
 questions.forEach((item,index)=>{
-  form.innerHTML += `
+  form.innerHTML+=`
   <div class="question">
     <p>${index+1}. ${item.q}</p>
     ${item.options.map((opt,i)=>`
@@ -182,215 +140,67 @@ questions.forEach((item,index)=>{
       <input type="radio" name="q${index}" value="${i}"> ${opt}
       </label><br>
     `).join("")}
-  </div>
-  `;
+  </div>`;
 });
 
-/* =======================
-   SUBMIT QUIZ
-======================= */
-
+/* SUBMIT */
 function submitQuiz(){
-  let score = 0;
-
+  let score=0;
   questions.forEach((item,index)=>{
-    const selected =
-    document.querySelector(`input[name="q${index}"]:checked`);
-
-    if(selected && parseInt(selected.value) === item.answer){
-      score++;
-    }
+    const selected=document.querySelector(`input[name="q${index}"]:checked`);
+    if(selected && parseInt(selected.value)===item.answer){ score++; }
   });
 
-  let percentage =
-  Math.round((score/questions.length)*100);
+  let percentage=Math.round((score/questions.length)*100);
+  document.getElementById("result").innerText="Your Score: "+percentage+"%";
 
-  document.getElementById("result").innerText =
-  "Your Score: " + percentage + "%";
-
-  const name =
-  document.getElementById("username").value;
+  const name=document.getElementById("username").value;
 
   document.getElementById("certificate").style.display="block";
   document.getElementById("downloadBtn").style.display="inline-block";
+  document.getElementById("certName").innerText=name;
+  document.getElementById("certScore").innerText=percentage;
+  document.getElementById("certDate").innerText=new Date().toLocaleDateString();
 
-  document.getElementById("certName").innerText = name;
-  document.getElementById("certScore").innerText = percentage;
-  document.getElementById("certDate").innerText =
-  new Date().toLocaleDateString();
-
-  saveScore(name, percentage);
+  saveScore(name,percentage);
   displayLeaderboard();
 
   document.getElementById("fireworks").style.display="block";
-  setTimeout(()=>{
-    document.getElementById("fireworks").style.display="none";
-  },3000);
+  setTimeout(()=>{document.getElementById("fireworks").style.display="none";},3000);
 }
 
-/* =======================
-   SAVE SCORE
-======================= */
-
-function saveScore(name, percentage){
-
-  let scores =
-  JSON.parse(localStorage.getItem("quizScores")) || [];
-
-  scores.push({name:name, score:percentage});
-
+/* SAVE SCORE */
+function saveScore(name,percentage){
+  let scores=JSON.parse(localStorage.getItem("quizScores"))||[];
+  scores.push({name:name,score:percentage});
   scores.sort((a,b)=>b.score-a.score);
-
-  scores = scores.slice(0,5);
-
-  localStorage.setItem("quizScores",
-  JSON.stringify(scores));
+  scores=scores.slice(0,5);
+  localStorage.setItem("quizScores",JSON.stringify(scores));
 }
 
-/* =======================
-   LEADERBOARD
-======================= */
-
+/* LEADERBOARD */
 function displayLeaderboard(){
-  let scores =
-  JSON.parse(localStorage.getItem("quizScores")) || [];
-
-  let list = document.getElementById("topScores");
+  let scores=JSON.parse(localStorage.getItem("quizScores"))||[];
+  let list=document.getElementById("topScores");
   list.innerHTML="";
-
   scores.forEach(item=>{
-    list.innerHTML +=
-    `<li>${item.name} - ${item.score}%</li>`;
+    list.innerHTML+=`<li>${item.name} - ${item.score}%</li>`;
   });
 }
-
 displayLeaderboard();
 
-/* =======================
-   DOWNLOAD PDF
-======================= */
-
+/* PDF */
 function downloadPDF(){
-
-  const { jsPDF } = window.jspdf;
-
-  html2canvas(document.getElementById("certificate"))
-  .then(canvas=>{
-    const imgData =
-    canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF('landscape');
-
-    pdf.addImage(imgData,'PNG',10,10,270,180);
-
-    pdf.save("Shiv_Jayanti_Certificate.pdf");
-  });
-  }
-const form = document.getElementById("quizForm");
-
-/* =======================
-   QUESTIONS SHOW
-======================= */
-questions.forEach((item,index)=>{
-  form.innerHTML += `
-  <div class="question">
-    <p>${index+1}. ${item.q}</p>
-    ${item.options.map((opt,i)=>`
-      <label>
-      <input type="radio" name="q${index}" value="${i}"> ${opt}
-      </label><br>
-    `).join("")}
-  </div>
-  `;
-});
-
-/* =======================
-   SUBMIT QUIZ
-======================= */
-function submitQuiz(){
-  let score = 0;
-
-  questions.forEach((item,index)=>{
-    const selected = document.querySelector(`input[name="q${index}"]:checked`);
-    if(selected && parseInt(selected.value) === item.answer){
-      score++;
-    }
-  });
-
-  let percentage = Math.round((score/questions.length)*100);
-
-  document.getElementById("result").innerText =
-  "Your Score: " + percentage + "%";
-
-  const name = document.getElementById("username").value;
-
-  document.getElementById("certificate").style.display="block";
-  document.getElementById("downloadBtn").style.display="inline-block";
-  document.getElementById("certName").innerText = name;
-  document.getElementById("certScore").innerText = percentage;
-  document.getElementById("certDate").innerText =
-  new Date().toLocaleDateString();
-
-  saveScore(name, percentage);
-  displayLeaderboard();
-
-  document.getElementById("fireworks").style.display="block";
-  setTimeout(()=>{
-    document.getElementById("fireworks").style.display="none";
-  },3000);
-}
-
-/* =======================
-   SAVE SCORE
-======================= */
-function saveScore(name, percentage){
-
-  let scores = JSON.parse(localStorage.getItem("quizScores")) || [];
-
-  scores.push({name:name, score:percentage});
-
-  scores.sort((a,b)=>b.score-a.score);
-
-  scores = scores.slice(0,5);
-
-  localStorage.setItem("quizScores", JSON.stringify(scores));
-}
-
-/* =======================
-   LEADERBOARD
-======================= */
-function displayLeaderboard(){
-  let scores = JSON.parse(localStorage.getItem("quizScores")) || [];
-  let list = document.getElementById("topScores");
-
-  list.innerHTML="";
-
-  scores.forEach(item=>{
-    list.innerHTML += `<li>${item.name} - ${item.score}%</li>`;
-  });
-}
-
-/* =======================
-   DOWNLOAD CERTIFICATE PDF
-======================= */
-function downloadPDF(){
-  const { jsPDF } = window.jspdf;
-
+  const { jsPDF }=window.jspdf;
   html2canvas(document.getElementById("certificate")).then(canvas=>{
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF('landscape');
+    const imgData=canvas.toDataURL("image/png");
+    const pdf=new jsPDF('landscape');
     pdf.addImage(imgData,'PNG',10,10,270,180);
     pdf.save("Shiv_Jayanti_Certificate.pdf");
   });
 }
-
-/* =======================
-   LOAD LEADERBOARD ON START
-======================= */
-displayLeaderboard();
 
 </script>
-  <h1>Thanks for participating </h1>
 
 </body>
-</html>
+  </html>
