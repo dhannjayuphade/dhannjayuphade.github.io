@@ -1,124 +1,190 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shiv Jayanti Quiz</title>
+<title>Ultimate Quiz System</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- QR + PDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 body{
   font-family: Arial;
-  background:linear-gradient(135deg,#ff9933,#ff3300);
   text-align:center;
-  padding:20px;
-  color:white;
+  background:#f4f4f4;
 }
-
-.quiz-box{
-  background:white;
-  color:black;
-  padding:20px;
-  border-radius:15px;
-  max-width:600px;
+.container{
+  width:80%;
   margin:auto;
 }
-
 button{
   padding:10px 20px;
-  border:none;
-  border-radius:8px;
-  background:#ff3300;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+  margin:10px;
+  font-size:16px;
 }
-
 #certificate{
-  display:none;
-  background:white;
-  color:black;
-  padding:40px;
-  border:8px solid orange;
   width:800px;
+  padding:40px;
   margin:auto;
+  display:none;
+  border:10px solid black;
 }
+.gold{ background:#FFD700;}
+.silver{ background:#C0C0C0;}
+.bronze{ background:#CD7F32;}
 </style>
 </head>
 <body>
-<h1>welcome<h1>
-<h2>🚩 Shiv Jayanti Quiz 🚩</h2>
+  <h1>welcome </h1>
 
-<div class="quiz-box" id="quizBox">
+<div class="container">
 
-<input type="text" id="username" placeholder="Enter Your Name"><br><br>
+<h1>Ultimate Quiz</h1>
 
-<p>1) Shivaji Maharaj Birth Year?</p>
-<input type="radio" name="q1" value="1">1630<br>
-<input type="radio" name="q1" value="0">1620<br><br>
+<input type="text" id="username" placeholder="Enter Your Name">
+<button onclick="startQuiz()">Start Quiz</button>
 
-<p>2) Mother Name?</p>
-<input type="radio" name="q2" value="1">Jijabai<br>
-<input type="radio" name="q2" value="0">Tarabai<br><br>
+<h3 id="timer"></h3>
 
-<p>3) Capital of Swarajya?</p>
-<input type="radio" name="q3" value="1">Raigad<br>
-<input type="radio" name="q3" value="0">Pune<br><br>
+<div id="quiz"></div>
 
-<button onclick="submitQuiz()">Submit Quiz</button>
+<button onclick="submitQuiz()" id="submitBtn" style="display:none;">Submit</button>
 
 </div>
 
+<!-- CERTIFICATE -->
 <div id="certificate">
-<h1>🏆 Certificate of Achievement 🏆</h1>
-<p>This certificate is proudly presented to</p>
+<h1>Certificate of Achievement</h1>
 <h2 id="certName"></h2>
-<h3 id="certScore"></h3>
-<br>
-<img src="signature.png" width="150"><br>
-<b>Authorized Signature</b>
+<p id="certScore"></p>
+<p id="certGrade"></p>
+<p id="certID"></p>
+<div id="qrcode"></div>
 </div>
 
 <script>
+
+// 50 Questions Example (Duplicate for Demo)
+const baseQuestions = [
+{question:"Shivaji Maharaj Birth Year?",options:["1630","1620","1640","1650"],answer:"1630"},
+{question:"Mother Name?",options:["Jijabai","Tarabai","Radhabai","Yesubai"],answer:"Jijabai"}
+];
+
+// Auto make 50
+let questions=[];
+for(let i=0;i<25;i++){
+  questions = questions.concat(baseQuestions);
+}
+
+let shuffled=[];
+let timerInterval;
+let timeLeft=1800; // 30 min
+
+function startQuiz(){
+
+  let name=document.getElementById("username").value;
+  if(name==""){ alert("Enter Name"); return;}
+
+  shuffled = questions.sort(()=>0.5-Math.random()).slice(0,50);
+
+  document.getElementById("quiz").innerHTML="";
+  shuffled.forEach((q,index)=>{
+    document.getElementById("quiz").innerHTML += 
+    `<p>${index+1}) ${q.question}</p>`;
+    q.options.forEach(opt=>{
+      document.getElementById("quiz").innerHTML +=
+      `<input type="radio" name="q${index}" value="${opt}">${opt}<br>`;
+    });
+    document.getElementById("quiz").innerHTML += "<br>";
+  });
+
+  document.getElementById("submitBtn").style.display="inline-block";
+  startTimer();
+}
+
+function startTimer(){
+  timerInterval=setInterval(()=>{
+    let min=Math.floor(timeLeft/60);
+    let sec=timeLeft%60;
+    document.getElementById("timer").innerText=
+      `Time Left: ${min}:${sec<10?"0"+sec:sec}`;
+    timeLeft--;
+    if(timeLeft<0){
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  },1000);
+}
+
 function submitQuiz(){
-  let name = document.getElementById("username").value;
-  if(name==""){
-    alert("Enter your name");
-    return;
-  }
+  clearInterval(timerInterval);
 
-  let score = 0;
-  let answers = document.querySelectorAll('input[type="radio"]:checked');
-  answers.forEach(ans=>{
-    score += parseInt(ans.value);
+  let name=document.getElementById("username").value;
+  let score=0;
+
+  shuffled.forEach((q,index)=>{
+    let selected=document.querySelector(`input[name="q${index}"]:checked`);
+    if(selected && selected.value===q.answer){
+      score+=2;
+    }
   });
 
-  if(answers.length < 3){
-    alert("Answer all questions");
-    return;
-  }
-
-  document.getElementById("quizBox").style.display="none";
-  document.getElementById("certificate").style.display="block";
-
-  document.getElementById("certName").innerText = name;
-  document.getElementById("certScore").innerText = "Score: "+score+" / 3";
-
-  generatePDF();
+  generateCertificate(name,score);
 }
 
-function generatePDF(){
-  const { jsPDF } = window.jspdf;
-  html2canvas(document.querySelector("#certificate")).then(canvas=>{
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("landscape","pt","a4");
-    pdf.addImage(imgData,"PNG",20,20,750,500);
-    pdf.save("ShivJayanti_Certificate.pdf");
+function generateCertificate(name,score){
+
+  let grade="";
+  let className="";
+
+  if(score==100){ grade="Gold 🥇"; className="gold";}
+  else if(score>=75){ grade="Silver 🥈"; className="silver";}
+  else if(score>=50){ grade="Bronze 🥉"; className="bronze";}
+  else{ grade="Participation";}
+
+  let certID="CERT"+Math.floor(Math.random()*1000000);
+
+  let cert=document.getElementById("certificate");
+  cert.style.display="block";
+  cert.className=className;
+
+  document.getElementById("certName").innerText=name;
+  document.getElementById("certScore").innerText="Score: "+score+"/100";
+  document.getElementById("certGrade").innerText=grade;
+  document.getElementById("certID").innerText="Certificate ID: "+certID;
+
+  new QRCode(document.getElementById("qrcode"),{
+    text:"Verified ID: "+certID+" Name:"+name+" Score:"+score,
+    width:100,
+    height:100
   });
+
+  saveLeaderboard(name,score);
+  downloadPDF();
 }
+
+function downloadPDF(){
+  html2pdf().from(document.getElementById("certificate")).save();
+}
+
+// Leaderboard (LocalStorage)
+function saveLeaderboard(name,score){
+  let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
+  board.push({name,score});
+  localStorage.setItem("leaderboard",JSON.stringify(board));
+}
+
+// Anti Cheat
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){
+    alert("Tab Switch Detected!");
+    submitQuiz();
+  }
+});
+document.addEventListener("contextmenu",(e)=>e.preventDefault());
+
 </script>
-
+Thanks for participating 
 </body>
-  </html>
+</html>
