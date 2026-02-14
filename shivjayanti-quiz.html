@@ -2,189 +2,171 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Ultimate Quiz System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shiv Jayanti Mega Quiz</title>
 
-<!-- QR + PDF CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body{
   font-family: Arial;
-  text-align:center;
-  background:#f4f4f4;
+  background:#f2f2f2;
+  padding:20px;
 }
-.container{
-  width:80%;
-  margin:auto;
+h1{
+  text-align:center;
+  color:#b71c1c;
+}
+.question{
+  background:white;
+  padding:12px;
+  margin:8px 0;
+  border-radius:6px;
 }
 button{
-  padding:10px 20px;
-  margin:10px;
-  font-size:16px;
+  padding:10px 15px;
+  background:#b71c1c;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  margin-top:10px;
 }
 #certificate{
-  width:800px;
-  padding:40px;
-  margin:auto;
   display:none;
-  border:10px solid black;
+  width:800px;
+  margin:30px auto;
+  padding:30px;
+  background:white;
+  border:8px double black;
+  text-align:center;
+  position:relative;
 }
-.gold{ background:#FFD700;}
-.silver{ background:#C0C0C0;}
-.bronze{ background:#CD7F32;}
+#certificate img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+.signature{
+  position:absolute;
+  bottom:20px;
+  right:40px;
+  font-weight:bold;
+}
 </style>
 </head>
 <body>
-  <h1>welcome </h1>
+  <h1>welcome</h1>
 
-<div class="container">
+<h1>🚩 Shiv Jayanti Mega Quiz 🚩</h1>
 
-<h1>Ultimate Quiz</h1>
+<label>Your Name:</label>
+<input type="text" id="username"><br><br>
 
-<input type="text" id="username" placeholder="Enter Your Name">
-<button onclick="startQuiz()">Start Quiz</button>
+<label>Your Instagram Username:</label>
+<input type="text" id="insta"><br><br>
 
-<h3 id="timer"></h3>
+<form id="quizForm"></form>
 
-<div id="quiz"></div>
+<button onclick="submitQuiz()">Submit Quiz</button>
 
-<button onclick="submitQuiz()" id="submitBtn" style="display:none;">Submit</button>
+<h2 id="result"></h2>
 
-</div>
-
-<!-- CERTIFICATE -->
 <div id="certificate">
-<h1>Certificate of Achievement</h1>
-<h2 id="certName"></h2>
-<p id="certScore"></p>
-<p id="certGrade"></p>
-<p id="certID"></p>
-<div id="qrcode"></div>
+<img src="banner.jpg">
+<h2>Certificate of Excellence</h2>
+<p>This certificate is proudly presented to</p>
+<h1 id="certName"></h1>
+<p>Instagram: <span id="certInsta"></span></p>
+<p>For scoring 50/50 (100%) in Shiv Jayanti Mega Quiz</p>
+<p>Date: <span id="certDate"></span></p>
+
+<div class="signature">
+Dhannjay Uphade
 </div>
+</div>
+
+<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download Certificate</button>
 
 <script>
 
-// 50 Questions Example (Duplicate for Demo)
-const baseQuestions = [
-{question:"Shivaji Maharaj Birth Year?",options:["1630","1620","1640","1650"],answer:"1630"},
-{question:"Mother Name?",options:["Jijabai","Tarabai","Radhabai","Yesubai"],answer:"Jijabai"}
+const questions = [];
+
+// First 10 real
+const realQuestions = [
+  {q:"Who founded Hindavi Swarajya?", a:"Shivaji"},
+  {q:"Birth year of Shivaji Maharaj?", a:"1630"},
+  {q:"Mother of Shivaji Maharaj?", a:"Jijabai"},
+  {q:"Father of Shivaji Maharaj?", a:"Shahaji"},
+  {q:"Capital of Maratha Empire?", a:"Raigad"},
+  {q:"Coronation year?", a:"1674"},
+  {q:"Guru of Shivaji Maharaj?", a:"Samarth Ramdas"},
+  {q:"Born at which fort?", a:"Shivneri"},
+  {q:"First fort captured?", a:"Torna"},
+  {q:"Title received at coronation?", a:"Chhatrapati"}
 ];
 
-// Auto make 50
-let questions=[];
-for(let i=0;i<25;i++){
-  questions = questions.concat(baseQuestions);
+questions.push(...realQuestions);
+
+// Auto fill up to 50
+for(let i=11;i<=50;i++){
+  questions.push({q:"Shivaji Question "+i+"?", a:"A"});
 }
 
-let shuffled=[];
-let timerInterval;
-let timeLeft=1800; // 30 min
+const form=document.getElementById("quizForm");
 
-function startQuiz(){
-
-  let name=document.getElementById("username").value;
-  if(name==""){ alert("Enter Name"); return;}
-
-  shuffled = questions.sort(()=>0.5-Math.random()).slice(0,50);
-
-  document.getElementById("quiz").innerHTML="";
-  shuffled.forEach((q,index)=>{
-    document.getElementById("quiz").innerHTML += 
-    `<p>${index+1}) ${q.question}</p>`;
-    q.options.forEach(opt=>{
-      document.getElementById("quiz").innerHTML +=
-      `<input type="radio" name="q${index}" value="${opt}">${opt}<br>`;
-    });
-    document.getElementById("quiz").innerHTML += "<br>";
-  });
-
-  document.getElementById("submitBtn").style.display="inline-block";
-  startTimer();
-}
-
-function startTimer(){
-  timerInterval=setInterval(()=>{
-    let min=Math.floor(timeLeft/60);
-    let sec=timeLeft%60;
-    document.getElementById("timer").innerText=
-      `Time Left: ${min}:${sec<10?"0"+sec:sec}`;
-    timeLeft--;
-    if(timeLeft<0){
-      clearInterval(timerInterval);
-      submitQuiz();
-    }
-  },1000);
-}
+questions.forEach((item,index)=>{
+  form.innerHTML+=`
+  <div class="question">
+  <p>${index+1}. ${item.q}</p>
+  <input type="text" name="q${index}">
+  </div>
+  `;
+});
 
 function submitQuiz(){
-  clearInterval(timerInterval);
-
-  let name=document.getElementById("username").value;
   let score=0;
 
-  shuffled.forEach((q,index)=>{
-    let selected=document.querySelector(`input[name="q${index}"]:checked`);
-    if(selected && selected.value===q.answer){
-      score+=2;
+  questions.forEach((item,index)=>{
+    const ans=document.querySelector(`input[name="q${index}"]`).value.trim();
+    if(ans.toLowerCase()===item.a.toLowerCase()){
+      score++;
     }
   });
 
-  generateCertificate(name,score);
-}
+  document.getElementById("result").innerText="Your Score: "+score+"/50";
 
-function generateCertificate(name,score){
+  if(score===50){
 
-  let grade="";
-  let className="";
+    const name=document.getElementById("username").value;
+    const insta=document.getElementById("insta").value;
 
-  if(score==100){ grade="Gold 🥇"; className="gold";}
-  else if(score>=75){ grade="Silver 🥈"; className="silver";}
-  else if(score>=50){ grade="Bronze 🥉"; className="bronze";}
-  else{ grade="Participation";}
+    document.getElementById("certificate").style.display="block";
+    document.getElementById("downloadBtn").style.display="inline-block";
 
-  let certID="CERT"+Math.floor(Math.random()*1000000);
+    document.getElementById("certName").innerText=name;
+    document.getElementById("certInsta").innerText=insta;
+    document.getElementById("certDate").innerText=new Date().toLocaleDateString();
 
-  let cert=document.getElementById("certificate");
-  cert.style.display="block";
-  cert.className=className;
-
-  document.getElementById("certName").innerText=name;
-  document.getElementById("certScore").innerText="Score: "+score+"/100";
-  document.getElementById("certGrade").innerText=grade;
-  document.getElementById("certID").innerText="Certificate ID: "+certID;
-
-  new QRCode(document.getElementById("qrcode"),{
-    text:"Verified ID: "+certID+" Name:"+name+" Score:"+score,
-    width:100,
-    height:100
-  });
-
-  saveLeaderboard(name,score);
-  downloadPDF();
-}
-
-function downloadPDF(){
-  html2pdf().from(document.getElementById("certificate")).save();
-}
-
-// Leaderboard (LocalStorage)
-function saveLeaderboard(name,score){
-  let board=JSON.parse(localStorage.getItem("leaderboard"))||[];
-  board.push({name,score});
-  localStorage.setItem("leaderboard",JSON.stringify(board));
-}
-
-// Anti Cheat
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){
-    alert("Tab Switch Detected!");
-    submitQuiz();
+  }else{
+    alert("Certificate only for 100% (50/50) score.");
   }
-});
-document.addEventListener("contextmenu",(e)=>e.preventDefault());
+}
+
+async function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const cert=document.getElementById("certificate");
+
+  html2canvas(cert).then(canvas=>{
+    const imgData=canvas.toDataURL("image/png");
+    const pdf=new jsPDF('landscape');
+    pdf.addImage(imgData,'PNG',10,10,270,180);
+    pdf.save("Shiv_Jayanti_Certificate.pdf");
+  });
+}
 
 </script>
-Thanks for participating 
+<h1>Thank for participating </h1>
 </body>
 </html>
