@@ -11,107 +11,168 @@
 <style>
 body{
   font-family: Arial;
-  background:#f2f2f2;
-  padding:20px;
+  background: linear-gradient(135deg,#ff9933,#ff5722);
+  padding:15px;
+  color:white;
 }
+
+/* Flag animation */
+.flag {
+  width:120px;
+  height:60px;
+  background:#ff9933;
+  position:relative;
+  margin:auto;
+  animation:wave 2s infinite ease-in-out;
+  border-radius:5px;
+}
+@keyframes wave {
+  0%{transform:rotate(0deg);}
+  50%{transform:rotate(2deg);}
+  100%{transform:rotate(0deg);}
+}
+
 h1{
   text-align:center;
-  color:#b71c1c;
 }
+
+.timer{
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
 .question{
   background:white;
-  padding:12px;
-  margin:8px 0;
-  border-radius:6px;
+  color:black;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
 }
+
 button{
-  padding:10px 15px;
-  background:#b71c1c;
-  color:white;
+  padding:10px 18px;
+  background:white;
+  color:#ff5722;
+  font-weight:bold;
   border:none;
-  border-radius:5px;
+  border-radius:8px;
   cursor:pointer;
-  margin-top:10px;
 }
+
 #certificate{
   display:none;
-  width:800px;
+  width:900px;
   margin:30px auto;
   padding:30px;
   background:white;
-  border:8px double black;
+  color:black;
+  border:12px solid #ff5722;
   text-align:center;
   position:relative;
 }
+
 #certificate img{
   width:100%;
   height:180px;
   object-fit:cover;
 }
+
 .signature{
   position:absolute;
   bottom:20px;
   right:40px;
   font-weight:bold;
+  color:#ff5722;
+}
+
+@media(max-width:768px){
+  #certificate{
+    width:100%;
+  }
 }
 </style>
 </head>
 <body>
-  <h1>welcome</h1>
 
+<div class="flag"></div>
 <h1>🚩 Shiv Jayanti Mega Quiz 🚩</h1>
 
-<label>Your Name:</label>
+<div class="timer">Time Left: <span id="time">10:00</span></div>
+
+<label>Your Name:</label><br>
 <input type="text" id="username"><br><br>
 
-<label>Your Instagram Username:</label>
+<label>Your Instagram Username:</label><br>
 <input type="text" id="insta"><br><br>
 
 <form id="quizForm"></form>
 
+<br>
 <button onclick="submitQuiz()">Submit Quiz</button>
 
 <h2 id="result"></h2>
 
 <div id="certificate">
 <img src="banner.jpg">
-<h2>Certificate of Excellence</h2>
+<h2 style="color:#ff5722;">Certificate of Excellence</h2>
 <p>This certificate is proudly presented to</p>
 <h1 id="certName"></h1>
 <p>Instagram: <span id="certInsta"></span></p>
 <p>For scoring 50/50 (100%) in Shiv Jayanti Mega Quiz</p>
 <p>Date: <span id="certDate"></span></p>
-
-<div class="signature">
-Dhannjay Uphade
-</div>
+<div class="signature">Dhannjay Uphade</div>
 </div>
 
 <button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download Certificate</button>
 
+<!-- Optional Background Music -->
+<audio autoplay loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 
-const questions = [];
+/* TIMER */
+let totalTime = 600; // 10 minutes
+const timerDisplay = document.getElementById("time");
 
-// First 10 real
-const realQuestions = [
-  {q:"Who founded Hindavi Swarajya?", a:"Shivaji"},
-  {q:"Birth year of Shivaji Maharaj?", a:"1630"},
-  {q:"Mother of Shivaji Maharaj?", a:"Jijabai"},
-  {q:"Father of Shivaji Maharaj?", a:"Shahaji"},
-  {q:"Capital of Maratha Empire?", a:"Raigad"},
-  {q:"Coronation year?", a:"1674"},
-  {q:"Guru of Shivaji Maharaj?", a:"Samarth Ramdas"},
-  {q:"Born at which fort?", a:"Shivneri"},
-  {q:"First fort captured?", a:"Torna"},
-  {q:"Title received at coronation?", a:"Chhatrapati"}
+const timer = setInterval(()=>{
+  let minutes = Math.floor(totalTime/60);
+  let seconds = totalTime%60;
+  timerDisplay.innerText =
+    minutes + ":" + (seconds<10?"0":"") + seconds;
+
+  totalTime--;
+  if(totalTime < 0){
+    clearInterval(timer);
+    alert("Time Over!");
+    submitQuiz();
+  }
+},1000);
+
+
+/* QUESTIONS */
+const questions = [
+{
+q:"Where was Shivaji Maharaj born?",
+options:["Raigad","Shivneri","Torna","Sinhagad"],
+answer:1
+},
+{
+q:"Birth year?",
+options:["1627","1630","1640","1650"],
+answer:1
+}
 ];
 
-questions.push(...realQuestions);
-
-// Auto fill up to 50
-for(let i=11;i<=50;i++){
-  questions.push({q:"Shivaji Question "+i+"?", a:"A"});
+for(let i=3;i<=50;i++){
+  questions.push({
+    q:"Shivaji Question "+i+"?",
+    options:["Option A","Option B","Option C","Option D"],
+    answer:0
+  });
 }
 
 const form=document.getElementById("quizForm");
@@ -119,18 +180,24 @@ const form=document.getElementById("quizForm");
 questions.forEach((item,index)=>{
   form.innerHTML+=`
   <div class="question">
-  <p>${index+1}. ${item.q}</p>
-  <input type="text" name="q${index}">
+    <p>${index+1}. ${item.q}</p>
+    ${item.options.map((opt,i)=>`
+      <label>
+      <input type="radio" name="q${index}" value="${i}"> ${opt}
+      </label><br>
+    `).join("")}
   </div>
   `;
 });
 
 function submitQuiz(){
+  clearInterval(timer);
+
   let score=0;
 
   questions.forEach((item,index)=>{
-    const ans=document.querySelector(`input[name="q${index}"]`).value.trim();
-    if(ans.toLowerCase()===item.a.toLowerCase()){
+    const selected=document.querySelector(`input[name="q${index}"]:checked`);
+    if(selected && parseInt(selected.value)===item.answer){
       score++;
     }
   });
@@ -138,7 +205,6 @@ function submitQuiz(){
   document.getElementById("result").innerText="Your Score: "+score+"/50";
 
   if(score===50){
-
     const name=document.getElementById("username").value;
     const insta=document.getElementById("insta").value;
 
@@ -148,17 +214,14 @@ function submitQuiz(){
     document.getElementById("certName").innerText=name;
     document.getElementById("certInsta").innerText=insta;
     document.getElementById("certDate").innerText=new Date().toLocaleDateString();
-
   }else{
-    alert("Certificate only for 100% (50/50) score.");
+    alert("Certificate only for 100% score.");
   }
 }
 
-async function downloadPDF(){
+function downloadPDF(){
   const { jsPDF } = window.jspdf;
-  const cert=document.getElementById("certificate");
-
-  html2canvas(cert).then(canvas=>{
+  html2canvas(document.getElementById("certificate")).then(canvas=>{
     const imgData=canvas.toDataURL("image/png");
     const pdf=new jsPDF('landscape');
     pdf.addImage(imgData,'PNG',10,10,270,180);
@@ -167,6 +230,7 @@ async function downloadPDF(){
 }
 
 </script>
-<h1>Thank for participating </h1>
+  
+
 </body>
-</html>
+  </html>
