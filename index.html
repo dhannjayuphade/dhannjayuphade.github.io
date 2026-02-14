@@ -302,7 +302,8 @@ footer{
 }
 
 </style>
-
+  
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -424,7 +425,14 @@ footer{
   <button onclick="subscribeSite()">Subscribe</button>
   <p id="subStatus"></p>
 </div>
+<form id="emailForm">
+  <input type="text" name="name" placeholder="Your Name" required />
+  <input type="email" name="email" placeholder="Your Email" required />
+  <button type="submit">Subscribe</button>
+</form>
 
+<p id="status"></p>
+  
   <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" style="text-decoration:none;">
   <div style="display:inline-block; background:#25D366; color:white; padding:12px 18px; border-radius:30px; font-weight:bold;">
     📱 WhatsApp Group Join करा
@@ -568,5 +576,26 @@ if ("serviceWorker" in navigator) {
     .then(() => console.log("Service Worker Registered"));
 }
   </script>
+<script>
+  // EmailJS initialize
+  emailjs.init("4yXhs5Vh8xS1RW-Vl"); // EmailJS Public Key
+
+  const form = document.getElementById('emailForm');
+  const status = document.getElementById('status');
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    emailjs.sendForm('service_2v58rjb', 'template_template_f6gitrf', this)
+      .then(() => {
+        status.textContent = "✅ Welcome Email Sent Successfully!";
+        form.reset();
+      })
+      .catch(err => {
+        console.error(err);
+        status.textContent = "❌ Something went wrong.";
+      });
+  });
+</script>
 </body>
 </html>
