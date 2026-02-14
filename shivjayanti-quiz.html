@@ -58,6 +58,31 @@ button{
 @media(max-width:768px){
   #certificate{width:100%;}
 }
+  #leaderboard{
+  background:white;
+  color:black;
+  padding:15px;
+  margin-top:20px;
+  border-radius:10px;
+}
+
+.fireworks{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  display:none;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: spark 0.5s linear infinite;
+}
+
+@keyframes spark{
+  from{background-position:0 0;}
+  to{background-position:20px 20px;}
+  }
 </style>
 </head>
 <body>
@@ -99,6 +124,12 @@ dhannjayuphade.github.io
 
 <div class="signature">Dhannjay Uphade</div>
 </div>
+  <div class="fireworks" id="fireworks"></div>
+
+<div id="leaderboard">
+<h3>🏆 Top 5 Scores</h3>
+<ul id="topScores"></ul>
+</div>
 
 <button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download Certificate</button>
 
@@ -136,11 +167,14 @@ const questions = [
 {q:"Shivaji's childhood guide?",options:["Dadoji Konddev","Ramdas","Tanaji","Baji Rao"],answer:0},
 {q:"Shivaji promoted women's respect policy?",options:["Yes","No","Maybe","Unknown"],answer:0}
 ];
+  /* =======================
+   SHOW QUESTIONS
+======================= */
 
-const form=document.getElementById("quizForm");
+const form = document.getElementById("quizForm");
 
 questions.forEach((item,index)=>{
-  form.innerHTML+=`
+  form.innerHTML += `
   <div class="question">
     <p>${index+1}. ${item.q}</p>
     ${item.options.map((opt,i)=>`
@@ -152,37 +186,208 @@ questions.forEach((item,index)=>{
   `;
 });
 
+/* =======================
+   SUBMIT QUIZ
+======================= */
+
 function submitQuiz(){
-  let score=0;
+  let score = 0;
+
   questions.forEach((item,index)=>{
-    const selected=document.querySelector(`input[name="q${index}"]:checked`);
-    if(selected && parseInt(selected.value)===item.answer){
+    const selected =
+    document.querySelector(`input[name="q${index}"]:checked`);
+
+    if(selected && parseInt(selected.value) === item.answer){
+      score++;
+    }
+  });
+
+  let percentage =
+  Math.round((score/questions.length)*100);
+
+  document.getElementById("result").innerText =
+  "Your Score: " + percentage + "%";
+
+  const name =
+  document.getElementById("username").value;
+
+  document.getElementById("certificate").style.display="block";
+  document.getElementById("downloadBtn").style.display="inline-block";
+
+  document.getElementById("certName").innerText = name;
+  document.getElementById("certScore").innerText = percentage;
+  document.getElementById("certDate").innerText =
+  new Date().toLocaleDateString();
+
+  saveScore(name, percentage);
+  displayLeaderboard();
+
+  document.getElementById("fireworks").style.display="block";
+  setTimeout(()=>{
+    document.getElementById("fireworks").style.display="none";
+  },3000);
+}
+
+/* =======================
+   SAVE SCORE
+======================= */
+
+function saveScore(name, percentage){
+
+  let scores =
+  JSON.parse(localStorage.getItem("quizScores")) || [];
+
+  scores.push({name:name, score:percentage});
+
+  scores.sort((a,b)=>b.score-a.score);
+
+  scores = scores.slice(0,5);
+
+  localStorage.setItem("quizScores",
+  JSON.stringify(scores));
+}
+
+/* =======================
+   LEADERBOARD
+======================= */
+
+function displayLeaderboard(){
+  let scores =
+  JSON.parse(localStorage.getItem("quizScores")) || [];
+
+  let list = document.getElementById("topScores");
+  list.innerHTML="";
+
+  scores.forEach(item=>{
+    list.innerHTML +=
+    `<li>${item.name} - ${item.score}%</li>`;
+  });
+}
+
+displayLeaderboard();
+
+/* =======================
+   DOWNLOAD PDF
+======================= */
+
+function downloadPDF(){
+
+  const { jsPDF } = window.jspdf;
+
+  html2canvas(document.getElementById("certificate"))
+  .then(canvas=>{
+    const imgData =
+    canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF('landscape');
+
+    pdf.addImage(imgData,'PNG',10,10,270,180);
+
+    pdf.save("Shiv_Jayanti_Certificate.pdf");
+  });
+  }
+const form = document.getElementById("quizForm");
+
+/* =======================
+   QUESTIONS SHOW
+======================= */
+questions.forEach((item,index)=>{
+  form.innerHTML += `
+  <div class="question">
+    <p>${index+1}. ${item.q}</p>
+    ${item.options.map((opt,i)=>`
+      <label>
+      <input type="radio" name="q${index}" value="${i}"> ${opt}
+      </label><br>
+    `).join("")}
+  </div>
+  `;
+});
+
+/* =======================
+   SUBMIT QUIZ
+======================= */
+function submitQuiz(){
+  let score = 0;
+
+  questions.forEach((item,index)=>{
+    const selected = document.querySelector(`input[name="q${index}"]:checked`);
+    if(selected && parseInt(selected.value) === item.answer){
       score++;
     }
   });
 
   let percentage = Math.round((score/questions.length)*100);
 
-  document.getElementById("result").innerText="Your Score: "+percentage+"%";
+  document.getElementById("result").innerText =
+  "Your Score: " + percentage + "%";
 
-  const name=document.getElementById("username").value;
+  const name = document.getElementById("username").value;
 
   document.getElementById("certificate").style.display="block";
   document.getElementById("downloadBtn").style.display="inline-block";
-  document.getElementById("certName").innerText=name;
-  document.getElementById("certScore").innerText=percentage;
-  document.getElementById("certDate").innerText=new Date().toLocaleDateString();
+  document.getElementById("certName").innerText = name;
+  document.getElementById("certScore").innerText = percentage;
+  document.getElementById("certDate").innerText =
+  new Date().toLocaleDateString();
+
+  saveScore(name, percentage);
+  displayLeaderboard();
+
+  document.getElementById("fireworks").style.display="block";
+  setTimeout(()=>{
+    document.getElementById("fireworks").style.display="none";
+  },3000);
 }
 
+/* =======================
+   SAVE SCORE
+======================= */
+function saveScore(name, percentage){
+
+  let scores = JSON.parse(localStorage.getItem("quizScores")) || [];
+
+  scores.push({name:name, score:percentage});
+
+  scores.sort((a,b)=>b.score-a.score);
+
+  scores = scores.slice(0,5);
+
+  localStorage.setItem("quizScores", JSON.stringify(scores));
+}
+
+/* =======================
+   LEADERBOARD
+======================= */
+function displayLeaderboard(){
+  let scores = JSON.parse(localStorage.getItem("quizScores")) || [];
+  let list = document.getElementById("topScores");
+
+  list.innerHTML="";
+
+  scores.forEach(item=>{
+    list.innerHTML += `<li>${item.name} - ${item.score}%</li>`;
+  });
+}
+
+/* =======================
+   DOWNLOAD CERTIFICATE PDF
+======================= */
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
+
   html2canvas(document.getElementById("certificate")).then(canvas=>{
-    const imgData=canvas.toDataURL("image/png");
-    const pdf=new jsPDF('landscape');
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF('landscape');
     pdf.addImage(imgData,'PNG',10,10,270,180);
     pdf.save("Shiv_Jayanti_Certificate.pdf");
   });
 }
+
+/* =======================
+   LOAD LEADERBOARD ON START
+======================= */
+displayLeaderboard();
 
 </script>
   <h1>Thanks for participating </h1>
