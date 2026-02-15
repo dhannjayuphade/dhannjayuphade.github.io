@@ -2,44 +2,102 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catch The Trishul</title>
+<title>Catch The Trishul 🔱</title>
 
 <style>
 body{
   margin:0;
-  overflow:hidden;
-  background:black;
+  background:radial-gradient(circle,#000,#111);
   color:white;
   text-align:center;
   font-family:Arial;
+  overflow:hidden;
+}
+
+h2{
+  margin-top:10px;
+}
+
+#stats{
+  font-size:18px;
 }
 
 #gameArea{
   position:relative;
   width:100%;
-  height:80vh;
+  height:75vh;
   overflow:hidden;
 }
 
 .trishul{
   position:absolute;
-  font-size:40px;
+  font-size:42px;
   cursor:pointer;
   user-select:none;
+  transition:transform 0.1s;
+}
+
+.trishul:active{
+  transform:scale(1.3);
+}
+
+#gameOver{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#111;
+  padding:30px;
+  border-radius:10px;
+  display:none;
+  box-shadow:0 0 20px orange;
+}
+
+button{
+  padding:10px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:orange;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Catch The Trishul 🔱</h2>
-<p>Score: <span id="score">0</span></p>
+<h2>🔱 Catch The Trishul 🔱</h2>
+
+<div id="stats">
+Score: <span id="score">0</span> |
+Time: <span id="time">30</span>s |
+Level: <span id="level">1</span> |
+High Score: <span id="highScore">0</span>
+</div>
 
 <div id="gameArea"></div>
 
+<div id="gameOver">
+  <h3>🔱 Har Har Mahadev 🔱</h3>
+  <p>Your Score: <span id="finalScore"></span></p>
+  <button onclick="restartGame()">Play Again</button>
+</div>
+
+<!-- Sound Effects -->
+<audio id="catchSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>
+<audio id="bgMusic" src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3" loop></audio>
+
 <script>
 let score = 0;
+let timeLeft = 30;
+let speed = 4;
+let level = 1;
+let gameInterval;
+let timerInterval;
 let gameArea = document.getElementById("gameArea");
+
+let highScore = localStorage.getItem("highScore") || 0;
+document.getElementById("highScore").innerText = highScore;
 
 function createTrishul(){
   const t = document.createElement("div");
@@ -52,6 +110,69 @@ function createTrishul(){
   gameArea.appendChild(t);
 
   let fall = setInterval(()=>{
-    t.style.top = (t.offsetTop + 5) + "px";
+    t.style.top = (t.offsetTop + speed) + "px";
 
-    if(t.offset
+    if(t.offsetTop > gameArea.offsetHeight){
+      t.remove();
+      clearInterval(fall);
+    }
+  },20);
+
+  t.onclick = function(){
+    score++;
+    document.getElementById("score").innerText = score;
+
+    document.getElementById("catchSound").play();
+    if(navigator.vibrate){ navigator.vibrate(50); }
+
+    t.remove();
+    clearInterval(fall);
+
+    if(score % 10 === 0){
+      level++;
+      speed += 1;
+      document.getElementById("level").innerText = level;
+    }
+  }
+}
+
+function startGame(){
+  document.getElementById("bgMusic").play();
+
+  gameInterval = setInterval(createTrishul,1000);
+
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    document.getElementById("time").innerText = timeLeft;
+
+    if(timeLeft <= 0){
+      endGame();
+    }
+  },1000);
+}
+
+function endGame(){
+  clearInterval(gameInterval);
+  clearInterval(timerInterval);
+
+  document.querySelectorAll(".trishul").forEach(e=>e.remove());
+
+  document.getElementById("gameOver").style.display="block";
+  document.getElementById("finalScore").innerText = score;
+
+  if(score > highScore){
+    localStorage.setItem("highScore", score);
+  }
+
+  document.getElementById("bgMusic").pause();
+}
+
+function restartGame(){
+  location.reload();
+}
+
+startGame();
+</script>
+
+</body>
+</html>
