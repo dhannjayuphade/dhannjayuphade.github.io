@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Catch The Trishul</title>
+
 <style>
 body{
   margin:0;
@@ -11,50 +13,45 @@ body{
   text-align:center;
   font-family:Arial;
 }
+
+#gameArea{
+  position:relative;
+  width:100%;
+  height:80vh;
+  overflow:hidden;
+}
+
 .trishul{
   position:absolute;
   font-size:40px;
   cursor:pointer;
+  user-select:none;
 }
 </style>
 </head>
+
 <body>
 
 <h2>Catch The Trishul 🔱</h2>
 <p>Score: <span id="score">0</span></p>
 
+<div id="gameArea"></div>
+
 <script>
 let score = 0;
+let gameArea = document.getElementById("gameArea");
 
 function createTrishul(){
   const t = document.createElement("div");
   t.className = "trishul";
   t.innerHTML = "🔱";
 
-  t.style.left = Math.random() * window.innerWidth + "px";
+  t.style.left = Math.random() * (window.innerWidth - 40) + "px";
   t.style.top = "0px";
 
-  document.body.appendChild(t);
+  gameArea.appendChild(t);
 
   let fall = setInterval(()=>{
     t.style.top = (t.offsetTop + 5) + "px";
 
-    if(t.offsetTop > window.innerHeight){
-      t.remove();
-      clearInterval(fall);
-    }
-  },20);
-
-  t.onclick = function(){
-    score++;
-    document.getElementById("score").innerText = score;
-    t.remove();
-    clearInterval(fall);
-  }
-}
-
-setInterval(createTrishul,1000);
-</script>
-
-</body>
-</html>
+    if(t.offset
