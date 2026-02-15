@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔱 Happy Mahashivratri 🔱</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(circle at top,#0a0a2a,#000);
+  color:white;
+  text-align:center;
+  overflow-x:hidden;
+}
+.stars{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url('https://i.imgur.com/9Qe7YwK.png');
+  animation:moveStars 80s linear infinite;
+  z-index:-2;
+}
+@keyframes moveStars{
+  from{background-position:0 0;}
+  to{background-position:10000px 5000px;}
+}
+.leaf{
+  position:fixed;
+  top:-50px;
+  width:35px;
+  animation:fall linear infinite;
+  z-index:-1;
+}
+@keyframes fall{
+  to{transform:translateY(100vh) rotate(360deg);}
+}
+h1{
+  font-size:38px;
+  animation:glow 2s infinite alternate;
+}
+@keyframes glow{
+  from{text-shadow:0 0 10px cyan;}
+  to{text-shadow:0 0 30px blue;}
+}
+.section{padding:40px 20px;}
+.btn{
+  padding:12px 25px;
+  background:linear-gradient(45deg,#00f2ff,#0072ff);
+  border:none;
+  color:white;
+  border-radius:30px;
+  cursor:pointer;
+  box-shadow:0 0 15px cyan;
+  margin:10px;
+}
+.counter{font-size:24px;margin-top:10px;}
+#shivling{width:150px;margin-top:15px;}
+.water{
+  width:10px;
+  height:0;
+  background:cyan;
+  margin:auto;
+  transition:height 1s;
+}
+.quiz-box{
+  background:#111;
+  padding:20px;
+  border-radius:15px;
+  max-width:400px;
+  margin:auto;
+}
+.option{
+  display:block;
+  margin:8px;
+  padding:8px;
+  background:#222;
+  border-radius:8px;
+  cursor:pointer;
+}
+.correct{background:green !important;}
+.wrong{background:red !important;}
+footer{padding:20px;opacity:0.7;}
+</style>
+</head>
+
+<body>
+
+<div class="stars"></div>
+
+<div class="section">
+<h1>🔱 Happy Mahashivratri 🔱</h1>
+<p>Har Har Mahadev</p>
+<button class="btn" onclick="startMusic()">🎵 Start Om Chant</button>
+</div>
+
+<div class="section">
+<h2>⏳ Countdown</h2>
+<div id="countdown"></div>
+</div>
+
+<div class="section">
+<h2>📿 108 Jaap</h2>
+<button class="btn" onclick="increaseJaap()">Chant</button>
+<div class="counter">Total: <span id="jaap">0</span>/108</div>
+</div>
+
+<div class="section">
+<h2>🪔 Jal Abhishek</h2>
+<div class="water" id="water"></div>
+<img src="https://i.imgur.com/6oKQZ4E.png" id="shivling">
+<br>
+<button class="btn" onclick="abhishek()">💧 Offer Jal</button>
+</div>
+
+<div class="section">
+<h2>🏆 Shiv Quiz</h2>
+<div class="quiz-box">
+<p>Shiva’s weapon?</p>
+<div class="option" onclick="check(this,false)">Sudarshan</div>
+<div class="option" onclick="check(this,true)">Trishul</div>
+<div class="option" onclick="check(this,false)">Gada</div>
+<div class="option" onclick="check(this,false)">Chakra</div>
+</div>
+</div>
+
+<div class="section">
+<button class="btn" onclick="share()">📲 Share</button>
+</div>
+
+<footer>
+Made with Devotion 🔱 | Dhannjay Uphade
+</footer>
+
+<audio id="omAudio" loop>
+<source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
+
+<script>
+// Countdown
+var festivalDate=new Date("March 6, 2026 00:00:00").getTime();
+setInterval(()=>{
+var now=new Date().getTime();
+var d=festivalDate-now;
+if(d<0){document.getElementById("countdown").innerHTML="Festival Started 🔱";}
+else{
+var days=Math.floor(d/(1000*60*60*24));
+var h=Math.floor((d%(1000*60*60*24))/(1000*60*60));
+var m=Math.floor((d%(1000*60*60))/(1000*60));
+var s=Math.floor((d%(1000*60))/1000);
+document.getElementById("countdown").innerHTML=days+"d "+h+"h "+m+"m "+s+"s";
+}
+},1000);
+
+// Leaves animation
+setInterval(()=>{
+let leaf=document.createElement("img");
+leaf.src="https://i.imgur.com/4NZ6uLY.png";
+leaf.className="leaf";
+leaf.style.left=Math.random()*100+"%";
+leaf.style.animationDuration=(5+Math.random()*5)+"s";
+document.body.appendChild(leaf);
+setTimeout(()=>leaf.remove(),10000);
+},1500);
+
+// Jaap
+let jaapCount=
