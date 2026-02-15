@@ -1,131 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catch The Trishul 🔱</title>
-
+<title>Catch The Trishul</title>
 <style>
 body{
   margin:0;
-  background:black;
   overflow:hidden;
-  font-family:Arial;
+  background:black;
   color:white;
   text-align:center;
+  font-family:Arial;
 }
-
-#gameArea{
-  position:relative;
-  width:100%;
-  height:80vh;
-  background:linear-gradient(to bottom,#000,#111);
-  overflow:hidden;
-}
-
 .trishul{
   position:absolute;
   font-size:40px;
   cursor:pointer;
-  user-select:none;
-}
-
-#scoreBoard{
-  padding:10px;
-  font-size:18px;
-}
-
-button{
-  padding:10px 20px;
-  margin:10px;
-  border:none;
-  background:orange;
-  color:white;
-  cursor:pointer;
 }
 </style>
 </head>
-
 <body>
 
-<h2>🔱 Catch The Trishul 🔱</h2>
-
-<div id="scoreBoard">
-Score: <span id="score">0</span> |
-Time: <span id="time">30</span> |
-High Score: <span id="highScore">0</span>
-</div>
-
-<div id="gameArea"></div>
-
-<button onclick="startGame()">Start Game</button>
+<h2>Catch The Trishul 🔱</h2>
+<p>Score: <span id="score">0</span></p>
 
 <script>
-let score=0;
-let timeLeft=30;
-let gameInterval;
-let dropInterval;
-let highScore=localStorage.getItem("highScore")||0;
-document.getElementById("highScore").innerText=highScore;
+let score = 0;
 
-function startGame(){
-  score=0;
-  timeLeft=30;
-  document.getElementById("score").innerText=score;
-  document.getElementById("time").innerText=timeLeft;
-  document.getElementById("gameArea").innerHTML="";
+function createTrishul(){
+  const t = document.createElement("div");
+  t.className = "trishul";
+  t.innerHTML = "🔱";
 
-  gameInterval=setInterval(()=>{
-    timeLeft--;
-    document.getElementById("time").innerText=timeLeft;
-    if(timeLeft<=0){
-      clearInterval(gameInterval);
-      clearInterval(dropInterval);
-      endGame();
-    }
-  },1000);
+  t.style.left = Math.random() * window.innerWidth + "px";
+  t.style.top = "0px";
 
-  dropInterval=setInterval(dropTrishul,800);
-}
+  document.body.appendChild(t);
 
-function dropTrishul(){
-  let trishul=document.createElement("div");
-  trishul.className="trishul";
-  trishul.innerText="🔱";
-  trishul.style.left=Math.random()*90+"%";
-  trishul.style.top="0px";
+  let fall = setInterval(()=>{
+    t.style.top = (t.offsetTop + 5) + "px";
 
-  document.getElementById("gameArea").appendChild(trishul);
-
-  let fall=setInterval(()=>{
-    let top=parseInt(trishul.style.top);
-    trishul.style.top=(top+5)+"px";
-
-    if(top>window.innerHeight*0.75){
+    if(t.offsetTop > window.innerHeight){
+      t.remove();
       clearInterval(fall);
-      trishul.remove();
-      score--;
-      document.getElementById("score").innerText=score;
     }
-  },30);
+  },20);
 
-  trishul.onclick=function(){
+  t.onclick = function(){
     score++;
-    document.getElementById("score").innerText=score;
+    document.getElementById("score").innerText = score;
+    t.remove();
     clearInterval(fall);
-    trishul.remove();
   }
 }
 
-function endGame(){
-  if(score>highScore){
-    highScore=score;
-    localStorage.setItem("highScore",highScore);
-  }
-  alert("Game Over 🔱 Your Score: "+score);
-  document.getElementById("highScore").innerText=highScore;
-}
+setInterval(createTrishul,1000);
 </script>
 
 </body>
-  </html>
+</html>
