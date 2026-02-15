@@ -5,96 +5,85 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🔱 Happy Mahashivratri 🔱</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
-
 <style>
 body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background:radial-gradient(circle at top,#0a0a2a,#000);
-  color:white;
-  text-align:center;
-  overflow-x:hidden;
+margin:0;
+font-family:Arial, sans-serif;
+background:black;
+color:white;
+text-align:center;
+overflow:hidden;
 }
-.stars{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:url('https://i.imgur.com/9Qe7YwK.png');
-  animation:moveStars 80s linear infinite;
-  z-index:-2;
+
+/* Animated Stars (Pure CSS) */
+body::before{
+content:"";
+position:fixed;
+width:200%;
+height:200%;
+background:
+radial-gradient(white 1px, transparent 1px),
+radial-gradient(white 1px, transparent 1px);
+background-size:50px 50px;
+animation:move 60s linear infinite;
+z-index:-1;
 }
-@keyframes moveStars{
-  from{background-position:0 0;}
-  to{background-position:10000px 5000px;}
+
+@keyframes move{
+from{transform:translate(0,0);}
+to{transform:translate(-500px,-500px);}
 }
-.leaf{
-  position:fixed;
-  top:-50px;
-  width:35px;
-  animation:fall linear infinite;
-  z-index:-1;
-}
-@keyframes fall{
-  to{transform:translateY(100vh) rotate(360deg);}
-}
+
 h1{
-  font-size:38px;
-  animation:glow 2s infinite alternate;
+font-size:35px;
+text-shadow:0 0 20px cyan;
 }
-@keyframes glow{
-  from{text-shadow:0 0 10px cyan;}
-  to{text-shadow:0 0 30px blue;}
-}
+
 .section{padding:40px 20px;}
+
 .btn{
-  padding:12px 25px;
-  background:linear-gradient(45deg,#00f2ff,#0072ff);
-  border:none;
-  color:white;
-  border-radius:30px;
-  cursor:pointer;
-  box-shadow:0 0 15px cyan;
-  margin:10px;
+padding:12px 25px;
+background:cyan;
+border:none;
+border-radius:30px;
+cursor:pointer;
+margin:10px;
 }
-.counter{font-size:24px;margin-top:10px;}
-#shivling{width:150px;margin-top:15px;}
+
 .water{
-  width:10px;
-  height:0;
-  background:cyan;
-  margin:auto;
-  transition:height 1s;
+width:8px;
+height:0;
+background:cyan;
+margin:auto;
+transition:height 1s;
 }
+
 .quiz-box{
-  background:#111;
-  padding:20px;
-  border-radius:15px;
-  max-width:400px;
-  margin:auto;
+background:#111;
+padding:15px;
+border-radius:10px;
+max-width:350px;
+margin:auto;
 }
+
 .option{
-  display:block;
-  margin:8px;
-  padding:8px;
-  background:#222;
-  border-radius:8px;
-  cursor:pointer;
+margin:8px;
+padding:8px;
+background:#222;
+cursor:pointer;
+border-radius:5px;
 }
-.correct{background:green !important;}
-.wrong{background:red !important;}
-footer{padding:20px;opacity:0.7;}
+
+.correct{background:green;}
+.wrong{background:red;}
 </style>
 </head>
 
 <body>
 
-<div class="stars"></div>
-
 <div class="section">
 <h1>🔱 Happy Mahashivratri 🔱</h1>
 <p>Har Har Mahadev</p>
-<button class="btn" onclick="startMusic()">🎵 Start Om Chant</button>
 </div>
 
 <div class="section">
@@ -105,15 +94,13 @@ footer{padding:20px;opacity:0.7;}
 <div class="section">
 <h2>📿 108 Jaap</h2>
 <button class="btn" onclick="increaseJaap()">Chant</button>
-<div class="counter">Total: <span id="jaap">0</span>/108</div>
+<div>Total: <span id="jaap">0</span>/108</div>
 </div>
 
 <div class="section">
 <h2>🪔 Jal Abhishek</h2>
 <div class="water" id="water"></div>
-<img src="https://i.imgur.com/6oKQZ4E.png" id="shivling">
-<br>
-<button class="btn" onclick="abhishek()">💧 Offer Jal</button>
+<button class="btn" onclick="abhishek()">Offer Jal</button>
 </div>
 
 <div class="section">
@@ -128,19 +115,11 @@ footer{padding:20px;opacity:0.7;}
 </div>
 
 <div class="section">
-<button class="btn" onclick="share()">📲 Share</button>
+<button class="btn" onclick="share()">Share</button>
 </div>
 
-<footer>
-Made with Devotion 🔱 | Dhannjay Uphade
-</footer>
-
-<audio id="omAudio" loop>
-<source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
-</audio>
-
 <script>
-// Countdown
+/* Countdown */
 var festivalDate=new Date("March 6, 2026 00:00:00").getTime();
 setInterval(()=>{
 var now=new Date().getTime();
@@ -151,20 +130,43 @@ var days=Math.floor(d/(1000*60*60*24));
 var h=Math.floor((d%(1000*60*60*24))/(1000*60*60));
 var m=Math.floor((d%(1000*60*60))/(1000*60));
 var s=Math.floor((d%(1000*60))/1000);
-document.getElementById("countdown").innerHTML=days+"d "+h+"h "+m+"m "+s+"s";
+document.getElementById("countdown").innerHTML=
+days+"d "+h+"h "+m+"m "+s+"s";
 }
 },1000);
 
-// Leaves animation
-setInterval(()=>{
-let leaf=document.createElement("img");
-leaf.src="https://i.imgur.com/4NZ6uLY.png";
-leaf.className="leaf";
-leaf.style.left=Math.random()*100+"%";
-leaf.style.animationDuration=(5+Math.random()*5)+"s";
-document.body.appendChild(leaf);
-setTimeout(()=>leaf.remove(),10000);
-},1500);
+/* Jaap */
+let jaapCount=localStorage.getItem("jaap")||0;
+document.getElementById("jaap").innerText=jaapCount;
 
-// Jaap
-let jaapCount=
+function increaseJaap(){
+jaapCount++;
+if(jaapCount>108)jaapCount=108;
+document.getElementById("jaap").innerText=jaapCount;
+localStorage.setItem("jaap",jaapCount);
+if(jaapCount==108){
+alert("🎉 108 Jaap Completed! Har Har Mahadev!");
+}
+}
+
+/* Abhishek */
+function abhishek(){
+let water=document.getElementById("water");
+water.style.height="80px";
+setTimeout(()=>{water.style.height="0"},1500);
+}
+
+/* Quiz */
+function check(el,correct){
+if(correct){el.classList.add("correct");}
+else{el.classList.add("wrong");}
+}
+
+/* Share */
+function share(){
+window.open("https://wa.me/?text=Happy Mahashivratri 🔱 "+window.location.href);
+}
+</script>
+
+</body>
+</html>
