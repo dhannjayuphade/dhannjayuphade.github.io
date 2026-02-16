@@ -3,152 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dhannjay Uphade | Official Portal</title>
+<title>Dhannjay Uphade Official Portal</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
 }
 
-/* HERO SECTION */
-.hero {
-  height: 90vh;
+/* HEADER */
+header {
+  background: #1e3a8a;
+  color: white;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* LAYOUT */
+.wrapper {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-  animation: fadeIn 1.5s ease;
 }
 
-.hero h1 {
-  font-size: 40px;
-  background: linear-gradient(45deg, #2563eb, #9333ea);
-  -webkit-background-clip: text;
-  color: transparent;
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: white;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+  height: 100vh;
+  position: sticky;
+  top: 55px;
 }
 
-.hero p {
-  margin: 15px 0;
-  font-size: 18px;
-  color: #cbd5e1;
-}
-
-.hero a {
-  padding: 12px 30px;
-  background: linear-gradient(45deg, #2563eb, #9333ea);
-  border-radius: 30px;
+.sidebar a {
+  display: block;
+  padding: 8px;
   text-decoration: none;
-  color: white;
-  transition: 0.3s;
+  color: #1e3a8a;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.hero a:hover {
-  transform: scale(1.1);
+.sidebar a:hover {
+  background: #e0e7ff;
 }
 
-/* SECTION TITLE */
-.section-title {
-  text-align: center;
-  margin: 50px 0 20px;
-  font-size: 28px;
-}
-
-/* GRID CARDS */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 25px;
-  padding: 0 20px 50px;
+/* CONTENT */
+.content {
+  flex: 1;
+  padding: 30px;
 }
 
 .card {
-  background: #1e293b;
-  padding: 25px;
-  border-radius: 15px;
-  text-align: center;
-  transition: 0.4s;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-}
-
-.card:hover {
-  transform: translateY(-10px);
-}
-
-.card h3 {
-  margin-bottom: 15px;
-}
-
-.card a {
-  text-decoration: none;
-  color: #2563eb;
-  font-weight: bold;
-}
-
-/* FOOTER */
-footer {
-  background: #111827;
+  background: white;
   padding: 20px;
-  text-align: center;
-  color: #94a3b8;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-/* ANIMATION */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+.card h2 {
+  margin-top: 0;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #1e3a8a;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+/* SEARCH */
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* MOBILE */
+@media(max-width: 768px){
+  .wrapper {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+  }
 }
 </style>
-</head>
 
+<script>
+function searchLinks() {
+  let input = document.getElementById("search").value.toLowerCase();
+  let cards = document.getElementsByClassName("card");
+
+  for (let i = 0; i < cards.length; i++) {
+    let text = cards[i].innerText.toLowerCase();
+    cards[i].style.display = text.includes(input) ? "" : "none";
+  }
+}
+</script>
+
+</head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <h1>Dhannjay Uphade</h1>
-  <p>Creator | Editor | Quiz Developer</p>
-  <a href="#explore">Explore Now</a>
-</section>
+<header>
+Dhannjay Uphade Official Portal
+</header>
 
-<!-- CONTENT -->
-<h2 class="section-title" id="explore">Explore Content</h2>
+<div class="wrapper">
 
-<div class="grid">
-
-  <div class="card">
-    <h3>General Knowledge Quiz</h3>
-    <a href="/quiz/">Start Quiz →</a>
-  </div>
-
-  <div class="card">
-    <h3>Game Hub</h3>
-    <a href="/gamehub/">Play Now →</a>
-  </div>
-
-  <div class="card">
-    <h3>Shivaji Maharaj Info</h3>
-    <a href="/shiv/">Explore →</a>
-  </div>
-
-  <div class="card">
-    <h3>Shivjayanti Special Quiz</h3>
-    <a href="/shivjayanti-quiz/">Start →</a>
-  </div>
-
+<div class="sidebar">
+  <a href="/">Home</a>
+  <a href="/index2.html">New Version</a>
+  <a href="/quiz.html">Quiz</a>
+  <a href="/gamehub.html">Game Hub</a>
+  <a href="/shiv.html">Shiv Info</a>
+  <a href="/shivjayanti-quiz.html">Shivjayanti Quiz</a>
 </div>
 
-<footer>
-© 2026 Dhannjay Uphade | Official Creator Portal
-</footer>
+<div class="content">
+
+<div class="search-box">
+  <input type="text" id="search" onkeyup="searchLinks()" placeholder="Search pages...">
+</div>
+
+<div class="card">
+  <h2>General Knowledge Quiz</h2>
+  <p>Interactive MCQ quiz section.</p>
+  <a href="/quiz.html" class="btn">Start Quiz</a>
+</div>
+
+<div class="card">
+  <h2>Game Hub</h2>
+  <p>Play browser-based games.</p>
+  <a href="/gamehub.html" class="btn">Play Now</a>
+</div>
+
+<div class="card">
+  <h2>Shivaji Maharaj Information</h2>
+  <p>Learn about Chhatrapati Shivaji Maharaj.</p>
+  <a href="/shiv.html" class="btn">Read More</a>
+</div>
+
+<div class="card">
+  <h2>Shivjayanti Special Quiz</h2>
+  <p>Special quiz for celebration.</p>
+  <a href="/shivjayanti-quiz.html" class="btn">Start Now</a>
+</div>
+
+</div>
+</div>
 
 </body>
   </html>
