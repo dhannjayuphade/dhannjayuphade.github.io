@@ -3,286 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dynamic Website</title>
+<title>My Official Website</title>
 
 <style>
-
-/* ===== Theme Variables ===== */
-:root{
-  --bg:#0f172a;
-  --text:#ffffff;
-  --card:#1e293b;
-  --nav:#111827;
-}
-
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  transition:0.4s;
+  background:#111827;
+  color:white;
+  text-align:center;
 }
 
-/* ===== Navbar ===== */
+/* Navbar */
 nav{
-  background:var(--nav);
-  padding:10px;
-  text-align:center;
+  background:#000;
+  padding:15px;
 }
 
 nav a{
-  color:var(--text);
+  color:white;
   text-decoration:none;
-  margin:15px;
+  margin:0 15px;
   font-weight:bold;
 }
 
-nav button{
-  padding:5px 10px;
-  cursor:pointer;
+/* Hero Section */
+.hero{
+  padding:60px 20px;
 }
 
-/* ===== Banner Slider ===== */
-.slider{
-  position:relative;
-  width:100%;
-  height:180px;
-  overflow:hidden;
+.hero h1{
+  font-size:32px;
+  margin-bottom:10px;
 }
 
-.slide{
-  width:100%;
-  height:100%;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  font-weight:bold;
-  cursor:pointer;
+.hero p{
+  color:#ccc;
 }
 
-.pink{background:#ec4899;}
-.black{background:#000;}
-
-.slide.active{display:flex;}
-
-/* ===== Cards ===== */
-.container{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
+/* Social Links */
+.links{
+  margin-top:30px;
 }
 
-.card{
-  background:var(--card);
-  margin:15px;
-  padding:20px;
-  width:250px;
-  border-radius:8px;
-  transition:0.4s;
-}
-
-/* ===== Pagination ===== */
-.pagination{
-  text-align:center;
-  margin:20px;
-}
-
-.pagination button{
-  padding:5px 10px;
-  margin:5px;
-  cursor:pointer;
-}
-
-/* ===== Flash Popup ===== */
-.popup{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.8);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.popup-content{
-  background:#fff;
-  padding:20px;
-  text-align:center;
-  border-radius:8px;
-}
-
-.popup-content a{
-  display:block;
+.links a{
+  display:inline-block;
   margin:10px;
-  padding:10px;
-  background:red;
+  padding:12px 20px;
+  background:#ec4899;
   color:white;
   text-decoration:none;
   border-radius:5px;
+  font-weight:bold;
+  transition:0.3s;
 }
 
-.close{
-  margin-top:10px;
-  cursor:pointer;
-  color:red;
+.links a:hover{
+  background:#db2777;
 }
 
+/* Footer */
+footer{
+  margin-top:60px;
+  padding:20px;
+  background:#000;
+  font-size:14px;
+  color:#aaa;
+}
 </style>
 </head>
 
 <body>
-  <h1>welcome</h1>
 
-<!-- ===== Navbar ===== -->
 <nav>
 <a href="#">Home</a>
-<a href="#">About</a>
-<a href="#">Contact</a>
-<button onclick="toggleTheme()">🌗 Theme</button>
+<a href="#about">About</a>
+<a href="#contact">Contact</a>
 </nav>
 
-<!-- ===== Banner Slider ===== -->
-<div class="slider">
-<div class="slide pink active" onclick="openWebsite()">
-Tap Here To Open Website
-</div>
+<div class="hero">
+<h1>Welcome To My Official Website</h1>
+<p>Content Creator | YouTube | Social Media</p>
 
-<div class="slide black" onclick="showPopup()">
-Tap Here For Follow & Subscribe
-</div>
-</div>
-
-<!-- ===== Cards Section ===== -->
-<div class="container" id="cardContainer"></div>
-
-<!-- ===== Pagination ===== -->
-<div class="pagination">
-<button onclick="prevPage()">Prev</button>
-<button onclick="nextPage()">Next</button>
-</div>
-
-<!-- ===== Popup ===== -->
-<div class="popup" id="popup">
-<div class="popup-content">
-<h3>Follow & Subscribe</h3>
-
-<a href="https://youtube.com/" target="_blank">Subscribe YouTube</a>
-<a href="https://instagram.com/" target="_blank">Follow Instagram</a>
-
-<div class="close" onclick="closePopup()">Close</div>
+<div class="links">
+<a href="https://youtube.com/" target="_blank">YouTube Channel</a>
+<a href="https://instagram.com/" target="_blank">Instagram ID</a>
+<a href="mailto:yourmail@gmail.com">Email Me</a>
 </div>
 </div>
 
-<script>
-
-/* ===== Banner Auto Slide ===== */
-let slides=document.querySelectorAll(".slide");
-let index=0;
-
-setInterval(()=>{
-  slides[index].classList.remove("active");
-  index=(index+1)%slides.length;
-  slides[index].classList.add("active");
-},3000);
-
-/* ===== Banner Actions ===== */
-function openWebsite(){
-  window.open("https://dhannjayuphade.github.io/","_blank");
-}
-
-function showPopup(){
-  document.getElementById("popup").style.display="flex";
-}
-
-function closePopup(){
-  document.getElementById("popup").style.display="none";
-}
-
-/* ===== Dynamic Cards + Pagination ===== */
-let items=[];
-for(let i=1;i<=12;i++){
-  items.push("Card Item "+i);
-}
-
-let currentPage=1;
-let perPage=4;
-
-function displayCards(){
-  let container=document.getElementById("cardContainer");
-  container.innerHTML="";
-  
-  let start=(currentPage-1)*perPage;
-  let end=start+perPage;
-  let pageItems=items.slice(start,end);
-
-  pageItems.forEach(item=>{
-    let div=document.createElement("div");
-    div.className="card";
-    div.innerHTML="<h3>"+item+"</h3><p>Dynamic Content</p>";
-    container.appendChild(div);
-  });
-}
-
-function nextPage(){
-  if(currentPage < Math.ceil(items.length/perPage)){
-    currentPage++;
-    displayCards();
-  }
-}
-
-function prevPage(){
-  if(currentPage>1){
-    currentPage--;
-    displayCards();
-  }
-}
-
-displayCards();
-
-/* ===== Theme System ===== */
-function setTheme(type){
-
-  if(type==="dark"){
-    document.documentElement.style.setProperty('--bg','#0f172a');
-    document.documentElement.style.setProperty('--text','#ffffff');
-    document.documentElement.style.setProperty('--card','#1e293b');
-    document.documentElement.style.setProperty('--nav','#111827');
-  }
-
-  if(type==="light"){
-    document.documentElement.style.setProperty('--bg','#ffffff');
-    document.documentElement.style.setProperty('--text','#000000');
-    document.documentElement.style.setProperty('--card','#f3f4f6');
-    document.documentElement.style.setProperty('--nav','#e5e7eb');
-  }
-
-  if(type==="orange"){
-    document.documentElement.style.setProperty('--bg','#ffedd5');
-    document.documentElement.style.setProperty('--text','#000000');
-    document.documentElement.style.setProperty('--card','#fed7aa');
-    document.documentElement.style.setProperty('--nav','#fb923c');
-  }
-
-  localStorage.setItem("theme",type);
-}
-
-function toggleTheme(){
-  let current=localStorage.getItem("theme") || "dark";
-
-  if(current==="dark") setTheme("light");
-  else if(current==="light") setTheme("orange");
-  else setTheme("dark");
-}
-
-window.onload=function(){
-  let saved=localStorage.getItem("theme") || "dark";
-  setTheme(saved);
-}
-
-</script>
+<footer>
+© 2026 All Rights Reserved
+</footer>
 
 </body>
-  </html>
+</html>
