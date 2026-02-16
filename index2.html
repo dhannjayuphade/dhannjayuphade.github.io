@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhannjay Uphade | Official Portal</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+}
+
+/* HERO SECTION */
+.hero {
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  animation: fadeIn 1.5s ease;
+}
+
+.hero h1 {
+  font-size: 40px;
+  background: linear-gradient(45deg, #2563eb, #9333ea);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  margin: 15px 0;
+  font-size: 18px;
+  color: #cbd5e1;
+}
+
+.hero a {
+  padding: 12px 30px;
+  background: linear-gradient(45deg, #2563eb, #9333ea);
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+}
+
+.hero a:hover {
+  transform: scale(1.1);
+}
+
+/* SECTION TITLE */
+.section-title {
+  text-align: center;
+  margin: 50px 0 20px;
+  font-size: 28px;
+}
+
+/* GRID CARDS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  padding: 0 20px 50px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  transition: 0.4s;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card h3 {
+  margin-bottom: 15px;
+}
+
+.card a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: bold;
+}
+
+/* FOOTER */
+footer {
+  background: #111827;
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Dhannjay Uphade</h1>
+  <p>Creator | Editor | Quiz Developer</p>
+  <a href="#explore">Explore Now</a>
+</section>
+
+<!-- CONTENT -->
+<h2 class="section-title" id="explore">Explore Content</h2>
+
+<div class="grid">
+
+  <div class="card">
+    <h3>General Knowledge Quiz</h3>
+    <a href="/quiz/">Start Quiz →</a>
+  </div>
+
+  <div class="card">
+    <h3>Game Hub</h3>
+    <a href="/gamehub/">Play Now →</a>
+  </div>
+
+  <div class="card">
+    <h3>Shivaji Maharaj Info</h3>
+    <a href="/shiv/">Explore →</a>
+  </div>
+
+  <div class="card">
+    <h3>Shivjayanti Special Quiz</h3>
+    <a href="/shivjayanti-quiz/">Start →</a>
+  </div>
+
+</div>
+
+<footer>
+© 2026 Dhannjay Uphade | Official Creator Portal
+</footer>
+
+</body>
+  </html>
