@@ -1,248 +1,287 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dhannjay Uphade Official Portal</title>
-<script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+<title>Dynamic Website</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
+
+/* ===== Theme Variables ===== */
+:root{
+  --bg:#0f172a;
+  --text:#ffffff;
+  --card:#1e293b;
+  --nav:#111827;
 }
 
-/* ===== NAVBAR ===== */
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:0.4s;
+}
+
+/* ===== Navbar ===== */
 nav{
-  background:#111827;
+  background:var(--nav);
   padding:10px;
   text-align:center;
 }
+
 nav a{
-  color:white;
+  color:var(--text);
   text-decoration:none;
-  margin:10px;
+  margin:15px;
   font-weight:bold;
 }
 
-/* ===== HERO ===== */
-.hero{
-  position:relative;
-  height:380px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  overflow:hidden;
-  background:linear-gradient(135deg,#000000,#111827);
-}
-#particles-js{
-  position:absolute;
-  width:100%;
-  height:100%;
-}
-.hero-content{
-  position:relative;
-  z-index:2;
-}
-.hero-btn{
-  padding:10px 20px;
-  background:red;
-  border:none;
-  color:white;
-  border-radius:5px;
+nav button{
+  padding:5px 10px;
   cursor:pointer;
 }
 
-/* ===== CARDS SECTION ===== */
-.section{
-  padding:30px;
-  text-align:center;
+/* ===== Banner Slider ===== */
+.slider{
+  position:relative;
+  width:100%;
+  height:180px;
+  overflow:hidden;
 }
-.cards{
+
+.slide{
+  width:100%;
+  height:100%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.pink{background:#ec4899;}
+.black{background:#000;}
+
+.slide.active{display:flex;}
+
+/* ===== Cards ===== */
+.container{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
 }
+
 .card{
-  background:#1e293b;
+  background:var(--card);
   margin:15px;
   padding:20px;
   width:250px;
   border-radius:8px;
-}
-.card a{
-  display:inline-block;
-  margin-top:10px;
-  padding:8px 15px;
-  background:#2563eb;
-  color:white;
-  text-decoration:none;
-  border-radius:5px;
+  transition:0.4s;
 }
 
-/* ===== SLIDER ===== */
-.slider{overflow:hidden;}
-.slides{display:flex;transition:0.5s;}
-.slide{min-width:100%;}
-.slide img{width:100%;height:220px;object-fit:cover;cursor:pointer;}
-
-/* ===== FOOTER ===== */
-footer{
-  background:#111827;
+/* ===== Pagination ===== */
+.pagination{
   text-align:center;
-  padding:20px;
-}
-footer a{
-  color:white;
-  margin:10px;
-  text-decoration:none;
+  margin:20px;
 }
 
-/* ===== POPUP ===== */
+.pagination button{
+  padding:5px 10px;
+  margin:5px;
+  cursor:pointer;
+}
+
+/* ===== Flash Popup ===== */
 .popup{
-  display:none;
   position:fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
   background:rgba(0,0,0,0.8);
-  justify-content:center;
+  display:none;
   align-items:center;
+  justify-content:center;
 }
-.popup-box{
-  background:white;
-  color:black;
+
+.popup-content{
+  background:#fff;
   padding:20px;
-  border-radius:10px;
   text-align:center;
+  border-radius:8px;
 }
-.popup-box a{
+
+.popup-content a{
   display:block;
-  margin:10px 0;
+  margin:10px;
   padding:10px;
+  background:red;
   color:white;
   text-decoration:none;
   border-radius:5px;
 }
-.yt{background:red;}
-.insta{background:#e1306c;}
+
+.close{
+  margin-top:10px;
+  cursor:pointer;
+  color:red;
+}
 
 </style>
 </head>
 
 <body>
+  <h1>welcome</h1>
 
-<!-- ===== NAVBAR ===== -->
+<!-- ===== Navbar ===== -->
 <nav>
-<a href="/">Home</a>
-<a href="/quiz.html">Quiz</a>
-<a href="/gamehub.html">Game Hub</a>
-<a href="/shiv.html">Shiv Info</a>
-<a href="/suvichar.html">Suvichar</a>
+<a href="#">Home</a>
+<a href="#">About</a>
+<a href="#">Contact</a>
+<button onclick="toggleTheme()">🌗 Theme</button>
 </nav>
 
-<!-- ===== HERO ===== -->
-<div class="hero">
-<div id="particles-js"></div>
-<div class="hero-content">
-<h1>Dhannjay Uphade Portal</h1>
-<p>Science | GK | Shiv Content | Games</p>
-<button class="hero-btn" onclick="openPopup()">Subscribe Now</button>
-</div>
-</div>
-
-<!-- ===== SLIDER ===== -->
+<!-- ===== Banner Slider ===== -->
 <div class="slider">
-<div class="slides">
-<div class="slide">
-<img src="pink-banner.jpg"
-onclick="window.location.href='https://dhannjayuphade.github.io/'">
+<div class="slide pink active" onclick="openWebsite()">
+Tap Here To Open Website
 </div>
-<div class="slide">
-<img src="black-banner.jpg"
-onclick="openPopup()">
-</div>
+
+<div class="slide black" onclick="showPopup()">
+Tap Here For Follow & Subscribe
 </div>
 </div>
 
-<!-- ===== MAIN SECTIONS ===== -->
-<div class="section">
-<h2>Explore Portal</h2>
+<!-- ===== Cards Section ===== -->
+<div class="container" id="cardContainer"></div>
 
-<div class="cards">
-
-<div class="card">
-<h3>GK Quiz</h3>
-<p>Test your knowledge.</p>
-<a href="/quiz.html">Start Quiz</a>
+<!-- ===== Pagination ===== -->
+<div class="pagination">
+<button onclick="prevPage()">Prev</button>
+<button onclick="nextPage()">Next</button>
 </div>
 
-<div class="card">
-<h3>Shivjayanti Quiz</h3>
-<p>Special Shivaji Maharaj quiz.</p>
-<a href="/shivjayanti-quiz.html">Play Now</a>
-</div>
+<!-- ===== Popup ===== -->
+<div class="popup" id="popup">
+<div class="popup-content">
+<h3>Follow & Subscribe</h3>
 
-<div class="card">
-<h3>Game Hub</h3>
-<p>Play browser games.</p>
-<a href="/gamehub.html">Open Games</a>
-</div>
+<a href="https://youtube.com/" target="_blank">Subscribe YouTube</a>
+<a href="https://instagram.com/" target="_blank">Follow Instagram</a>
 
-<div class="card">
-<h3>Suvichar</h3>
-<p>Daily motivational quotes.</p>
-<a href="/suvichar.html">Read</a>
-</div>
-
-</div>
-</div>
-
-<!-- ===== FOOTER ===== -->
-<footer>
-<p>Connect With Me</p>
-
-<a href="https://youtube.com/@DhananjayGaming2.0" target="_blank">YouTube</a>
-<a href="https://instagram.com/yourid" target="_blank">Instagram</a>
-<a href="mailto:your@email.com">Email</a>
-
-<p>© 2026 Dhannjay Uphade</p>
-</footer>
-
-<!-- ===== POPUP ===== -->
-<div id="popup" class="popup">
-<div class="popup-box">
-<h2>Follow & Subscribe</h2>
-<a href="https://youtube.com/@DhananjayGaming2.0" class="yt" target="_blank">Subscribe YouTube</a>
-<a href="https://instagram.com/yourid" class="insta" target="_blank">Follow Instagram</a>
-<button onclick="closePopup()">Close</button>
+<div class="close" onclick="closePopup()">Close</div>
 </div>
 </div>
 
 <script>
-/* Slider Auto */
-let current=0;
-const slides=document.querySelector(".slides");
+
+/* ===== Banner Auto Slide ===== */
+let slides=document.querySelectorAll(".slide");
+let index=0;
+
 setInterval(()=>{
-current=(current+1)%2;
-slides.style.transform=`translateX(-${current*100}%)`;
-},5000);
+  slides[index].classList.remove("active");
+  index=(index+1)%slides.length;
+  slides[index].classList.add("active");
+},3000);
 
-/* Popup */
-function openPopup(){
-document.getElementById("popup").style.display="flex";
+/* ===== Banner Actions ===== */
+function openWebsite(){
+  window.open("https://dhannjayuphade.github.io/","_blank");
 }
+
+function showPopup(){
+  document.getElementById("popup").style.display="flex";
+}
+
 function closePopup(){
-document.getElementById("popup").style.display="none";
+  document.getElementById("popup").style.display="none";
 }
 
-/* Particles */
-particlesJS("particles-js",{
-particles:{number:{value:60},size:{value:3},move:{speed:2},color:{value:"#ff4500"},line_linked:{enable:false}}
-});
+/* ===== Dynamic Cards + Pagination ===== */
+let items=[];
+for(let i=1;i<=12;i++){
+  items.push("Card Item "+i);
+}
+
+let currentPage=1;
+let perPage=4;
+
+function displayCards(){
+  let container=document.getElementById("cardContainer");
+  container.innerHTML="";
+  
+  let start=(currentPage-1)*perPage;
+  let end=start+perPage;
+  let pageItems=items.slice(start,end);
+
+  pageItems.forEach(item=>{
+    let div=document.createElement("div");
+    div.className="card";
+    div.innerHTML="<h3>"+item+"</h3><p>Dynamic Content</p>";
+    container.appendChild(div);
+  });
+}
+
+function nextPage(){
+  if(currentPage < Math.ceil(items.length/perPage)){
+    currentPage++;
+    displayCards();
+  }
+}
+
+function prevPage(){
+  if(currentPage>1){
+    currentPage--;
+    displayCards();
+  }
+}
+
+displayCards();
+
+/* ===== Theme System ===== */
+function setTheme(type){
+
+  if(type==="dark"){
+    document.documentElement.style.setProperty('--bg','#0f172a');
+    document.documentElement.style.setProperty('--text','#ffffff');
+    document.documentElement.style.setProperty('--card','#1e293b');
+    document.documentElement.style.setProperty('--nav','#111827');
+  }
+
+  if(type==="light"){
+    document.documentElement.style.setProperty('--bg','#ffffff');
+    document.documentElement.style.setProperty('--text','#000000');
+    document.documentElement.style.setProperty('--card','#f3f4f6');
+    document.documentElement.style.setProperty('--nav','#e5e7eb');
+  }
+
+  if(type==="orange"){
+    document.documentElement.style.setProperty('--bg','#ffedd5');
+    document.documentElement.style.setProperty('--text','#000000');
+    document.documentElement.style.setProperty('--card','#fed7aa');
+    document.documentElement.style.setProperty('--nav','#fb923c');
+  }
+
+  localStorage.setItem("theme",type);
+}
+
+function toggleTheme(){
+  let current=localStorage.getItem("theme") || "dark";
+
+  if(current==="dark") setTheme("light");
+  else if(current==="light") setTheme("orange");
+  else setTheme("dark");
+}
+
+window.onload=function(){
+  let saved=localStorage.getItem("theme") || "dark";
+  setTheme(saved);
+}
+
 </script>
 
 </body>
