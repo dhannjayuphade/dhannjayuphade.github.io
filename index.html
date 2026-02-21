@@ -671,10 +671,12 @@ function closePopup(){
   <!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
   <a href="index.html">🏠<span>Home</span></a>
+  <a href="index2.html">🏠<span>second home</span></a>
   <a href="gamehub.html">🎮<span>Game</span></a>
-  <a href="quizhub.html">🧠<span>Quiz</span></a>
+  <a href="quiz.html">🧠<span>Quiz</span></a>
   <a href="ai.html">🤖<span>AI</span></a>
   <a href="login.html">🔐<span>Login</span></a>
+  
 </div>
 
 <style>
@@ -693,7 +695,7 @@ function closePopup(){
 .bottom-nav a {
   text-decoration: none;
   color: white;
-  font-size: 12px;
+  font-size: 17px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -702,7 +704,11 @@ function closePopup(){
 .bottom-nav a span {
   font-size: 11px;
 }
-
+.bottom-nav a:hover {
+  color: #28a745;       /* icon/label hover color */
+  transform: scale(1.2); /* slightly enlarge icon */
+  transition: 0.2s;      /* smooth animation */
+  }
 body {
   padding-bottom: 60px;
 }
