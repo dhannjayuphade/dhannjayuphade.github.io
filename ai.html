@@ -6,69 +6,97 @@
 <title>Dhannjay AI</title>
 
 <style>
-body {
-  background: #0f0f0f;
-  color: white;
-  font-family: Arial;
-  margin: 0;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f0f0f;
+  color:white;
 }
 
-header {
-  background: #111;
-  padding: 15px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  border-bottom: 1px solid #333;
+header{
+  background:#111;
+  padding:15px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  border-bottom:1px solid #333;
 }
 
-.chat-box {
-  padding: 15px;
-  height: 70vh;
-  overflow-y: auto;
+.chat-box{
+  padding:15px;
+  height:65vh;
+  overflow-y:auto;
 }
 
-.message {
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 10px;
-  max-width: 80%;
+.message{
+  margin:8px 0;
+  padding:10px 14px;
+  border-radius:20px;
+  max-width:75%;
+  word-wrap:break-word;
 }
 
-.user {
-  background: #2563eb;
-  align-self: flex-end;
+.user{
+  background:#2563eb;
+  margin-left:auto;
 }
 
-.bot {
-  background: #333;
+.bot{
+  background:#333;
 }
 
-.input-area {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  background: #111;
-  padding: 10px;
+.suggestions{
+  padding:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
 }
 
-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 20px;
-  border: none;
-  outline: none;
+.suggestions button{
+  padding:6px 12px;
+  border:none;
+  border-radius:20px;
+  background:#222;
+  color:white;
+  cursor:pointer;
+  font-size:12px;
 }
 
-button {
-  margin-left: 8px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 20px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
+.input-area{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  padding:10px;
+  background:#111;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  outline:none;
+}
+
+button.send-btn{
+  margin-left:8px;
+  padding:10px 14px;
+  border:none;
+  border-radius:20px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+button.mic-btn{
+  margin-left:5px;
+  padding:10px;
+  border:none;
+  border-radius:50%;
+  background:#444;
+  color:white;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -79,51 +107,85 @@ button {
 
 <div class="chat-box" id="chatBox"></div>
 
+<div class="suggestions">
+  <button onclick="quickAsk('quiz')">Quiz</button>
+  <button onclick="quickAsk('game')">Game</button>
+  <button onclick="quickAsk('website')">Website</button>
+  <button onclick="quickAsk('help')">Help</button>
+</div>
+
 <div class="input-area">
   <input type="text" id="userInput" placeholder="Ask something...">
-  <button onclick="sendMessage()">Send</button>
+  <button class="mic-btn" onclick="startVoice()">🎤</button>
+  <button class="send-btn" onclick="sendMessage()">Send</button>
 </div>
 
 <script>
-function sendMessage() {
-  let input = document.getElementById("userInput").value;
-  if(input === "") return;
+function sendMessage(){
+  let input=document.getElementById("userInput").value;
+  if(input==="") return;
 
-  addMessage(input, "user");
+  addMessage(input,"user");
+  let reply=getReply(input);
 
-  let reply = getReply(input);
-  setTimeout(() => {
-    addMessage(reply, "bot");
-  }, 500);
+  setTimeout(()=>{
+    addMessage(reply,"bot");
+  },400);
 
-  document.getElementById("userInput").value = "";
+  document.getElementById("userInput").value="";
 }
 
-function addMessage(text, type) {
-  let chatBox = document.getElementById("chatBox");
-  let msg = document.createElement("div");
-  msg.classList.add("message", type);
-  msg.innerText = text;
+function quickAsk(text){
+  document.getElementById("userInput").value=text;
+  sendMessage();
+}
+
+function addMessage(text,type){
+  let chatBox=document.getElementById("chatBox");
+  let msg=document.createElement("div");
+  msg.classList.add("message",type);
+  msg.innerHTML=text;
   chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollTop=chatBox.scrollHeight;
 }
 
-function getReply(input) {
-  input = input.toLowerCase();
+function getReply(input){
+  input=input.toLowerCase();
 
-  if(input.includes("hi") || input.includes("hello"))
+  if(input.includes("hi")||input.includes("hello"))
     return "Hello 👋 Welcome to Dhannjay AI!";
 
   if(input.includes("quiz"))
-    return "Go to Quiz Hub section to start quiz.";
+    return 'Open Quiz Hub 👉 <a href="quizhub.html" style="color:#4da6ff;">Click Here</a>';
 
   if(input.includes("game"))
-    return "Visit Game Hub to play games 🎮";
+    return 'Open Game Hub 👉 <a href="gamehub.html" style="color:#4da6ff;">Click Here</a>';
 
   if(input.includes("website"))
-    return "This is Dhannjay Uphade official website.";
+    return 'Main Website 👉 <a href="index.html" style="color:#4da6ff;">Open Home</a>';
 
-  return "I am learning. Ask something else 😊";
+  if(input.includes("help"))
+    return "You can ask about: quiz, game, website, help.";
+
+  return "I am learning 🤖 Ask about quiz, game or website.";
+}
+
+/* Voice Input */
+function startVoice(){
+  if(!('webkitSpeechRecognition' in window)){
+    alert("Voice not supported in this browser");
+    return;
+  }
+
+  let recognition=new webkitSpeechRecognition();
+  recognition.lang="en-US";
+  recognition.start();
+
+  recognition.onresult=function(event){
+    let voiceText=event.results[0][0].transcript;
+    document.getElementById("userInput").value=voiceText;
+    sendMessage();
+  };
 }
 </script>
 
