@@ -78,4 +78,83 @@ button{
   padding:10px 15px;
   margin-left:5px;
   border:none;
-  background:#22c
+  background:#22c55e;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover{
+  background:#16a34a;
+}
+</style>
+</head>
+
+<body>
+
+<header>🤖 Dhannjay Smart AI</header>
+<div class="avatar">🤖</div>
+
+<div id="chatBox"></div>
+
+<div class="input-area">
+  <input type="text" id="userInput" placeholder="Ask something...">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+
+async function sendMessage(){
+
+  let input = document.getElementById("userInput");
+  let text = input.value.trim();
+  if(text === "") return;
+
+  addMessage(text,"user");
+  input.value="";
+
+  let reply = "";
+
+  try{
+
+    const response = await fetch("https://dhannjayuphade-github-io.vercel.app/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await response.json();
+
+    if(response.ok && data.reply){
+        reply = data.reply;
+    } else {
+        reply = "API Error: " + (data.error || response.status);
+    }
+
+  } catch(error){
+      reply = "Server Connection Failed ❌";
+  }
+
+  addMessage(reply,"bot");
+  speak(reply);
+}
+
+function addMessage(text,type){
+  let msg = document.createElement("div");
+  msg.classList.add("message",type);
+  msg.innerText=text;
+  document.getElementById("chatBox").appendChild(msg);
+  document.getElementById("chatBox").scrollTop =
+      document.getElementById("chatBox").scrollHeight;
+}
+
+function speak(text){
+   let speech = new SpeechSynthesisUtterance(text);
+   speech.lang = "en-US";
+   speech.rate = 1;
+   window.speechSynthesis.speak(speech);
+}
+
+</script>
+
+</body>
+</html>
