@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dhannjay AI</title>
+<title>Dhannjay Smart AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -78,111 +78,4 @@ button{
   padding:10px 15px;
   margin-left:5px;
   border:none;
-  background:#22c55e;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-  <h1>wellcome to creator studio ai </h1>
-
-<header>🤖 Dhannjay Smart AI</header>
-<div class="avatar">🤖</div>
-
-<div id="chatBox"></div>
-
-<div class="input-area">
-  <input type="text" id="userInput" placeholder="Ask something...">
-  <button onclick="sendMessage()">Send</button>
-</div>
-
-<script>
-
-let userName = localStorage.getItem("dhannjayUser") || "";
-
-/* ========== SEND MESSAGE ========== */
-async function sendMessage(){
-  let input = document.getElementById("userInput");
-  let text = input.value.trim();
-  if(text === "") return;
-
-  addMessage(text,"user");
-  input.value="";
-
-  let reply;
-
-  try{
-      // ===== REAL API CALL =====
-      const response = await fetch("https://dhannjayuphade-github-io.vercel.app/api/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: text })
-});
-
-console.log("Status:", response.status);
-
-const data = await response.json();
-console.log("API DATA:", data);
-
-if(response.ok && data.reply){
-    reply = data.reply;
-}else{
-    reply = "API Error: " + (data.error || "Unknown error");
-  }
-      // ===== FALLBACK SMART AI =====
-      reply = smartFallback(text);
-  }
-
-  addMessage(reply,"bot");
-  speak(reply);
-}
-
-/* ========== SMART FALLBACK AI ========== */
-function smartFallback(text){
-
-  text = text.toLowerCase();
-
-  if(text.startsWith("my name is")){
-      userName = text.replace("my name is","").trim();
-      localStorage.setItem("dhannjayUser", userName);
-      return "Nice to meet you " + userName + " 👋";
-  }
-
-  if(text.includes("who am i")){
-      return userName ? "You are " + userName : "Tell me your name first.";
-  }
-
-  if(text.includes("quiz")) return "Quiz Hub la ja 🧠";
-  if(text.includes("game")) return "Game Hub available 🎮";
-  if(text.includes("login")) return "Login page var jaun account create kara 🔐";
-  if(text.includes("hi") || text.includes("hello")) 
-      return "Hello " + (userName || "") + " 👋";
-
-  return "Mi ajun sikat ahe 🤖";
-}
-
-/* ========== ADD MESSAGE UI ========== */
-function addMessage(text,type){
-  let msg = document.createElement("div");
-  msg.classList.add("message",type);
-  msg.innerText=text;
-  document.getElementById("chatBox").appendChild(msg);
-  document.getElementById("chatBox").scrollTop =
-      document.getElementById("chatBox").scrollHeight;
-}
-
-/* ========== VOICE ========== */
-function speak(text){
-   let speech = new SpeechSynthesisUtterance(text);
-   speech.lang = "en-US";
-   speech.rate = 1;
-   window.speechSynthesis.speak(speech);
-}
-
-</script>
-
-</body>
-</html>
+  background:#22c
