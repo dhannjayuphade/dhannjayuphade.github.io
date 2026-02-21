@@ -668,5 +668,44 @@ function closePopup(){
   document.getElementById("welcomePopup").style.display="none";
 }
 </script>
+  <!-- Bottom Navigation Bar -->
+<div class="bottom-nav">
+  <a href="index.html">🏠<span>Home</span></a>
+  <a href="gamehub.html">🎮<span>Game</span></a>
+  <a href="quizhub.html">🧠<span>Quiz</span></a>
+  <a href="ai.html">🤖<span>AI</span></a>
+  <a href="login.html">🔐<span>Login</span></a>
+</div>
+
+<style>
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  border-top: 1px solid #333;
+  z-index: 1000;
+}
+
+.bottom-nav a {
+  text-decoration: none;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-nav a span {
+  font-size: 11px;
+}
+
+body {
+  padding-bottom: 60px;
+}
+  </style>
 </body>
 </html>
