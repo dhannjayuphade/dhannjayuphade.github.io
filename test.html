@@ -8,23 +8,32 @@
 <h2>Test Dhannjay AI</h2>
 
 <input id="msg" placeholder="Type message" style="padding:10px;width:70%">
-<button onclick="send()">Send</button>
+<button id="sendBtn">Send</button>
 
 <p id="output"></p>
 
 <script>
-async function send() {
+const sendBtn = document.getElementById("sendBtn");
+sendBtn.addEventListener("click", async () => {
   const message = document.getElementById("msg").value;
+  document.getElementById("output").innerText = "AI is thinking...";
 
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message })
-  });
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
+    });
 
-  const data = await res.json();
-  document.getElementById("output").innerText = data.reply;
-}
+    const data = await res.json();
+
+    document.getElementById("output").innerText = data.reply || "AI did not respond";
+
+  } catch (err) {
+    document.getElementById("output").innerText = "Error: " + err.message;
+    console.error(err);
+  }
+});
 </script>
 
 </body>
