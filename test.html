@@ -11,18 +11,7 @@
 <button id="sendBtn">Send</button>
 
 <p id="output"></p>
-  try {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message })
-  });
 
-  const text = await res.text(); // <- JSON parsing आधी text पहा
-  console.log("Raw server response:", text);
-} catch(err) {
-  console.error(err);
-}
 <script>
 const sendBtn = document.getElementById("sendBtn");
 sendBtn.addEventListener("click", async () => {
@@ -31,10 +20,14 @@ sendBtn.addEventListener("click", async () => {
 
   try {
     const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: "Hello AI" })
+});
+
+const text = await res.text();
+console.log("Raw server response:", text);
+ 
 
     const data = await res.json();
 
