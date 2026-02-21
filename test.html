@@ -1,45 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Test</title>
+  <meta charset="UTF-8">
+  <title>Dhannjay AI Test</title>
+  <style>
+    body { 
+      background: black; 
+      color: white; 
+      font-family: sans-serif; 
+      text-align: center; 
+      padding: 50px; 
+    }
+    #msg {
+      padding: 10px;
+      width: 70%;
+      margin-bottom: 10px;
+    }
+    #sendBtn {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      min-height: 50px;
+    }
+  </style>
 </head>
-<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding:50px;">
+<body>
 
 <h2>Test Dhannjay AI</h2>
 
-<input id="msg" placeholder="Type message" style="padding:10px;width:70%">
+<input id="msg" placeholder="Type message here...">
+<br>
 <button id="sendBtn">Send</button>
 
 <p id="output"></p>
 
 <script>
 const sendBtn = document.getElementById("sendBtn");
+
 sendBtn.addEventListener("click", async () => {
   const message = document.getElementById("msg").value;
-  document.getElementById("output").innerText = "AI is thinking...";
+  if (!message) return;
+
+  const output = document.getElementById("output");
+  output.innerText = "AI is thinking...";
 
   try {
     const res = await fetch("/api/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: "Hello AI" })
-});
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
+    });
 
-const text = await res.text();
-console.log("Raw server response:", text);
- 
-
+    // ✅ Only parse JSON once
     const data = await res.json();
 
-    document.getElementById("output").innerText = data.reply || "AI did not respond";
+    output.innerText = data.reply || "AI did not respond";
 
   } catch (err) {
-    document.getElementById("output").innerText = "Error: " + err.message;
+    output.innerText = "Error: " + err.message;
     console.error(err);
   }
 });
 </script>
-
 
 </body>
 </html>
