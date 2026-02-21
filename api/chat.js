@@ -20,9 +20,10 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    return res.status(200).json({
-      reply: data.output[0].content[0].text
-    });
+    // Correct path to get AI reply
+    const reply = data.output?.[0]?.content?.[0]?.text || "AI did not respond";
+
+    return res.status(200).json({ reply });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
