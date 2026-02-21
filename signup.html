@@ -32,21 +32,17 @@ signupBtn.addEventListener("click", () => {
     return;
   }
 
-  // Get users from localStorage
   let users = JSON.parse(localStorage.getItem("dhannjay_users")) || [];
-
-  // Check if username exists
   if(users.find(u => u.username === username)) {
     error.innerText = "Username already exists!";
     return;
   }
 
-  // Add new user
   users.push({ username, password });
   localStorage.setItem("dhannjay_users", JSON.stringify(users));
 
   alert("Sign up successful! Please login now.");
-  window.location.href = "login.html"; // Redirect to login page
+  window.location.href = "login.html";
 });
 </script>
 
