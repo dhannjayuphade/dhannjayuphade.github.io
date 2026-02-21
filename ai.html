@@ -116,16 +116,22 @@ async function sendMessage(){
 
   try{
       // ===== REAL API CALL =====
-      const response = await fetch("/api/chat", {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ message:text })
-      });
+      const response = await fetch("https://dhannjayuphade-github-io.vercel.app/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: text })
+});
 
-      const data = await response.json();
-      reply = data.reply || smartFallback(text);
+console.log("Status:", response.status);
 
-  }catch(error){
+const data = await response.json();
+console.log("API DATA:", data);
+
+if(response.ok && data.reply){
+    reply = data.reply;
+}else{
+    reply = "API Error: " + (data.error || "Unknown error");
+  }
       // ===== FALLBACK SMART AI =====
       reply = smartFallback(text);
   }
