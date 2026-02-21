@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Test</title>
+</head>
+<body style="background:black;color:white;font-family:sans-serif;text-align:center;padding:50px;">
+
+<h2>Test Dhannjay AI</h2>
+
+<input id="msg" placeholder="Type message" style="padding:10px;width:70%">
+<button onclick="send()">Send</button>
+
+<p id="output"></p>
+
+<script>
+async function send() {
+  const message = document.getElementById("msg").value;
+
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  });
+
+  const data = await res.json();
+  document.getElementById("output").innerText = data.reply;
+}
+</script>
+
+</body>
+</html>
