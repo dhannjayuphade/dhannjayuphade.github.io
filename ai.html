@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhannjay AI</title>
+
+<style>
+body {
+  background: #0f0f0f;
+  color: white;
+  font-family: Arial;
+  margin: 0;
+}
+
+header {
+  background: #111;
+  padding: 15px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 1px solid #333;
+}
+
+.chat-box {
+  padding: 15px;
+  height: 70vh;
+  overflow-y: auto;
+}
+
+.message {
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+.user {
+  background: #2563eb;
+  align-self: flex-end;
+}
+
+.bot {
+  background: #333;
+}
+
+.input-area {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: #111;
+  padding: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+}
+
+button {
+  margin-left: 8px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>🤖 Dhannjay AI</header>
+
+<div class="chat-box" id="chatBox"></div>
+
+<div class="input-area">
+  <input type="text" id="userInput" placeholder="Ask something...">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+function sendMessage() {
+  let input = document.getElementById("userInput").value;
+  if(input === "") return;
+
+  addMessage(input, "user");
+
+  let reply = getReply(input);
+  setTimeout(() => {
+    addMessage(reply, "bot");
+  }, 500);
+
+  document.getElementById("userInput").value = "";
+}
+
+function addMessage(text, type) {
+  let chatBox = document.getElementById("chatBox");
+  let msg = document.createElement("div");
+  msg.classList.add("message", type);
+  msg.innerText = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function getReply(input) {
+  input = input.toLowerCase();
+
+  if(input.includes("hi") || input.includes("hello"))
+    return "Hello 👋 Welcome to Dhannjay AI!";
+
+  if(input.includes("quiz"))
+    return "Go to Quiz Hub section to start quiz.";
+
+  if(input.includes("game"))
+    return "Visit Game Hub to play games 🎮";
+
+  if(input.includes("website"))
+    return "This is Dhannjay Uphade official website.";
+
+  return "I am learning. Ask something else 😊";
+}
+</script>
+
+</body>
+  </html>
