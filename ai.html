@@ -2,97 +2,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dhannjay Smart AI</title>
+<title>Dhannjay AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body{
-  margin:0;
-  font-family: Arial;
-  background:#0f172a;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-}
-
-header{
-  background:#111;
-  padding:15px;
-  text-align:center;
-  font-size:18px;
-  font-weight:bold;
-}
-
-.avatar{
-  text-align:center;
-  font-size:50px;
-  animation:float 2s infinite alternate;
-}
-
-@keyframes float{
-  from{ transform: translateY(0px); }
-  to{ transform: translateY(10px); }
-}
-
-#chatBox{
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-}
-
-.message{
-  margin:8px 0;
-  padding:10px;
-  border-radius:10px;
-  max-width:75%;
-}
-
-.user{
-  background:#2563eb;
-  align-self:flex-end;
-}
-
-.bot{
-  background:#1e293b;
-  align-self:flex-start;
-}
-
-.input-area{
-  display:flex;
-  padding:10px;
-  background:#111;
-}
-
-input{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:6px;
-  outline:none;
-}
-
-button{
-  padding:10px 15px;
-  margin-left:5px;
-  border:none;
-  background:#22c55e;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-button:hover{
-  background:#16a34a;
-}
+body { margin:0; font-family: Arial; background:#0f172a; color:white; display:flex; flex-direction:column; height:100vh;}
+header{ background:#111; padding:15px; text-align:center; font-size:18px; font-weight:bold;}
+#chatBox{ flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column;}
+.message{ margin:8px 0; padding:10px; border-radius:10px; max-width:75%;}
+.user{ background:#2563eb; align-self:flex-end;}
+.bot{ background:#1e293b; align-self:flex-start;}
+.input-area{ display:flex; padding:10px; background:#111;}
+input{ flex:1; padding:10px; border:none; border-radius:6px; outline:none;}
+button{ padding:10px 15px; margin-left:5px; border:none; background:#22c55e; color:white; border-radius:6px; cursor:pointer;}
 </style>
 </head>
-
 <body>
 
 <header>🤖 Dhannjay Smart AI</header>
-<div class="avatar">🤖</div>
 
 <div id="chatBox"></div>
 
@@ -102,58 +28,61 @@ button:hover{
 </div>
 
 <script>
+let userName = localStorage.getItem("dhannjayUser") || "";
 
-async function sendMessage(){
-
+// ===== SEND MESSAGE =====
+function sendMessage(){
   let input = document.getElementById("userInput");
   let text = input.value.trim();
-  if(text === "") return;
+  if(text==="") return;
 
   addMessage(text,"user");
   input.value="";
 
-  let reply = "";
-
-  try{
-
-    const response = await fetch("https://dhannjayuphade-github-io.vercel.app/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await response.json();
-
-    if(response.ok && data.reply){
-        reply = data.reply;
-    } else {
-        reply = "API Error: " + (data.error || response.status);
-    }
-
-  } catch(error){
-      reply = "Server Connection Failed ❌";
-  }
-
+  let reply = smartFallback(text);
   addMessage(reply,"bot");
   speak(reply);
 }
 
+// ===== SMART FALLBACK AI =====
+function smartFallback(text){
+  text = text.toLowerCase();
+
+  if(text.startsWith("my name is")){
+      userName = text.replace("my name is","").trim();
+      localStorage.setItem("dhannjayUser", userName);
+      return "Nice to meet you " + userName + " 👋";
+  }
+
+  if(text.includes("who am i")){
+      return userName ? "You are " + userName : "Tell me your name first.";
+  }
+
+  if(text.includes("quiz")) return "Quiz Hub la ja 🧠";
+  if(text.includes("game")) return "Game Hub available 🎮";
+  if(text.includes("login")) return "Login page var jaun account create kara 🔐";
+  if(text.includes("hi") || text.includes("hello")) 
+      return "Hello " + (userName || "") + " 👋";
+
+  return "Mi ajun sikat ahe 🤖";
+}
+
+// ===== ADD MESSAGE TO UI =====
 function addMessage(text,type){
   let msg = document.createElement("div");
   msg.classList.add("message",type);
   msg.innerText=text;
   document.getElementById("chatBox").appendChild(msg);
-  document.getElementById("chatBox").scrollTop =
-      document.getElementById("chatBox").scrollHeight;
+  document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
 }
 
+// ===== VOICE =====
 function speak(text){
    let speech = new SpeechSynthesisUtterance(text);
    speech.lang = "en-US";
    speech.rate = 1;
    window.speechSynthesis.speak(speech);
 }
-
 </script>
 
 </body>
