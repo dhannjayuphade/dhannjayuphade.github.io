@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     <a href="index.html">🏠<span>Home</span></a>
     <a href="index2.html">📂<span>Hubs</span></a>
     <a href="gamehub.html">🎮<span>Game</span></a>
-    <a href="quiz.html">🧠<span>Quiz</span></a>
+    <a href="https://dhannjayuphade.github.io/suvichar/">✅<span>suvichar</a>
+    <a href="quizhub.html">🧠<span>Quiz</span></a>
     <a href="ai.html">🤖<span>AI</span></a>
     <a href="login.html">🔐<span>Login</span></a>
   </div>
