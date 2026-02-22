@@ -20,7 +20,9 @@ export default async function handler(req, res) {
     if (!process.env.OPENAI_API_KEY) {
       return res.status(500).json({ error: "API key missing" });
     }
-
+const openai = new OpenAI({
+  apiKey: "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"
+});
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
