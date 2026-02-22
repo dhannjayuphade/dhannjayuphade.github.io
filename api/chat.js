@@ -42,7 +42,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       reply: completion.choices[0].message.content
     });
-
+return res.status(200).json({
+  envCheck: process.env.OPENAI_API_KEY || "NOT FOUND"
+});
   } catch (error) {
     console.error("OPENAI ERROR:", error);
     return res.status(500).json({
