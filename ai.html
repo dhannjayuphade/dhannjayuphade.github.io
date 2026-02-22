@@ -57,14 +57,14 @@ function smartFallback(text){
   if(text.includes("who am i")){
       return userName ? "You are " + userName : "Tell me your name first.";
   }
-
+if(text.includes("how are you")) return "i am fine , Thanks";
   if(text.includes("quiz")) return "Quiz Hub la ja 🧠";
   if(text.includes("game")) return "Game Hub available 🎮";
   if(text.includes("login")) return "Login page var jaun account create kara 🔐";
   if(text.includes("hi") || text.includes("hello")) 
       return "Hello " + (userName || "") + " 👋";
 
-  return "Mi ajun sikat ahe 🤖";
+  return "Mi ajun sikat ahe 🤖,now go to play games game hub, solve quiz quiz hub";
 }
 
 // ===== ADD MESSAGE TO UI =====
@@ -84,6 +84,6 @@ function speak(text){
    window.speechSynthesis.speak(speech);
 }
 </script>
-
+<script src="navbar.js"></script>
 </body>
 </html>
