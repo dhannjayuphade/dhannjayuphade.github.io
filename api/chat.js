@@ -1,7 +1,12 @@
 import OpenAI from "openai";
 
 export default async function handler(req, res) {
-
+// DEBUG ONLY
+if (req.method === "POST") {
+  return res.status(200).json({
+    envCheck: process.env.OPENAI_API_KEY ? "FOUND" : "NOT FOUND"
+  });
+}
   // ===== CORS =====
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
