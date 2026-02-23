@@ -231,11 +231,7 @@ let percent=Math.round((score/questions.length)*100);
 document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
 
 showCertificate(name,percent);
-}
-<img src="banners.jpg"
-style="width:100%;height:120px;object-fit:cover;border-radius:10px;">
 function showCertificate(name,percent){
-
 let cert=`
 <div id="certificateBox" style="
 width:95%;
@@ -248,35 +244,45 @@ font-family:Georgia,serif;
 box-shadow:0 0 30px rgba(0,0,0,0.3);
 ">
 
-<h1 style="color:#1e3c72;font-size:36px;">
+<!-- Banner on top of certificate -->
+<img src="banners.jpg"
+style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:20px;">
+
+<h1 style="color:#1e3c72;font-size:36px;text-align:center;">
 SCIENCE ACHIEVEMENT CERTIFICATE
 </h1>
 
 <hr style="border:3px solid #1e3c72;margin:15px 0;">
 
-<h2 style="color:#ff512f;">${name}</h2>
+<h2 style="color:#ff512f;text-align:center;">${name}</h2>
 
-<p>Has successfully completed the Science Special Online Quiz</p>
+<p style="text-align:center;">Has successfully completed the Science Special Online Quiz</p>
 
-<h3>Final Score: ${percent}%</h3>
+<h3 style="text-align:center;">Final Score: ${percent}%</h3>
 
-<p>Date: ${new Date().toLocaleDateString()}</p>
+<p style="text-align:center;">Date: ${new Date().toLocaleDateString()}</p>
 
 <hr style="margin:25px 0;">
 
-<p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
-<p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
+<p style="text-align:center;"><strong>Website:</strong> https://dhannjayuphade.github.io</p>
+<p style="text-align:center;"><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
+
+<div style="text-align:center;margin-top:30px;">
+<img src="signature.png" style="width:180px;"><br>
+<b>Authorized Signature</b>
+</div>
 
 <br>
 
+<div style="text-align:center;">
 <button onclick="downloadPDF()">Download PDF</button>
+</div>
 
 </div>
-`;
+
 
 document.getElementById("certificateArea").innerHTML=cert;
-}
-
+                    }
 function downloadPDF(){
 html2pdf().from(document.getElementById("certificateBox")).save();
 }
