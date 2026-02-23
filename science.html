@@ -3,128 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Science Special Quiz</title>
+<title>Science Quiz Special</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#1e3c72,#2a5298);
-}
-
-header{
-  text-align:center;
-  color:white;
-  padding:20px;
-  font-size:28px;
-  font-weight:bold;
-  letter-spacing:2px;
-}
-
-.container{
-  max-width:800px;
-  margin:auto;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#1e3c72,#2a5298);
   padding:15px;
+  color:white;
 }
-
+h1{text-align:center;}
 input[type=text]{
   width:100%;
-  padding:12px;
+  padding:10px;
   margin:15px 0;
   border-radius:8px;
   border:none;
   font-size:16px;
 }
-
-.timer{
-  text-align:center;
-  font-size:20px;
-  color:white;
-  margin-bottom:20px;
-}
-
-.question-box{
+.question{
   background:white;
-  padding:20px;
-  margin-bottom:20px;
-  border-radius:8px;
+  color:black;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
 }
-
-.option{
-  display:block;
-  margin:8px 0;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #ddd;
-  cursor:pointer;
-}
-
+.correct{background:#c8e6c9;}
+.incorrect{background:#ffcdd2;}
 button{
+  padding:10px 18px;
   background:#ff512f;
   color:white;
-  padding:12px 20px;
+  font-weight:bold;
   border:none;
-  border-radius:10px;
-  font-size:16px;
+  border-radius:8px;
   cursor:pointer;
-  margin-top:15px;
+  margin-top:10px;
 }
-
-button:hover{
-  background:#e04128;
-}
-
-.score{
-  text-align:center;
-  font-size:24px;
-  color:white;
-  margin:20px 0;
-}
-
-a.home-btn{
+#certificate{
+  display:none;
+  width:100%;
+  max-width:900px;
+  margin:30px auto;
+  padding:30px;
   background:white;
-  color:#1e3c72;
-  padding:8px 18px;
-  border-radius:20px;
-  text-decoration:none;
-  font-weight:bold;
+  color:black;
+  border:8px solid #1e3c72;
+  text-align:center;
+  position:relative;
+  border-radius:15px;
 }
-
-a.whatsapp-btn{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#25D366;
-  color:white;
-  padding:12px 18px;
-  border-radius:50px;
-  text-decoration:none;
-  font-weight:bold;
-  z-index:999;
+#certificate img.banner{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  margin-bottom:15px;
+}
+.signature{
+  width:150px;
+  display:block;
+  margin:20px auto;
 }
 </style>
 </head>
-
 <body>
 
-<header>🔬 SCIENCE SPECIAL QUIZ</header>
+<h1>🔬 Science Special Quiz 🔬</h1>
+<label>Enter Your Name:</label><br>
+<input type="text" id="username"><br>
 
-<div style="text-align:center;margin:15px 0;">
-  <a href="index.html" class="home-btn">🏠 Back to Home</a>
-</div>
-
-<a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" class="whatsapp-btn">💬 Join Group</a>
-
-<div class="container">
-<input type="text" id="username" placeholder="Enter Your Name">
-<div class="timer">Time Left: <span id="time">15:00</span></div>
 <form id="quizForm"></form>
+
 <button onclick="submitQuiz()">Submit Quiz</button>
-<div class="score" id="result"></div>
-<div id="certificateArea"></div>
+
+<h2 id="result"></h2>
+
+<div id="certificate">
+  <img src="banners.jpg" class="banner">
+  <h2 style="color:#1e3c72;">SCIENCE ACHIEVEMENT CERTIFICATE</h2>
+  <p>This certificate is proudly presented to</p>
+  <h1 id="certName"></h1>
+  <p>For scoring <span id="certScore"></span>% in Science Special Quiz</p>
+  <p>Date: <span id="certDate"></span></p>
+  <hr>
+  <img src="signatures.png" class="signature">
+  <p><strong>Website:</strong> <a href="https://dhannjayuphade.github.io/" target="_blank">dhannjayuphade.github.io</a></p>
+  <p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
 </div>
+
+<button id="downloadBtn" style="display:none;" onclick="downloadPDF()">Download PDF</button>
 
 <script>
 const questions=[
@@ -163,114 +133,51 @@ const questions=[
 const form=document.getElementById("quizForm");
 questions.forEach((item,index)=>{
   let div=document.createElement("div");
-  div.className="question-box";
-  div.innerHTML=`<h3>${item.q}</h3>`+
-  item.a.map(opt=>`
-  <label class="option">
-  <input type="radio" name="q${index}" value="${opt}"> ${opt}
-  </label>`).join("");
+  div.className="question";
+  div.innerHTML=`<p>${index+1}. ${item.q}</p>` +
+    item.a.map(opt=>`<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join("");
   form.appendChild(div);
 });
 
-let totalTime=900;
-const timer=document.getElementById("time");
-
-let countdown=setInterval(()=>{
-  let m=Math.floor(totalTime/60);
-  let s=totalTime%60;
-  timer.innerText=`${m}:${s<10?"0":""}${s}`;
-  totalTime--;
-  if(totalTime<0){
-    clearInterval(countdown);
-    submitQuiz();
-  }
-},1000);
-
 function submitQuiz(){
-  clearInterval(countdown);
   let name=document.getElementById("username").value;
   if(name===""){alert("Enter Name"); return;}
   let score=0;
 
   questions.forEach((item,index)=>{
-    let options=document.querySelectorAll(`input[name="q${index}"]`);
-    options.forEach(opt=>{
-      let label=opt.parentElement;
-      label.style.background="#fff";
-      label.style.border="1px solid #ddd";
-      if(opt.value===item.c) label.style.border="3px solid green";
-      if(opt.checked && opt.value!==item.c){
-        label.style.background="#ffcccc";
-        label.style.border="3px solid red";
-      }
-      if(opt.checked && opt.value===item.c){
-        label.style.background="#ccffcc";
-        score++;
-      }
+    const selected=document.querySelector(`input[name="q${index}"]:checked`);
+    const options=document.querySelectorAll(`input[name="q${index}"]`);
+    options.forEach((opt,i)=>{
+      opt.parentElement.classList.remove("correct","incorrect");
     });
+    if(selected){
+      if(selected.value===item.c) score++;
+      options.forEach((opt)=>{
+        if(opt.value===item.c) opt.parentElement.classList.add("correct");
+        if(selected.value!==item.c && opt.checked) opt.parentElement.classList.add("incorrect");
+      });
+    }
   });
 
   let percent=Math.round((score/questions.length)*100);
-  document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
+  document.getElementById("result").innerText="Your Score: "+percent+"%";
 
-  showCertificate(name, percent);
-}
-
-function showCertificate(name, percent){
-  let grade="";
-  if(percent>=90) grade="A+";
-  else if(percent>=75) grade="A";
-  else if(percent>=60) grade="B";
-  else if(percent>=40) grade="C";
-  else grade="D";
-
-  let cert = `
-  <div id="certificateBox" style="
-    width:100%;
-    max-width:900px;
-    margin:0 auto;
-    background:white;
-    padding:30px;
-    border:8px solid #1e3c72;
-    font-family:Georgia,serif;
-    text-align:center;
-  ">
-  <img src="https://dhannjayuphade.github.io/banner.jpg" style="width:100%;height:120px;display:block;margin-bottom:15px;">
-  <h1 style="color:#1e3c72;font-size:32px;">SCIENCE ACHIEVEMENT CERTIFICATE</h1>
-  <hr style="border:2px solid #1e3c72;margin:15px 0;">
-  <h2 style="color:#ff512f;">${name}</h2>
-  <p>Has successfully completed the Science Special Online Quiz</p>
-  <h3>Score: ${percent}%</h3>
-  <h2 style="color:#ff512f;">Grade: ${grade}</h2>
-  <p>Date: ${new Date().toLocaleDateString()}</p>
-  <hr style="border:2px solid #1e3c72;margin:20px 0;">
-  <p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
-  <p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
-  <img src="https://dhannjayuphade.github.io/signature.png" style="width:150px;display:block;margin:20px auto;">
-  <b>Authorized Signature</b>
-  <div style="margin-top:20px;">
-    <button onclick="downloadPDF()">Download PDF</button>
-  </div>
-  </div>
-  `;
-
-  document.getElementById("certificateArea").innerHTML = cert;
+  document.getElementById("certificate").style.display="block";
+  document.getElementById("downloadBtn").style.display="inline-block";
+  document.getElementById("certName").innerText=name;
+  document.getElementById("certScore").innerText=percent;
+  document.getElementById("certDate").innerText=new Date().toLocaleDateString();
 }
 
 function downloadPDF(){
-  const element = document.getElementById("certificateBox");
-  const opt = {
-    margin:0.3,
-    filename:`${document.getElementById("username").value}_Certificate.pdf`,
-    image:{type:'jpeg', quality:1},
-    html2canvas:{scale:3, logging:true, letterRendering:true, useCORS:true},
-    jsPDF:{unit:'in', format:'a4', orientation:'landscape'}
-  };
-  html2pdf().set(opt).from(element).save();
+  const { jsPDF }=window.jspdf;
+  html2canvas(document.getElementById("certificate")).then(canvas=>{
+    const imgData=canvas.toDataURL("image/png");
+    const pdf=new jsPDF('landscape');
+    pdf.addImage(imgData,'PNG',10,10,270,180);
+    pdf.save("Science_Certificate.pdf");
+  });
 }
 </script>
-
-<h1 style="text-align:center;color:white;margin-top:20px;">Thank you 💕 for participating </h1>
-
 </body>
   </html>
