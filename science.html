@@ -2,24 +2,66 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Science Quiz System</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<title>Science Quiz | Dhannjay Official</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
-body{font-family:Arial;background:#f4f4f4;text-align:center;}
-.container{background:white;width:90%;max-width:700px;margin:auto;margin-top:20px;padding:20px;border-radius:10px;}
-button{padding:10px 20px;margin:5px;border:none;background:#007bff;color:white;border-radius:5px;cursor:pointer;}
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    text-align:center;
+    color:white;
+}
+
+.container{
+    background:white;
+    color:black;
+    width:90%;
+    max-width:700px;
+    margin:auto;
+    padding:20px;
+    border-radius:10px;
+    margin-top:30px;
+}
+
+button{
+    padding:10px 20px;
+    background:#007BFF;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
 button:hover{background:#0056b3;}
+
 .hidden{display:none;}
-#timer{font-weight:bold;color:red;}
-table{width:100%;margin-top:20px;border-collapse:collapse;}
-td,th{border:1px solid black;padding:8px;}
+
+#timer{
+    font-weight:bold;
+    color:red;
+    font-size:18px;
+}
+
+/* Certificate Style */
+.certificate{
+    background:white;
+    color:black;
+    padding:40px;
+    border:10px solid gold;
+    margin-top:20px;
+}
 </style>
 </head>
+
 <body oncontextmenu="return false">
 
-<div class="container">
+<h1>🌟 Science Quiz 🌟</h1>
 
-<h2>Science Quiz</h2>
+<div class="container">
 
 <div id="startSection">
 <input type="text" id="username" placeholder="Enter Your Name"><br><br>
@@ -27,51 +69,31 @@ td,th{border:1px solid black;padding:8px;}
 </div>
 
 <div id="quizSection" class="hidden">
-<p>Time Left: <span id="timer">60</span> sec</p>
+<p id="timer">Time Left: 60 sec</p>
 <div id="questions"></div>
 <button onclick="submitQuiz()">Submit</button>
 </div>
 
 <div id="resultSection" class="hidden"></div>
 
-<div id="leaderboardSection" class="hidden">
-<h3>Leaderboard</h3>
-<table>
-<tr><th>Name</th><th>Score</th><th>ID</th></tr>
-<tbody id="board"></tbody>
-</table>
-</div>
-
-<div id="verifySection" class="hidden">
-<h3>Verify Certificate</h3>
-<input type="text" id="verifyID" placeholder="Enter Certificate ID">
-<button onclick="verifyCert()">Verify</button>
-<div id="verifyResult"></div>
-</div>
-
 </div>
 
 <script>
-let timer;
-let timeLeft = 60;
-let certID = "";
 
-let questions = [
-{q:"Water chemical formula?", a:["H2O","CO2","O2","NaCl"], correct:0},
-{q:"Earth is the ___ planet from Sun?", a:["2nd","3rd","4th","5th"], correct:1},
-{q:"Human heart chambers?", a:["2","3","4","5"], correct:2},
-{q:"Gas plants absorb?", a:["Oxygen","Hydrogen","CO2","Nitrogen"], correct:2},
-{q:"Boiling point of water?", a:["90°C","80°C","100°C","120°C"], correct:2},
-{q:"Largest planet?", a:["Earth","Mars","Jupiter","Venus"], correct:2},
-{q:"Speed of light approx?", a:["3x10^8 m/s","3x10^6","3000","100"], correct:0},
-{q:"DNA full form?", a:["Data New Acid","Deoxy Nucleic Acid","Dynamic Acid","None"], correct:1},
-{q:"Sun is a?", a:["Planet","Star","Moon","Asteroid"], correct:1},
-{q:"Force unit?", a:["Newton","Joule","Watt","Volt"], correct:0}
+const questions=[
+{q:"Water formula?",a:["H2O","CO2","NaCl","O2"],c:"H2O"},
+{q:"Earth is ____ planet?",a:["2nd","3rd","4th","5th"],c:"3rd"},
+{q:"Sun is a?",a:["Star","Planet","Moon","Asteroid"],c:"Star"},
+{q:"Human heart chambers?",a:["2","3","4","5"],c:"4"},
+{q:"Boiling point of water?",a:["100°C","50°C","0°C","200°C"],c:"100°C"}
 ];
 
+let timeLeft=60;
+let timer;
+
 function startQuiz(){
-let name = document.getElementById("username").value;
-if(name==""){alert("Enter Name");return;}
+let name=document.getElementById("username").value.trim();
+if(name===""){alert("Enter your name");return;}
 
 document.getElementById("startSection").classList.add("hidden");
 document.getElementById("quizSection").classList.remove("hidden");
@@ -81,23 +103,24 @@ startTimer();
 }
 
 function loadQuestions(){
-let qDiv = document.getElementById("questions");
-questions.forEach((q,index)=>{
-qDiv.innerHTML+=`<p>${index+1}. ${q.q}</p>`;
-q.a.forEach((opt,i)=>{
+let qDiv=document.getElementById("questions");
+qDiv.innerHTML="";
+questions.forEach((q,i)=>{
+qDiv.innerHTML+=`<p>${i+1}. ${q.q}</p>`;
+q.a.forEach(opt=>{
 qDiv.innerHTML+=`
 <label>
-<input type="radio" name="q${index}" value="${i}">
-${opt}
+<input type="radio" name="q${i}" value="${opt}" required> ${opt}
 </label><br>`;
 });
+qDiv.innerHTML+="<br>";
 });
 }
 
 function startTimer(){
 timer=setInterval(()=>{
 timeLeft--;
-document.getElementById("timer").innerText=timeLeft;
+document.getElementById("timer").innerText="Time Left: "+timeLeft+" sec";
 if(timeLeft<=0){
 clearInterval(timer);
 submitQuiz();
@@ -107,81 +130,58 @@ submitQuiz();
 
 function submitQuiz(){
 clearInterval(timer);
+
 let score=0;
 questions.forEach((q,i)=>{
-let ans=document.querySelector(`input[name="q${i}"]:checked`);
-if(ans && parseInt(ans.value)===q.correct){score++;}
+let selected=document.querySelector(`input[name="q${i}"]:checked`);
+if(selected && selected.value===q.c){
+score++;
+}
 });
 
 let percent=Math.round((score/questions.length)*100);
-certID="SCI-"+Math.floor(10000+Math.random()*90000);
-
 let name=document.getElementById("username").value;
 
-let resultData={name:name,score:percent,id:certID};
-let results=JSON.parse(localStorage.getItem("quizResults"))||[];
-results.push(resultData);
-localStorage.setItem("quizResults",JSON.stringify(results));
+showCertificate(name,percent);
+}
 
-document.getElementById("quizSection").classList.add("hidden");
-let resultHTML=`
-<h3>Result</h3>
-<p>Name: ${name}</p>
-<p>Score: ${percent}%</p>
-<p>Certificate ID: ${certID}</p>
-<div id="qrcode"></div>
-<button onclick="downloadCert()">Download Certificate</button>
-<button onclick="showLeaderboard()">Leaderboard</button>
-<button onclick="showVerify()">Verify Certificate</button>
+function showCertificate(name,percent){
+let html=`
+<div class="certificate" id="certificateBox">
+<h2>🏆 Certificate of Completion 🏆</h2>
+<p>This is proudly presented to</p>
+<h1>${name}</h1>
+<p>for completing the Science Quiz</p>
+<h3>Score: ${percent}%</h3>
+<p>Date: ${new Date().toLocaleDateString()}</p>
+<br>
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
 `;
 
-document.getElementById("resultSection").innerHTML=resultHTML;
+document.getElementById("quizSection").classList.add("hidden");
+document.getElementById("resultSection").innerHTML=html;
 document.getElementById("resultSection").classList.remove("hidden");
-
-new QRCode(document.getElementById("qrcode"), certID);
 }
 
-function downloadCert(){
-let content=document.getElementById("resultSection").innerText;
-let blob=new Blob([content],{type:"text/plain"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="certificate.txt";
-a.click();
-}
-
-function showLeaderboard(){
-document.getElementById("leaderboardSection").classList.remove("hidden");
-let results=JSON.parse(localStorage.getItem("quizResults"))||[];
-results.sort((a,b)=>b.score-a.score);
-let board=document.getElementById("board");
-board.innerHTML="";
-results.forEach(r=>{
-board.innerHTML+=`<tr><td>${r.name}</td><td>${r.score}%</td><td>${r.id}</td></tr>`;
+function downloadPDF(){
+html2canvas(document.getElementById("certificateBox")).then(canvas=>{
+const imgData=canvas.toDataURL("image/png");
+const pdf=new jspdf.jsPDF();
+pdf.addImage(imgData,'PNG',10,10,190,0);
+pdf.save("Science_Certificate.pdf");
 });
 }
 
-function showVerify(){
-document.getElementById("verifySection").classList.remove("hidden");
-}
-
-function verifyCert(){
-let id=document.getElementById("verifyID").value;
-let results=JSON.parse(localStorage.getItem("quizResults"))||[];
-let found=results.find(r=>r.id===id);
-if(found){
-document.getElementById("verifyResult").innerHTML=
-`<p style="color:green;">Valid Certificate<br>Name: ${found.name}<br>Score: ${found.score}%</p>`;
-}else{
-document.getElementById("verifyResult").innerHTML=
-`<p style="color:red;">Invalid Certificate</p>`;
-}
-}
-
+// Anti Cheat
 document.addEventListener("visibilitychange",function(){
-if(document.hidden){alert("Tab switching detected! Auto submit.");submitQuiz();}
+if(document.hidden){
+alert("Tab change detected! Quiz submitted.");
+submitQuiz();
+}
 });
+
 </script>
 
 </body>
-  </html>
+</html>
