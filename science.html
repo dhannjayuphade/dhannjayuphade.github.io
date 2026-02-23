@@ -283,8 +283,16 @@ document.getElementById("certificateArea").innerHTML=cert;
 }
 
 function downloadPDF(){
-html2pdf().from(document.getElementById("certificateBox")).save();
-}
+  const element = document.getElementById("certificateBox");
+  const opt = {
+    margin:0.3,
+    filename:`${document.getElementById("username").value}_Certificate.pdf`,
+    image:{type:'jpeg', quality:0.98},
+    html2canvas:{scale:2, logging:true, letterRendering:true, useCORS:true},
+    jsPDF:{unit:'in', format:'a4', orientation:'landscape'}
+  };
+  html2pdf().set(opt).from(element).save();
+  }
 </script>
   <h1>Thank you 💕 for participating </h1>
 
