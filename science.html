@@ -11,7 +11,7 @@
 body{
 margin:0;
 font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#ff512f,#ff9966);
+background:linear-gradient(135deg,#1e3c72,#2a5298);
 }
 
 header{
@@ -20,24 +20,19 @@ color:white;
 padding:20px;
 font-size:28px;
 font-weight:bold;
-}
-
-.banner{
-width:100%;
-max-height:180px;
-object-fit:cover;
+letter-spacing:2px;
 }
 
 .container{
-max-width:700px;
+max-width:800px;
 margin:auto;
 padding:15px;
 }
 
 input[type=text]{
 width:100%;
-padding:10px;
-margin:10px 0 20px 0;
+padding:12px;
+margin:15px 0;
 border-radius:8px;
 border:none;
 font-size:16px;
@@ -47,7 +42,7 @@ font-size:16px;
 text-align:center;
 font-size:20px;
 color:white;
-margin-bottom:15px;
+margin-bottom:20px;
 }
 
 .question-box{
@@ -75,7 +70,7 @@ border:none;
 border-radius:10px;
 font-size:16px;
 cursor:pointer;
-margin-top:10px;
+margin-top:15px;
 }
 
 button:hover{
@@ -88,29 +83,40 @@ font-size:24px;
 color:white;
 margin:20px 0;
 }
-
-.certificate{
-background:white;
-padding:30px;
-border-radius:15px;
-text-align:center;
-margin-top:20px;
-border:6px solid gold;
-}
-
-.footer{
-margin-top:20px;
-font-size:14px;
-}
 </style>
 </head>
 
 <body>
 
-<header>🔬 Science Special Quiz</header>
-
-<img src="https://images.unsplash.com/photo-1581091870627-3a1b3b2f1f6a" class="banner">
-
+<header>🔬 SCIENCE SPECIAL QUIZ</header>
+<div style="text-align:center;margin-top:-10px;margin-bottom:15px;">
+<a href="index.html" style="
+background:white;
+color:#1e3c72;
+padding:8px 18px;
+border-radius:20px;
+text-decoration:none;
+font-weight:bold;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+">
+🏠 Back to Home
+</a>
+</div>
+  <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:12px 18px;
+border-radius:50px;
+text-decoration:none;
+font-weight:bold;
+box-shadow:0 5px 20px rgba(0,0,0,0.4);
+z-index:999;
+">
+💬 Join Group
+  </a>
 <div class="container">
 
 <input type="text" id="username" placeholder="Enter Your Name">
@@ -179,9 +185,9 @@ let totalTime=900;
 const timer=document.getElementById("time");
 
 let countdown=setInterval(()=>{
-let minutes=Math.floor(totalTime/60);
-let seconds=totalTime%60;
-timer.innerText=`${minutes}:${seconds<10?"0":""}${seconds}`;
+let m=Math.floor(totalTime/60);
+let s=totalTime%60;
+timer.innerText=`${m}:${s<10?"0":""}${s}`;
 totalTime--;
 if(totalTime<0){
 clearInterval(countdown);
@@ -202,16 +208,16 @@ let options=document.querySelectorAll(`input[name="q${index}"]`);
 
 options.forEach(opt=>{
 let label=opt.parentElement;
-label.style.background="white";
+label.style.background="#fff";
 label.style.border="1px solid #ddd";
 
 if(opt.value===item.c){
-label.style.border="2px solid green";
+label.style.border="3px solid green";
 }
 
 if(opt.checked && opt.value!==item.c){
 label.style.background="#ffcccc";
-label.style.border="2px solid red";
+label.style.border="3px solid red";
 }
 
 if(opt.checked && opt.value===item.c){
@@ -230,34 +236,35 @@ showCertificate(name,percent);
 function showCertificate(name,percent){
 
 let cert=`
-<div class="certificate" id="certificateBox">
+<div id="certificateBox" style="
+width:95%;
+margin:30px auto;
+background:white;
+padding:40px;
+border:8px solid #1e3c72;
+border-radius:20px;
+font-family:Georgia,serif;
+box-shadow:0 0 30px rgba(0,0,0,0.3);
+">
 
-<img src="https://images.unsplash.com/photo-1581091870627-3a1b3b2f1f6a"
-style="width:100%;max-height:150px;object-fit:cover;border-radius:10px;">
+<h1 style="color:#1e3c72;font-size:36px;">
+SCIENCE ACHIEVEMENT CERTIFICATE
+</h1>
 
-<h2 style="color:#ff512f;margin-top:15px;">
-🏆 Certificate of Participation 🏆
-</h2>
+<hr style="border:3px solid #1e3c72;margin:15px 0;">
 
-<p>This is proudly presented to</p>
-<h1>${name}</h1>
+<h2 style="color:#ff512f;">${name}</h2>
 
-<p>for successfully completing the</p>
-<h2 style="color:#ff8c00;">Science Special Quiz</h2>
+<p>Has successfully completed the Science Special Online Quiz</p>
 
-<h3>Score: ${percent}%</h3>
+<h3>Final Score: ${percent}%</h3>
+
 <p>Date: ${new Date().toLocaleDateString()}</p>
 
-<hr>
+<hr style="margin:25px 0;">
 
 <p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
 <p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
-
-<div style="margin-top:30px;">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Signature_example.svg/512px-Signature_example.svg.png"
-style="width:150px;"><br>
-<b>Signature</b>
-</div>
 
 <br>
 
@@ -270,11 +277,10 @@ document.getElementById("certificateArea").innerHTML=cert;
 }
 
 function downloadPDF(){
-const element=document.getElementById("certificateBox");
-html2pdf().from(element).save();
+html2pdf().from(document.getElementById("certificateBox")).save();
 }
 
 </script>
 
 </body>
-</html>
+  </html>
