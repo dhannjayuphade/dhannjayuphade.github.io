@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Science Quiz Pro</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body{
+font-family:Arial;
+background:linear-gradient(to right,#4facfe,#00f2fe);
+text-align:center;
+}
+.quiz-box{
+background:white;
+width:70%;
+margin:auto;
+padding:20px;
+margin-top:30px;
+border-radius:10px;
+}
+button{
+padding:10px 20px;
+background:green;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+.timer{
+font-size:20px;
+color:red;
+font-weight:bold;
+}
+.certificate{
+display:none;
+width:800px;
+margin:auto;
+padding:40px;
+background:white;
+border:10px solid gold;
+margin-top:30px;
+}
+</style>
+</head>
+<body>
+<h1>wellcome</h1>
+<div class="quiz-box">
+<h2>Science Quiz</h2>
+
+<div class="timer">
+Time Left: <span id="time">60</span> seconds
+</div>
+
+<br>
+<input type="text" id="username" placeholder="Enter Your Name"><br><br>
+
+<form id="quizForm"></form>
+
+<button onclick="submitQuiz()">Submit</button>
+</div>
+
+<div class="certificate" id="certificate">
+<h1>Certificate of Achievement</h1>
+<p>This certificate is awarded to</p>
+<h2 id="certName"></h2>
+<p>For successfully completing Science Quiz</p>
+<p>Score: <span id="certScore"></span>%</p>
+<p>Date: <span id="certDate"></span></p>
+<p>Certificate ID: <span id="certID"></span></p>
+
+<div id="qrcode" style="margin:20px;"></div>
+
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<script>
+
+// Question Bank
+const questions = [
+{q:"Water formula?", options:["H2O","CO2","O2"], answer:"H2O"},
+{q:"Earth position?", options:["2","3","4"], answer:"3"},
+{q:"Sun type?", options:["Yellow Dwarf","Red Giant","White Dwarf"], answer:"Yellow Dwarf"},
+{q:"Gas plants release?", options:["Oxygen","Nitrogen","Carbon"], answer:"Oxygen"},
+{q:"Human heart chambers?", options:["4","2","3"], answer:"4"}
+];
+
+// Shuffle questions
+questions.sort(() => Math.random() - 0.5);
+
+let form = document.getElementById("quizForm");
+
+questions.forEach((item,index)=>{
+form.innerHTML += `<p>${index+1}) ${item.q}</p>`;
+item.options.forEach(opt=>{
+form.innerHTML += `
+<input type="radio" name="q${index}" value="${opt}" required> ${opt}
+`;
+});
+form.innerHTML += "<br><br>";
+});
+
+// TIMER
+let timeLeft = 60;
+let timer = setInterval(()=>{
+timeLeft--;
+document.getElementById("time").innerText = timeLeft;
+if(timeLeft<=0){
+clearInterval(timer);
+submitQuiz();
+}
+},1000);
+
+// CHEAT PREVENTION
+document.addEventListener("contextmenu", e=>e.preventDefault());
+
+document.addEventListener("visibilitychange", function(){
+if(document.hidden){
+alert("Tab switching detected! Quiz submitted.");
+submitQuiz();
+}
+});
+
+function submitQuiz(){
+
+clearInterval(timer);
+
+let name = document.getElementById("username").value;
+if(name===""){
+alert("Enter Name");
+return;
+}
+
+let score = 0;
+
+questions.forEach((item,index)=>{
+let selected = document.querySelector(`input[name="q${index}"]:checked`);
+if(selected && selected.value === item.answer){
+score++;
+}
+});
+
+let percent = Math.round((score/questions.length)*100);
+
+let certID = "SCI-" + Math.floor(Math.random()*100000);
+
+document.getElementById("certName").innerText = name;
+document.getElementById("certScore").innerText = percent;
+document.getElementById("certDate").innerText = new Date().toLocaleDateString();
+document.getElementById("certID").innerText = certID;
+
+document.getElementById("certificate").style.display="block";
+
+document.getElementById("qrcode").innerHTML="";
+new QRCode(document.getElementById("qrcode"),{
+text: window.location.href + "?id=" + certID,
+width:100,
+height:100
+});
+}
+
+function downloadPDF(){
+const { jsPDF } = window.jspdf;
+html2canvas(document.getElementById("certificate")).then(canvas=>{
+const img = canvas.toDataURL("image/png");
+const pdf = new jsPDF();
+pdf.addImage(img,'PNG',10,10,190,0);
+pdf.save("certificate.pdf");
+});
+}
+
+</script>
+
+</body>
+  </html>
