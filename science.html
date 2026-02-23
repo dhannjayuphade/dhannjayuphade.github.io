@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Science Quiz System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+body{font-family:Arial;background:#f4f4f4;text-align:center;}
+.container{background:white;width:90%;max-width:700px;margin:auto;margin-top:20px;padding:20px;border-radius:10px;}
+button{padding:10px 20px;margin:5px;border:none;background:#007bff;color:white;border-radius:5px;cursor:pointer;}
+button:hover{background:#0056b3;}
+.hidden{display:none;}
+#timer{font-weight:bold;color:red;}
+table{width:100%;margin-top:20px;border-collapse:collapse;}
+td,th{border:1px solid black;padding:8px;}
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<div class="container">
+
+<h2>Science Quiz</h2>
+
+<div id="startSection">
+<input type="text" id="username" placeholder="Enter Your Name"><br><br>
+<button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div id="quizSection" class="hidden">
+<p>Time Left: <span id="timer">60</span> sec</p>
+<div id="questions"></div>
+<button onclick="submitQuiz()">Submit</button>
+</div>
+
+<div id="resultSection" class="hidden"></div>
+
+<div id="leaderboardSection" class="hidden">
+<h3>Leaderboard</h3>
+<table>
+<tr><th>Name</th><th>Score</th><th>ID</th></tr>
+<tbody id="board"></tbody>
+</table>
+</div>
+
+<div id="verifySection" class="hidden">
+<h3>Verify Certificate</h3>
+<input type="text" id="verifyID" placeholder="Enter Certificate ID">
+<button onclick="verifyCert()">Verify</button>
+<div id="verifyResult"></div>
+</div>
+
+</div>
+
+<script>
+let timer;
+let timeLeft = 60;
+let certID = "";
+
+let questions = [
+{q:"Water chemical formula?", a:["H2O","CO2","O2","NaCl"], correct:0},
+{q:"Earth is the ___ planet from Sun?", a:["2nd","3rd","4th","5th"], correct:1},
+{q:"Human heart chambers?", a:["2","3","4","5"], correct:2},
+{q:"Gas plants absorb?", a:["Oxygen","Hydrogen","CO2","Nitrogen"], correct:2},
+{q:"Boiling point of water?", a:["90°C","80°C","100°C","120°C"], correct:2},
+{q:"Largest planet?", a:["Earth","Mars","Jupiter","Venus"], correct:2},
+{q:"Speed of light approx?", a:["3x10^8 m/s","3x10^6","3000","100"], correct:0},
+{q:"DNA full form?", a:["Data New Acid","Deoxy Nucleic Acid","Dynamic Acid","None"], correct:1},
+{q:"Sun is a?", a:["Planet","Star","Moon","Asteroid"], correct:1},
+{q:"Force unit?", a:["Newton","Joule","Watt","Volt"], correct:0}
+];
+
+function startQuiz(){
+let name = document.getElementById("username").value;
+if(name==""){alert("Enter Name");return;}
+
+document.getElementById("startSection").classList.add("hidden");
+document.getElementById("quizSection").classList.remove("hidden");
+
+loadQuestions();
+startTimer();
+}
+
+function loadQuestions(){
+let qDiv = document.getElementById("questions");
+questions.forEach((q,index)=>{
+qDiv.innerHTML+=`<p>${index+1}. ${q.q}</p>`;
+q.a.forEach((opt,i)=>{
+qDiv.innerHTML+=`
+<label>
+<input type="radio" name="q${index}" value="${i}">
+${opt}
+</label><br>`;
+});
+});
+}
+
+function startTimer(){
+timer=setInterval(()=>{
+timeLeft--;
+document.getElementById("timer").innerText=timeLeft;
+if(timeLeft<=0){
+clearInterval(timer);
+submitQuiz();
+}
+},1000);
+}
+
+function submitQuiz(){
+clearInterval(timer);
+let score=0;
+questions.forEach((q,i)=>{
+let ans=document.querySelector(`input[name="q${i}"]:checked`);
+if(ans && parseInt(ans.value)===q.correct){score++;}
+});
+
+let percent=Math.round((score/questions.length)*100);
+certID="SCI-"+Math.floor(10000+Math.random()*90000);
+
+let name=document.getElementById("username").value;
+
+let resultData={name:name,score:percent,id:certID};
+let results=JSON.parse(localStorage.getItem("quizResults"))||[];
+results.push(resultData);
+localStorage.setItem("quizResults",JSON.stringify(results));
+
+document.getElementById("quizSection").classList.add("hidden");
+let resultHTML=`
+<h3>Result</h3>
+<p>Name: ${name}</p>
+<p>Score: ${percent}%</p>
+<p>Certificate ID: ${certID}</p>
+<div id="qrcode"></div>
+<button onclick="downloadCert()">Download Certificate</button>
+<button onclick="showLeaderboard()">Leaderboard</button>
+<button onclick="showVerify()">Verify Certificate</button>
+`;
+
+document.getElementById("resultSection").innerHTML=resultHTML;
+document.getElementById("resultSection").classList.remove("hidden");
+
+new QRCode(document.getElementById("qrcode"), certID);
+}
+
+function downloadCert(){
+let content=document.getElementById("resultSection").innerText;
+let blob=new Blob([content],{type:"text/plain"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="certificate.txt";
+a.click();
+}
+
+function showLeaderboard(){
+document.getElementById("leaderboardSection").classList.remove("hidden");
+let results=JSON.parse(localStorage.getItem("quizResults"))||[];
+results.sort((a,b)=>b.score-a.score);
+let board=document.getElementById("board");
+board.innerHTML="";
+results.forEach(r=>{
+board.innerHTML+=`<tr><td>${r.name}</td><td>${r.score}%</td><td>${r.id}</td></tr>`;
+});
+}
+
+function showVerify(){
+document.getElementById("verifySection").classList.remove("hidden");
+}
+
+function verifyCert(){
+let id=document.getElementById("verifyID").value;
+let results=JSON.parse(localStorage.getItem("quizResults"))||[];
+let found=results.find(r=>r.id===id);
+if(found){
+document.getElementById("verifyResult").innerHTML=
+`<p style="color:green;">Valid Certificate<br>Name: ${found.name}<br>Score: ${found.score}%</p>`;
+}else{
+document.getElementById("verifyResult").innerHTML=
+`<p style="color:red;">Invalid Certificate</p>`;
+}
+}
+
+document.addEventListener("visibilitychange",function(){
+if(document.hidden){alert("Tab switching detected! Auto submit.");submitQuiz();}
+});
+</script>
+
+</body>
+  </html>
