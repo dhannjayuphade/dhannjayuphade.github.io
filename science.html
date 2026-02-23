@@ -2,186 +2,249 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Science Quiz | Dhannjay Official</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Special Quiz</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 body{
-    font-family: Arial;
-    background: linear-gradient(135deg,#1e3c72,#2a5298);
-    text-align:center;
-    color:white;
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#ff512f,#ff9966);
+}
+
+header{
+text-align:center;
+color:white;
+padding:20px;
+font-size:28px;
+font-weight:bold;
+}
+
+.banner{
+width:100%;
+max-height:200px;
+object-fit:cover;
 }
 
 .container{
-    background:white;
-    color:black;
-    width:90%;
-    max-width:700px;
-    margin:auto;
-    padding:20px;
-    border-radius:10px;
-    margin-top:30px;
+max-width:700px;
+margin:auto;
+padding:15px;
+}
+
+input[type=text]{
+width:100%;
+padding:10px;
+margin:10px 0 20px 0;
+border-radius:8px;
+border:none;
+font-size:16px;
+}
+
+.timer{
+text-align:center;
+font-size:20px;
+color:white;
+margin-bottom:15px;
+}
+
+.question-box{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.question-box h3{
+margin-bottom:15px;
+font-size:18px;
+line-height:1.5;
+}
+
+.option{
+display:block;
+margin:8px 0;
 }
 
 button{
-    padding:10px 20px;
-    background:#007BFF;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    margin-top:10px;
+background:#ff512f;
+color:white;
+padding:12px 20px;
+border:none;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
 }
 
-button:hover{background:#0056b3;}
-
-.hidden{display:none;}
-
-#timer{
-    font-weight:bold;
-    color:red;
-    font-size:18px;
+button:hover{
+background:#e04128;
 }
 
-/* Certificate Style */
+.score{
+text-align:center;
+font-size:24px;
+color:white;
+margin:20px 0;
+}
+
 .certificate{
-    background:white;
-    color:black;
-    padding:40px;
-    border:10px solid gold;
-    margin-top:20px;
+background:white;
+padding:30px;
+border-radius:15px;
+text-align:center;
+margin-top:20px;
+}
+
+.footer{
+margin-top:20px;
+font-size:14px;
 }
 </style>
 </head>
 
-<body oncontextmenu="return false">
+<body>
 
-<h1>🌟 Science Quiz 🌟</h1>
+<header>🔬 Science Special Quiz</header>
+
+<img src="https://images.unsplash.com/photo-1581091870627-3a1b3b2f1f6a" class="banner">
 
 <div class="container">
 
-<div id="startSection">
-<input type="text" id="username" placeholder="Enter Your Name"><br><br>
-<button onclick="startQuiz()">Start Quiz</button>
-</div>
+<input type="text" id="username" placeholder="Enter Your Name">
 
-<div id="quizSection" class="hidden">
-<p id="timer">Time Left: 60 sec</p>
-<div id="questions"></div>
-<button onclick="submitQuiz()">Submit</button>
-</div>
+<div class="timer">Time Left: <span id="time">15:00</span></div>
 
-<div id="resultSection" class="hidden"></div>
+<form id="quizForm"></form>
+
+<button onclick="submitQuiz()">Submit Quiz</button>
+
+<div class="score" id="result"></div>
+
+<div id="certificateArea"></div>
 
 </div>
 
 <script>
-
 const questions=[
-{q:"Water formula?",a:["H2O","CO2","NaCl","O2"],c:"H2O"},
-{q:"Earth is ____ planet?",a:["2nd","3rd","4th","5th"],c:"3rd"},
-{q:"Sun is a?",a:["Star","Planet","Moon","Asteroid"],c:"Star"},
-{q:"Human heart chambers?",a:["2","3","4","5"],c:"4"},
-{q:"Boiling point of water?",a:["100°C","50°C","0°C","200°C"],c:"100°C"}
+{q:"1. What planet is known as Red Planet?",a:["Earth","Mars","Jupiter","Venus"],c:"Mars"},
+{q:"2. H2O is chemical formula of?",a:["Oxygen","Hydrogen","Water","Salt"],c:"Water"},
+{q:"3. Sun is a?",a:["Planet","Star","Galaxy","Comet"],c:"Star"},
+{q:"4. Human heart has how many chambers?",a:["2","3","4","5"],c:"4"},
+{q:"5. Gas essential for breathing?",a:["Oxygen","Nitrogen","CO2","Helium"],c:"Oxygen"},
+{q:"6. Speed of light approx?",a:["3x10^8 m/s","1x10^5","5x10^6","9x10^2"],c:"3x10^8 m/s"},
+{q:"7. Largest planet?",a:["Earth","Mars","Jupiter","Saturn"],c:"Jupiter"},
+{q:"8. Plants prepare food by?",a:["Respiration","Photosynthesis","Digestion","Fermentation"],c:"Photosynthesis"},
+{q:"9. Blood color is red due to?",a:["Iron","Oxygen","Hemoglobin","Water"],c:"Hemoglobin"},
+{q:"10. SI unit of Force?",a:["Joule","Watt","Newton","Pascal"],c:"Newton"},
+{q:"11. DNA stands for?",a:["Deoxyribo Nucleic Acid","Dynamic Acid","Double Acid","None"],c:"Deoxyribo Nucleic Acid"},
+{q:"12. Human normal temperature?",a:["37°C","30°C","40°C","25°C"],c:"37°C"},
+{q:"13. Which gas causes global warming?",a:["Oxygen","CO2","Hydrogen","Nitrogen"],c:"CO2"},
+{q:"14. Earth revolves around?",a:["Moon","Mars","Sun","Venus"],c:"Sun"},
+{q:"15. Smallest bone in body?",a:["Femur","Stapes","Tibia","Skull"],c:"Stapes"},
+{q:"16. Vitamin C source?",a:["Orange","Rice","Milk","Bread"],c:"Orange"},
+{q:"17. Acid turns blue litmus to?",a:["Red","Green","Blue","Yellow"],c:"Red"},
+{q:"18. SI unit of electric current?",a:["Volt","Ampere","Watt","Ohm"],c:"Ampere"},
+{q:"19. Largest organ of body?",a:["Heart","Liver","Skin","Brain"],c:"Skin"},
+{q:"20. Light year measures?",a:["Time","Distance","Speed","Mass"],c:"Distance"},
+{q:"21. Moon is Earth’s?",a:["Star","Planet","Satellite","Comet"],c:"Satellite"},
+{q:"22. Metal liquid at room temp?",a:["Iron","Mercury","Gold","Copper"],c:"Mercury"},
+{q:"23. Plants release?",a:["CO2","Oxygen","Nitrogen","Hydrogen"],c:"Oxygen"},
+{q:"24. SI unit of energy?",a:["Watt","Joule","Newton","Volt"],c:"Joule"},
+{q:"25. Brain controls?",a:["Breathing","Thinking","Movement","All"],c:"All"},
+{q:"26. Largest ocean?",a:["Indian","Pacific","Atlantic","Arctic"],c:"Pacific"},
+{q:"27. Pollination by wind called?",a:["Hydrophily","Anemophily","Zoophily","None"],c:"Anemophily"},
+{q:"28. Hardest substance?",a:["Iron","Diamond","Gold","Silver"],c:"Diamond"},
+{q:"29. Device to measure temperature?",a:["Barometer","Thermometer","Speedometer","Ammeter"],c:"Thermometer"},
+{q:"30. Energy from Sun called?",a:["Solar","Wind","Hydro","Thermal"],c:"Solar"}
 ];
 
-let timeLeft=60;
-let timer;
+const form=document.getElementById("quizForm");
 
-function startQuiz(){
-let name=document.getElementById("username").value.trim();
-if(name===""){alert("Enter your name");return;}
-
-document.getElementById("startSection").classList.add("hidden");
-document.getElementById("quizSection").classList.remove("hidden");
-
-loadQuestions();
-startTimer();
-}
-
-function loadQuestions(){
-let qDiv=document.getElementById("questions");
-qDiv.innerHTML="";
-questions.forEach((q,i)=>{
-qDiv.innerHTML+=`<p>${i+1}. ${q.q}</p>`;
-q.a.forEach(opt=>{
-qDiv.innerHTML+=`
-<label>
-<input type="radio" name="q${i}" value="${opt}" required> ${opt}
-</label><br>`;
+questions.forEach((item,index)=>{
+let div=document.createElement("div");
+div.className="question-box";
+div.innerHTML=`<h3>${item.q}</h3>`+
+item.a.map(opt=>`
+<label class="option">
+<input type="radio" name="q${index}" value="${opt}"> ${opt}
+</label>`).join("");
+form.appendChild(div);
 });
-qDiv.innerHTML+="<br>";
-});
-}
 
-function startTimer(){
-timer=setInterval(()=>{
-timeLeft--;
-document.getElementById("timer").innerText="Time Left: "+timeLeft+" sec";
-if(timeLeft<=0){
-clearInterval(timer);
+let totalTime=900;
+const timer=document.getElementById("time");
+
+let countdown=setInterval(()=>{
+let minutes=Math.floor(totalTime/60);
+let seconds=totalTime%60;
+timer.innerText=`${minutes}:${seconds<10?"0":""}${seconds}`;
+totalTime--;
+if(totalTime<0){
+clearInterval(countdown);
 submitQuiz();
 }
 },1000);
-}
 
 function submitQuiz(){
-clearInterval(timer);
+clearInterval(countdown);
+let name=document.getElementById("username").value;
+if(name===""){alert("Enter Name");return;}
 
 let score=0;
-questions.forEach((q,i)=>{
-let selected=document.querySelector(`input[name="q${i}"]:checked`);
-if(selected && selected.value===q.c){
-score++;
-}
+
+questions.forEach((item,index)=>{
+let answer=document.querySelector(`input[name="q${index}"]:checked`);
+if(answer && answer.value===item.c) score++;
 });
 
 let percent=Math.round((score/questions.length)*100);
-let name=document.getElementById("username").value;
+
+document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
 
 showCertificate(name,percent);
 }
 
 function showCertificate(name,percent){
-let html=`
+let cert=`
 <div class="certificate" id="certificateBox">
-<h2>🏆 Certificate of Completion 🏆</h2>
+
+<h2>🏆 Certificate of Participation 🏆</h2>
+
 <p>This is proudly presented to</p>
 <h1>${name}</h1>
-<p>for completing the Science Quiz</p>
+
+<p>for successfully completing the</p>
+<h2>Science Special Quiz</h2>
+
 <h3>Score: ${percent}%</h3>
 <p>Date: ${new Date().toLocaleDateString()}</p>
-<br>
+
+<hr>
+
+<p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
+<p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
+
+<div class="footer">
+Creator: Dhannjay Uphade
+</div>
+
 <button onclick="downloadPDF()">Download PDF</button>
+
 </div>
 `;
 
-document.getElementById("quizSection").classList.add("hidden");
-document.getElementById("resultSection").innerHTML=html;
-document.getElementById("resultSection").classList.remove("hidden");
+document.getElementById("certificateArea").innerHTML=cert;
 }
 
 function downloadPDF(){
-html2canvas(document.getElementById("certificateBox")).then(canvas=>{
-const imgData=canvas.toDataURL("image/png");
-const pdf=new jspdf.jsPDF();
-pdf.addImage(imgData,'PNG',10,10,190,0);
-pdf.save("Science_Certificate.pdf");
-});
+const element=document.getElementById("certificateBox");
+html2pdf().from(element).save();
 }
-
-// Anti Cheat
-document.addEventListener("visibilitychange",function(){
-if(document.hidden){
-alert("Tab change detected! Quiz submitted.");
-submitQuiz();
-}
-});
-
 </script>
 
 </body>
-</html>
+    </html>
