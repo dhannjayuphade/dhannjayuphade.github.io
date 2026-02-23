@@ -229,58 +229,60 @@ document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
 showCertificate(name,percent);
 }
 
-function showCertificate(name,percent){
-let cert=`
-<div id="certificateBox" style="
-width:95%;
-margin:30px auto;
-background:white;
-padding:40px;
-border:8px solid #1e3c72;
-border-radius:20px;
-font-family:Georgia,serif;
-box-shadow:0 0 30px rgba(0,0,0,0.3);
-">
+function showCertificate(name, percent){
+  // Auto Grade
+  let grade="";
+  if(percent>=90) grade="A+";
+  else if(percent>=75) grade="A";
+  else if(percent>=60) grade="B";
+  else if(percent>=40) grade="C";
+  else grade="D";
 
-<!-- Banner on top -->
-<img src="banners.jpg"
-style="width:100%;height:125px;object-fit:cover;border-radius:10px;margin-bottom:20px;">
+  let cert = `
+  <div id="certificateBox" style="
+    width:100%;
+    max-width:900px;
+    margin:0 auto;
+    background:white;
+    padding:30px;
+    border:8px solid #1e3c72; /* Solid border for PDF */
+    font-family:Georgia,serif;
+    text-align:center;
+  ">
 
-<h1 style="color:#1e3c72;font-size:36px;text-align:center;">
-SCIENCE ACHIEVEMENT CERTIFICATE
-</h1>
+  <!-- Banner -->
+  <img src="banner.jpg" style="width:100%;height:120px;display:block;margin-bottom:15px;">
 
-<hr style="border:3px solid #1e3c72;margin:15px 0;">
+  <h1 style="color:#1e3c72;font-size:32px;">SCIENCE ACHIEVEMENT CERTIFICATE</h1>
 
-<h2 style="color:#ff512f;text-align:center;">${name}</h2>
+  <hr style="border:2px solid #1e3c72;margin:15px 0;">
 
-<p style="text-align:center;">Has successfully completed the Science Special Online Quiz</p>
+  <h2 style="color:#ff512f;">${name}</h2>
+  <p>Has successfully completed the Science Special Online Quiz</p>
 
-<h3 style="text-align:center;">Final Score: ${percent}%</h3>
+  <h3>Score: ${percent}%</h3>
+  <h2 style="color:#ff512f;">Grade: ${grade}</h2>
 
-<p style="text-align:center;">Date: ${new Date().toLocaleDateString()}</p>
+  <p>Date: ${new Date().toLocaleDateString()}</p>
 
-<hr style="margin:25px 0;">
+  <hr style="border:2px solid #1e3c72;margin:20px 0;">
 
-<p style="text-align:center;"><strong>Website:</strong> https://dhannjayuphade.github.io</p>
-<p style="text-align:center;"><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
+  <p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
+  <p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
 
-<div style="text-align:center;margin-top:30px;">
-<img src="signatures.png" style="width:180px;"><br>
-<b>Authorized Signatures</b>
-</div>
+  <!-- Signature -->
+  <img src="signature.png" style="width:150px;display:block;margin:20px auto;">
+  <b>Authorized Signature</b>
 
-<br>
+  <div style="margin-top:20px;">
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
 
-<div style="text-align:center;">
-<button onclick="downloadPDF()">Download PDF</button>
-</div>
+  </div>
+  `;
 
-</div>
-`;
-
-document.getElementById("certificateArea").innerHTML=cert;
-}
+  document.getElementById("certificateArea").innerHTML = cert;
+  }
 
 function downloadPDF(){
   const element = document.getElementById("certificateBox");
