@@ -24,7 +24,7 @@ font-weight:bold;
 
 .banner{
 width:100%;
-max-height:200px;
+max-height:180px;
 object-fit:cover;
 }
 
@@ -58,15 +58,13 @@ border-radius:15px;
 box-shadow:0 5px 15px rgba(0,0,0,0.2);
 }
 
-.question-box h3{
-margin-bottom:15px;
-font-size:18px;
-line-height:1.5;
-}
-
 .option{
 display:block;
 margin:8px 0;
+padding:8px;
+border-radius:8px;
+border:1px solid #ddd;
+cursor:pointer;
 }
 
 button{
@@ -97,6 +95,7 @@ padding:30px;
 border-radius:15px;
 text-align:center;
 margin-top:20px;
+border:6px solid gold;
 }
 
 .footer{
@@ -129,6 +128,7 @@ font-size:14px;
 </div>
 
 <script>
+
 const questions=[
 {q:"1. What planet is known as Red Planet?",a:["Earth","Mars","Jupiter","Venus"],c:"Mars"},
 {q:"2. H2O is chemical formula of?",a:["Oxygen","Hydrogen","Water","Salt"],c:"Water"},
@@ -191,34 +191,59 @@ submitQuiz();
 
 function submitQuiz(){
 clearInterval(countdown);
+
 let name=document.getElementById("username").value;
 if(name===""){alert("Enter Name");return;}
 
 let score=0;
 
 questions.forEach((item,index)=>{
-let answer=document.querySelector(`input[name="q${index}"]:checked`);
-if(answer && answer.value===item.c) score++;
+let options=document.querySelectorAll(`input[name="q${index}"]`);
+
+options.forEach(opt=>{
+let label=opt.parentElement;
+label.style.background="white";
+label.style.border="1px solid #ddd";
+
+if(opt.value===item.c){
+label.style.border="2px solid green";
+}
+
+if(opt.checked && opt.value!==item.c){
+label.style.background="#ffcccc";
+label.style.border="2px solid red";
+}
+
+if(opt.checked && opt.value===item.c){
+label.style.background="#ccffcc";
+score++;
+}
+});
 });
 
 let percent=Math.round((score/questions.length)*100);
-
 document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
 
 showCertificate(name,percent);
 }
 
 function showCertificate(name,percent){
+
 let cert=`
 <div class="certificate" id="certificateBox">
 
-<h2>🏆 Certificate of Participation 🏆</h2>
+<img src="https://images.unsplash.com/photo-1581091870627-3a1b3b2f1f6a"
+style="width:100%;max-height:150px;object-fit:cover;border-radius:10px;">
+
+<h2 style="color:#ff512f;margin-top:15px;">
+🏆 Certificate of Participation 🏆
+</h2>
 
 <p>This is proudly presented to</p>
 <h1>${name}</h1>
 
 <p>for successfully completing the</p>
-<h2>Science Special Quiz</h2>
+<h2 style="color:#ff8c00;">Science Special Quiz</h2>
 
 <h3>Score: ${percent}%</h3>
 <p>Date: ${new Date().toLocaleDateString()}</p>
@@ -228,9 +253,13 @@ let cert=`
 <p><strong>Website:</strong> https://dhannjayuphade.github.io</p>
 <p><strong>Email:</strong> dhannjayuphade5@gmail.com</p>
 
-<div class="footer">
-Creator: Dhannjay Uphade
+<div style="margin-top:30px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Signature_example.svg/512px-Signature_example.svg.png"
+style="width:150px;"><br>
+<b>Signature</b>
 </div>
+
+<br>
 
 <button onclick="downloadPDF()">Download PDF</button>
 
@@ -244,7 +273,8 @@ function downloadPDF(){
 const element=document.getElementById("certificateBox");
 html2pdf().from(element).save();
 }
+
 </script>
 
 </body>
-    </html>
+</html>
