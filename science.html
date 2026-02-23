@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -83,14 +83,8 @@ font-size:24px;
 color:white;
 margin:20px 0;
 }
-</style>
-</head>
 
-<body>
-
-<header>🔬 SCIENCE SPECIAL QUIZ</header>
-<div style="text-align:center;margin-top:-10px;margin-bottom:15px;">
-<a href="index.html" style="
+a.home-btn{
 background:white;
 color:#1e3c72;
 padding:8px 18px;
@@ -98,11 +92,9 @@ border-radius:20px;
 text-decoration:none;
 font-weight:bold;
 box-shadow:0 3px 10px rgba(0,0,0,0.2);
-">
-🏠 Back to Home
-</a>
-</div>
-  <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" style="
+}
+
+a.whatsapp-btn{
 position:fixed;
 bottom:20px;
 right:20px;
@@ -114,9 +106,22 @@ text-decoration:none;
 font-weight:bold;
 box-shadow:0 5px 20px rgba(0,0,0,0.4);
 z-index:999;
-">
-💬 Join Group
-  </a>
+}
+</style>
+</head>
+
+<body>
+
+<header>🔬 SCIENCE SPECIAL QUIZ</header>
+
+<!-- Back to Home -->
+<div style="text-align:center;margin:15px 0;">
+<a href="index.html" class="home-btn">🏠 Back to Home</a>
+</div>
+
+<!-- Floating WhatsApp -->
+<a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" class="whatsapp-btn">💬 Join Group</a>
+
 <div class="container">
 
 <input type="text" id="username" placeholder="Enter Your Name">
@@ -134,7 +139,6 @@ z-index:999;
 </div>
 
 <script>
-
 const questions=[
 {q:"1. What planet is known as Red Planet?",a:["Earth","Mars","Jupiter","Venus"],c:"Mars"},
 {q:"2. H2O is chemical formula of?",a:["Oxygen","Hydrogen","Water","Salt"],c:"Water"},
@@ -197,29 +201,21 @@ submitQuiz();
 
 function submitQuiz(){
 clearInterval(countdown);
-
 let name=document.getElementById("username").value;
 if(name===""){alert("Enter Name");return;}
-
 let score=0;
 
 questions.forEach((item,index)=>{
 let options=document.querySelectorAll(`input[name="q${index}"]`);
-
 options.forEach(opt=>{
 let label=opt.parentElement;
 label.style.background="#fff";
 label.style.border="1px solid #ddd";
-
-if(opt.value===item.c){
-label.style.border="3px solid green";
-}
-
+if(opt.value===item.c) label.style.border="3px solid green";
 if(opt.checked && opt.value!==item.c){
 label.style.background="#ffcccc";
 label.style.border="3px solid red";
 }
-
 if(opt.checked && opt.value===item.c){
 label.style.background="#ccffcc";
 score++;
@@ -231,6 +227,8 @@ let percent=Math.round((score/questions.length)*100);
 document.getElementById("result").innerHTML=`Your Score: ${percent}%`;
 
 showCertificate(name,percent);
+}
+
 function showCertificate(name,percent){
 let cert=`
 <div id="certificateBox" style="
@@ -244,8 +242,8 @@ font-family:Georgia,serif;
 box-shadow:0 0 30px rgba(0,0,0,0.3);
 ">
 
-<!-- Banner on top of certificate -->
-<img src="banners.jpg"
+<!-- Banner on top -->
+<img src="banner.jpg"
 style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:20px;">
 
 <h1 style="color:#1e3c72;font-size:36px;text-align:center;">
@@ -272,21 +270,21 @@ SCIENCE ACHIEVEMENT CERTIFICATE
 <b>Authorized Signature</b>
 </div>
 
-<br> 
+<br>
 
 <div style="text-align:center;">
 <button onclick="downloadPDF()">Download PDF</button>
 </div>
 
 </div>
-
+`;
 
 document.getElementById("certificateArea").innerHTML=cert;
-                    }
+}
+
 function downloadPDF(){
 html2pdf().from(document.getElementById("certificateBox")).save();
 }
-
 </script>
 
 </body>
