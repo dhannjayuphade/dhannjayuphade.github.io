@@ -40,7 +40,15 @@ h2{
 .trishul:active{
   transform:scale(1.3);
 }
+.trishul{
+position:absolute;
+font-size:40px;
+cursor:pointer;
+}
 
+.bad{
+transform: rotate(180deg);
+  }
 #gameOver{
   position:absolute;
   top:50%;
@@ -98,7 +106,58 @@ let gameArea = document.getElementById("gameArea");
 
 let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("highScore").innerText = highScore;
+function createTrishul(){
 
+let trishul = document.createElement("div");
+trishul.classList.add("trishul");
+trishul.innerHTML = "🔱";
+
+trishul.style.left = Math.random()*90 + "vw";
+trishul.style.top = "-50px";
+
+
+// 20% chance bad trishul
+let badChance = Math.random();
+
+if(badChance < 0.2){
+trishul.classList.add("bad");
+trishul.dataset.type="bad";
+}else{
+trishul.dataset.type="good";
+}
+
+document.body.appendChild(trishul);
+
+
+// click event
+trishul.onclick = function(){
+
+if(trishul.dataset.type==="bad"){
+alert("❌ Game Over");
+location.reload();
+}
+else{
+score++;
+document.getElementById("score").innerText=score;
+trishul.remove();
+}
+
+}
+
+
+// fall animation
+let fall=setInterval(()=>{
+let top=trishul.offsetTop;
+trishul.style.top=top+3+"px";
+
+if(top>window.innerHeight){
+clearInterval(fall);
+trishul.remove();
+}
+
+},20);
+
+  }
 function createTrishul(){
   const t = document.createElement("div");
   t.className = "trishul";
@@ -170,8 +229,10 @@ function endGame(){
 function restartGame(){
   location.reload();
 }
+  setInterval(createTrishul,1200);
 
 startGame();
+  
 </script>
   <script src="navbar.js"></script>
 
