@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lightning Dash Pro</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+margin:0;
+}
+
+h1{
+color:#ffd000;
+margin-top:20px;
+}
+
+#gameArea{
+position:relative;
+width:90%;
+max-width:400px;
+height:320px;
+margin:20px auto;
+border:3px solid #444;
+border-radius:12px;
+background:#1b1b1b;
+overflow:hidden;
+}
+
+#lightning{
+position:absolute;
+font-size:42px;
+cursor:pointer;
+transition:0.2s;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+border:none;
+border-radius:8px;
+background:#ffd000;
+cursor:pointer;
+}
+
+button:hover{
+background:#ffaa00;
+}
+
+.info{
+font-size:18px;
+margin-top:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>⚡ Lightning Dash</h1>
+
+<div class="info">
+Score: <span id="score">0</span> |
+High Score: <span id="high">0</span> |
+Time: <span id="time">15</span>s
+</div>
+
+<div id="gameArea">
+<div id="lightning">⚡</div>
+</div>
+
+<button onclick="startGame()">Start Game</button>
+
+<audio id="tapSound">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8a7c8c2c1.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+let score=0;
+let time=15;
+let running=false;
+
+let lightning=document.getElementById("lightning");
+let tap=document.getElementById("tapSound");
+
+let high=localStorage.getItem("lightHigh") || 0;
+document.getElementById("high").innerText=high;
+
+function move(){
+
+if(!running) return;
+
+let area=document.getElementById("gameArea");
+
+let maxX=area.clientWidth-40;
+let maxY=area.clientHeight-40;
+
+let x=Math.random()*maxX;
+let y=Math.random()*maxY;
+
+lightning.style.left=x+"px";
+lightning.style.top=y+"px";
+
+}
+
+lightning.onclick=function(){
+
+if(!running) return;
+
+score++;
+document.getElementById("score").innerText=score;
+
+tap.currentTime=0;
+tap.play();
+
+if(navigator.vibrate) navigator.vibrate(30);
+
+move();
+
+}
+
+function startGame(){
+
+score=0;
+time=15;
+running=true;
+
+document.getElementById("score").innerText=score;
+document.getElementById("time").innerText=time;
+
+move();
+
+let timer=setInterval(function(){
+
+time--;
+document.getElementById("time").innerText=time;
+
+if(time<=0){
+
+clearInterval(timer);
+running=false;
+
+if(score>high){
+high=score;
+localStorage.setItem("lightHigh",high);
+document.getElementById("high").innerText=high;
+}
+
+alert("Game Over! Score: "+score);
+
+}
+
+},1000);
+
+setInterval(move,700);
+
+}
+
+</script>
+
+</body>
+  </html>
