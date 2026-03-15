@@ -308,7 +308,47 @@ footer{
 </head>
 
 <body>
+<script type="module">
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
+  measurementId: "G-Y76NHS7ZV8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.login = function(){
+  signInWithPopup(auth, provider)
+  .then((result)=>{
+    const user = result.user;
+    document.getElementById("name").innerText = user.displayName;
+    document.getElementById("photo").src = user.photoURL;
+  });
+}
+
+window.logout = function(){
+  signOut(auth);
+}
+
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    document.getElementById("name").innerText = user.displayName;
+    document.getElementById("photo").src = user.photoURL;
+  }
+});
+
+</script>
 <h1> welcome </h1>
 
 <header>
