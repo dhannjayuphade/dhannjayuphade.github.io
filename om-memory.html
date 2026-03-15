@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Om Memory Game</title>
+
+<style>
+body{
+  font-family: Arial;
+  text-align:center;
+  background:#111;
+  color:white;
+}
+
+h1{
+  color:#ffa500;
+}
+
+.game{
+  display:grid;
+  grid-template-columns:repeat(4,80px);
+  gap:10px;
+  justify-content:center;
+  margin-top:20px;
+}
+
+.card{
+  width:80px;
+  height:80px;
+  background:#333;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  cursor:pointer;
+  border-radius:10px;
+}
+
+.card.open{
+  background:#ffa500;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🕉 Om Memory Game</h1>
+<p>Match the Om symbols!</p>
+<a href="index.html">subscribe official page</a>
+  
+<div class="game" id="game"></div>
+
+<script>
+
+const symbols = ["🕉","🕉","🔱","🔱","⚡","⚡","🌸","🌸"];
+
+symbols.sort(()=>0.5-Math.random());
+
+const game = document.getElementById("game");
+
+let first=null;
+let second=null;
+
+symbols.forEach(sym=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.dataset.symbol=sym;
+  card.innerHTML="?";
+
+  card.onclick=()=>{
+    if(card.classList.contains("open")) return;
+
+    card.innerHTML=sym;
+    card.classList.add("open");
+
+    if(!first){
+      first=card;
+    }else{
+      second=card;
+
+      if(first.dataset.symbol===second.dataset.symbol){
+        first=null;
+        second=null;
+      }else{
+        setTimeout(()=>{
+          first.innerHTML="?";
+          second.innerHTML="?";
+          first.classList.remove("open");
+          second.classList.remove("open");
+          first=null;
+          second=null;
+        },800);
+      }
+    }
+  }
+
+  game.appendChild(card);
+})
+
+</script>
+
+</body>
+  </html>
