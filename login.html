@@ -1,47 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login System</title>
+<meta charset="UTF-8">
+<title>Dhannjay Website</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#4facfe,#00f2fe);
+}
+
+/* login card */
+
+#loginBox{
+background:white;
+padding:40px;
+border-radius:15px;
+text-align:center;
+width:320px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+button{
+padding:12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+}
+
+/* profile */
+
+#profileBox{
+display:none;
+text-align:center;
+}
+
+#profileBox img{
+width:100px;
+border-radius:50%;
+}
+
+.logout{
+margin-top:20px;
+background:red;
+color:white;
+}
+
+</style>
+
 </head>
+
 <body>
 
-<h2>User Login</h2>
+<!-- LOGIN -->
 
-<button id="login">Login with Google</button>
-<button id="logout">Logout</button>
+<div id="loginBox">
 
-<h3 id="user"></h3>
-<img id="photo" width="80">
+<h2>Dhannjay Website</h2>
+
+<button onclick="login()">Login with Google</button>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div id="profileBox">
+
+<img id="photo">
+
+<h3 id="name"></h3>
+
+<button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { 
+import {
 getAuth,
 GoogleAuthProvider,
 signInWithPopup,
 signOut,
 onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
 const firebaseConfig = {
-
-apiKey: "YOUR_API_KEY",
-
+apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
 authDomain: "dhannjay-website.firebaseapp.com",
-
 projectId: "dhannjay-website",
-
-storageBucket: "dhannjay-website.appspot.com",
-
+storageBucket: "dhannjay-website.firebasestorage.app",
 messagingSenderId: "73314948186",
-
-appId: "YOUR_APP_ID"
-
+appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
-
 
 const app = initializeApp(firebaseConfig);
 
@@ -50,49 +113,53 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 
+window.login=function(){
 
-document.getElementById("login").onclick = function(){
-
-signInWithPopup(auth, provider)
+signInWithPopup(auth,provider)
 
 .then((result)=>{
 
-const user = result.user;
+const user=result.user;
 
-document.getElementById("user").innerText = user.displayName;
-
-document.getElementById("photo").src = user.photoURL;
+showProfile(user);
 
 });
 
-};
+}
 
 
-
-document.getElementById("logout").onclick = function(){
+window.logout=function(){
 
 signOut(auth);
 
-};
-
+}
 
 
 onAuthStateChanged(auth,(user)=>{
 
 if(user){
 
-document.getElementById("user").innerText = user.displayName;
-
-document.getElementById("photo").src = user.photoURL;
+showProfile(user);
 
 }else{
 
-document.getElementById("user").innerText = "Not logged in";
+document.getElementById("loginBox").style.display="block";
+document.getElementById("profileBox").style.display="none";
 
 }
 
 });
 
+
+function showProfile(user){
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("profileBox").style.display="block";
+
+document.getElementById("name").innerText=user.displayName;
+document.getElementById("photo").src=user.photoURL;
+
+}
 
 </script>
 
