@@ -1,47 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Dhannjay Portal Login</title>
-<style>
-body { background:#111; color:white; text-align:center; font-family:sans-serif; padding:50px; }
-input { padding:10px; margin:10px; width:70%; border-radius:5px; border:none; }
-button { padding:10px 20px; border:none; border-radius:5px; background:#28a745; color:white; cursor:pointer; }
-#error { color:red; margin-top:15px; }
-</style>
+<title>Login System</title>
 </head>
 <body>
 
-<h2>Login to Dhannjay Portal</h2>
+<h2>User Login</h2>
 
-<input type="text" id="username" placeholder="Username"><br>
-<input type="password" id="password" placeholder="Password"><br>
-<button id="loginBtn">Login</button>
-<p id="error"></p>
-  
-<p>Don't have an account? <a href="signup.html" style="color:#28a745;">Sign Up</a></p>
-<script>
-const loginBtn = document.getElementById("loginBtn");
+<button id="login">Login with Google</button>
+<button id="logout">Logout</button>
 
-loginBtn.addEventListener("click", () => {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const error = document.getElementById("error");
+<h3 id="user"></h3>
+<img id="photo" width="80">
 
-  const users = JSON.parse(localStorage.getItem("dhannjay_users")) || [];
+<script type="module">
 
-  const user = users.find(u => u.username === username && u.password === password);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-  if(user) {
-    error.innerText = "";
-    alert(`Welcome ${user.username}!`);
-    window.location.href = "index.html"; // Redirect to main site
-  } else {
-    error.innerText = "Invalid username or password!";
-  }
+import { 
+getAuth,
+GoogleAuthProvider,
+signInWithPopup,
+signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+
+authDomain: "dhannjay-website.firebaseapp.com",
+
+projectId: "dhannjay-website",
+
+storageBucket: "dhannjay-website.appspot.com",
+
+messagingSenderId: "73314948186",
+
+appId: "YOUR_APP_ID"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+
+
+document.getElementById("login").onclick = function(){
+
+signInWithPopup(auth, provider)
+
+.then((result)=>{
+
+const user = result.user;
+
+document.getElementById("user").innerText = user.displayName;
+
+document.getElementById("photo").src = user.photoURL;
+
 });
+
+};
+
+
+
+document.getElementById("logout").onclick = function(){
+
+signOut(auth);
+
+};
+
+
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+document.getElementById("user").innerText = user.displayName;
+
+document.getElementById("photo").src = user.photoURL;
+
+}else{
+
+document.getElementById("user").innerText = "Not logged in";
+
+}
+
+});
+
+
 </script>
-  <script src="navbar.js"></script>
 
 </body>
 </html>
