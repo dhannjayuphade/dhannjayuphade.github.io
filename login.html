@@ -9,48 +9,78 @@
 body{
 margin:0;
 font-family:Arial;
-height:100vh;
+background:#f2f2f2;
+}
+
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 20px;
+background:#222;
+color:white;
+}
+
+.avatar{
+width:40px;
+height:40px;
+border-radius:50%;
+cursor:pointer;
+}
+
+/* LOGIN CARD */
+
+#loginBox{
 display:flex;
 justify-content:center;
 align-items:center;
-background:linear-gradient(135deg,#4facfe,#00f2fe);
+height:90vh;
 }
 
-/* login card */
-
-#loginBox{
+.card{
 background:white;
 padding:40px;
 border-radius:15px;
 text-align:center;
 width:320px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
 }
 
-button{
+.google-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
 padding:12px;
-border:none;
+border:1px solid #ddd;
 border-radius:8px;
 cursor:pointer;
 font-size:16px;
+background:white;
 }
 
-/* profile */
+/* PROFILE MENU */
 
-#profileBox{
+#profileMenu{
+position:absolute;
+top:60px;
+right:20px;
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
 display:none;
-text-align:center;
 }
 
-#profileBox img{
-width:100px;
-border-radius:50%;
-}
-
-.logout{
-margin-top:20px;
+#profileMenu button{
 background:red;
 color:white;
+border:none;
+padding:10px;
+border-radius:6px;
+cursor:pointer;
 }
 
 </style>
@@ -59,38 +89,58 @@ color:white;
 
 <body>
 
-<!-- LOGIN -->
+<div class="navbar">
 
-<div id="loginBox">
+<h3>Dhannjay Website</h3>
 
-<h2>Dhannjay Website</h2>
-
-<button onclick="login()">Login with Google</button>
+<img id="avatar" class="avatar" style="display:none">
 
 </div>
 
 
-<!-- PROFILE -->
+<!-- LOGIN -->
 
-<div id="profileBox">
+<div id="loginBox">
 
-<img id="photo">
+<div class="card">
 
-<h3 id="name"></h3>
+<h2>Login</h2>
 
-<button class="logout" onclick="logout()">Logout</button>
+<button class="google-btn" onclick="login()">
+
+<img width="20"
+src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+
+Sign in with Google
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- PROFILE MENU -->
+
+<div id="profileMenu">
+
+<p id="username"></p>
+
+<button onclick="logout()">Logout</button>
 
 </div>
 
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getAuth,
 GoogleAuthProvider,
-signInWithPopup,
+signInWithRedirect,
+getRedirectResult,
 signOut,
 onAuthStateChanged
 }
@@ -115,15 +165,42 @@ const provider = new GoogleAuthProvider();
 
 window.login=function(){
 
-signInWithPopup(auth,provider)
+signInWithRedirect(auth,provider);
 
-.then((result)=>{
+}
 
-const user=result.user;
 
-showProfile(user);
+getRedirectResult(auth).then((result)=>{
+
+if(result){
+
+showUser(result.user);
+
+}
 
 });
+
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+showUser(user);
+
+}
+
+});
+
+
+function showUser(user){
+
+document.getElementById("loginBox").style.display="none";
+
+document.getElementById("avatar").style.display="block";
+
+document.getElementById("avatar").src=user.photoURL;
+
+document.getElementById("username").innerText=user.displayName;
 
 }
 
@@ -132,32 +209,19 @@ window.logout=function(){
 
 signOut(auth);
 
-}
-
-
-onAuthStateChanged(auth,(user)=>{
-
-if(user){
-
-showProfile(user);
-
-}else{
-
-document.getElementById("loginBox").style.display="block";
-document.getElementById("profileBox").style.display="none";
+location.reload();
 
 }
 
-});
 
+/* avatar menu */
 
-function showProfile(user){
+document.getElementById("avatar").onclick=function(){
 
-document.getElementById("loginBox").style.display="none";
-document.getElementById("profileBox").style.display="block";
+const menu=document.getElementById("profileMenu");
 
-document.getElementById("name").innerText=user.displayName;
-document.getElementById("photo").src=user.photoURL;
+menu.style.display=
+menu.style.display==="block" ? "none":"block";
 
 }
 
