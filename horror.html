@@ -2,36 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Haunted House Horror</title>
-
+<title>Real Horror House</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
+
 body{
 margin:0;
 overflow:hidden;
-background:black;
+background:#000;
 font-family:Arial;
-}
-
-#joystick{
-position:absolute;
-bottom:30px;
-left:30px;
-width:120px;
-height:120px;
-border-radius:50%;
-background:rgba(255,255,255,0.15);
-}
-
-#stick{
-width:60px;
-height:60px;
-border-radius:50%;
-background:white;
-position:absolute;
-left:30px;
-top:30px;
 }
 
 #ui{
@@ -44,12 +24,46 @@ padding:10px;
 border-radius:8px;
 }
 
+#inventory{
+position:absolute;
+bottom:10px;
+right:10px;
+color:white;
+background:rgba(0,0,0,0.5);
+padding:10px;
+border-radius:8px;
+}
+
+#joystick{
+position:absolute;
+bottom:30px;
+left:30px;
+width:120px;
+height:120px;
+border-radius:50%;
+background:rgba(255,255,255,0.2);
+}
+
+#stick{
+width:60px;
+height:60px;
+background:white;
+border-radius:50%;
+position:absolute;
+left:30px;
+top:30px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="ui">👻 Haunted House Escape</div>
+<div id="ui">👻 Mission: Find the key and escape</div>
+
+<div id="inventory">
+Inventory: <span id="inv">Empty</span>
+</div>
 
 <div id="joystick">
 <div id="stick"></div>
@@ -61,7 +75,7 @@ border-radius:8px;
 
 let scene=new THREE.Scene()
 
-scene.fog=new THREE.Fog(0x000000,10,120)
+scene.fog=new THREE.Fog(0x000000,20,120)
 
 let camera=new THREE.PerspectiveCamera(
 75,
@@ -70,29 +84,35 @@ window.innerWidth/window.innerHeight,
 1000
 )
 
-let renderer=new THREE.WebGLRenderer()
+let renderer=new THREE.WebGLRenderer({antialias:true})
+renderer.shadowMap.enabled=true
 renderer.setSize(window.innerWidth,window.innerHeight)
+
 document.body.appendChild(renderer.domElement)
 
 camera.position.set(0,2,8)
 
-let moon=new THREE.DirectionalLight(0x8899ff,0.6)
-moon.position.set(30,80,50)
-scene.add(moon)
-
-let ambient=new THREE.AmbientLight(0x333333)
+let ambient=new THREE.AmbientLight(0x555555)
 scene.add(ambient)
 
-let flashlight=new THREE.PointLight(0xffffff,2,40)
+let moon=new THREE.DirectionalLight(0xaaaaee,0.6)
+moon.position.set(20,40,10)
+moon.castShadow=true
+scene.add(moon)
+
+let flashlight=new THREE.SpotLight(0xffffff,2,40,0.6)
+flashlight.castShadow=true
 camera.add(flashlight)
+
 scene.add(camera)
 
 let floor=new THREE.Mesh(
-new THREE.PlaneGeometry(200,200),
-new THREE.MeshStandardMaterial({color:0x222222})
+new THREE.PlaneGeometry(60,60),
+new THREE.MeshStandardMaterial({color:0x333333})
 )
 
 floor.rotation.x=-Math.PI/2
+floor.receiveShadow=true
 scene.add(floor)
 
 function wall(x,z,w,d){
@@ -103,30 +123,58 @@ new THREE.MeshStandardMaterial({color:0x444444})
 )
 
 mesh.position.set(x,2,z)
+mesh.castShadow=true
+mesh.receiveShadow=true
 scene.add(mesh)
 
 }
 
-wall(0,-20,40,1)
-wall(-20,0,1,40)
-wall(20,0,1,40)
-wall(0,20,40,1)
+wall(0,-15,30,1)
+wall(-15,0,1,30)
+wall(15,0,1,30)
+wall(0,15,30,1)
 
-let house=new THREE.Mesh(
-new THREE.BoxGeometry(10,6,10),
-new THREE.MeshStandardMaterial({color:0x333333})
+wall(0,0,1,10)
+wall(5,0,1,10)
+
+let door=new THREE.Mesh(
+new THREE.BoxGeometry(1,3,0.2),
+new THREE.MeshStandardMaterial({color:0x663300})
 )
 
-house.position.set(0,3,-40)
-scene.add(house)
+door.position.set(0,1.5,-5)
+scene.add(door)
 
-let monster=new THREE.Mesh(
-new THREE.BoxGeometry(1,3,1),
-new THREE.MeshStandardMaterial({color:0xffffff})
+let doorOpen=false
+
+let key=new THREE.Mesh(
+new THREE.BoxGeometry(0.5,0.5,0.5),
+new THREE.MeshStandardMaterial({color:0xffff00})
 )
 
-monster.position.set(0,1,-60)
-scene.add(monster)
+key.position.set(8,1,0)
+scene.add(key)
+
+let inventory="Empty"
+
+document.addEventListener("click",()=>{
+
+if(camera.position.distanceTo(key.position)<2 && key.visible){
+
+key.visible=false
+inventory="Key"
+document.getElementById("inv").innerText="Key"
+
+}
+
+if(camera.position.distanceTo(door.position)<3 && inventory==="Key"){
+
+door.rotation.y=Math.PI/2
+doorOpen=true
+
+}
+
+})
 
 let moveX=0
 let moveZ=0
@@ -138,14 +186,7 @@ requestAnimationFrame(animate)
 camera.position.x+=moveX
 camera.position.z+=moveZ
 
-monster.position.lerp(camera.position,0.003)
-
-if(monster.position.distanceTo(camera.position)<2){
-
-alert("👻 Monster caught you!")
-location.reload()
-
-}
+flashlight.position.copy(camera.position)
 
 renderer.render(scene,camera)
 
@@ -200,4 +241,4 @@ startX=e.touches[0].clientX
 </script>
 
 </body>
-  </html>
+</html>
