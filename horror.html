@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Haunted House Horror</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+body{
+margin:0;
+overflow:hidden;
+background:black;
+font-family:Arial;
+}
+
+#joystick{
+position:absolute;
+bottom:30px;
+left:30px;
+width:120px;
+height:120px;
+border-radius:50%;
+background:rgba(255,255,255,0.15);
+}
+
+#stick{
+width:60px;
+height:60px;
+border-radius:50%;
+background:white;
+position:absolute;
+left:30px;
+top:30px;
+}
+
+#ui{
+position:absolute;
+top:10px;
+left:10px;
+color:white;
+background:rgba(0,0,0,0.5);
+padding:10px;
+border-radius:8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="ui">👻 Haunted House Escape</div>
+
+<div id="joystick">
+<div id="stick"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+let scene=new THREE.Scene()
+
+scene.fog=new THREE.Fog(0x000000,10,120)
+
+let camera=new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
+
+let renderer=new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth,window.innerHeight)
+document.body.appendChild(renderer.domElement)
+
+camera.position.set(0,2,8)
+
+let moon=new THREE.DirectionalLight(0x8899ff,0.6)
+moon.position.set(30,80,50)
+scene.add(moon)
+
+let ambient=new THREE.AmbientLight(0x333333)
+scene.add(ambient)
+
+let flashlight=new THREE.PointLight(0xffffff,2,40)
+camera.add(flashlight)
+scene.add(camera)
+
+let floor=new THREE.Mesh(
+new THREE.PlaneGeometry(200,200),
+new THREE.MeshStandardMaterial({color:0x222222})
+)
+
+floor.rotation.x=-Math.PI/2
+scene.add(floor)
+
+function wall(x,z,w,d){
+
+let mesh=new THREE.Mesh(
+new THREE.BoxGeometry(w,4,d),
+new THREE.MeshStandardMaterial({color:0x444444})
+)
+
+mesh.position.set(x,2,z)
+scene.add(mesh)
+
+}
+
+wall(0,-20,40,1)
+wall(-20,0,1,40)
+wall(20,0,1,40)
+wall(0,20,40,1)
+
+let house=new THREE.Mesh(
+new THREE.BoxGeometry(10,6,10),
+new THREE.MeshStandardMaterial({color:0x333333})
+)
+
+house.position.set(0,3,-40)
+scene.add(house)
+
+let monster=new THREE.Mesh(
+new THREE.BoxGeometry(1,3,1),
+new THREE.MeshStandardMaterial({color:0xffffff})
+)
+
+monster.position.set(0,1,-60)
+scene.add(monster)
+
+let moveX=0
+let moveZ=0
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+camera.position.x+=moveX
+camera.position.z+=moveZ
+
+monster.position.lerp(camera.position,0.003)
+
+if(monster.position.distanceTo(camera.position)<2){
+
+alert("👻 Monster caught you!")
+location.reload()
+
+}
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+let joystick=document.getElementById("joystick")
+let stick=document.getElementById("stick")
+
+joystick.addEventListener("touchmove",e=>{
+
+let rect=joystick.getBoundingClientRect()
+
+let x=e.touches[0].clientX-rect.left-60
+let y=e.touches[0].clientY-rect.top-60
+
+stick.style.left=(x+30)+"px"
+stick.style.top=(y+30)+"px"
+
+moveX=x*0.02
+moveZ=y*0.02
+
+})
+
+joystick.addEventListener("touchend",()=>{
+
+stick.style.left="30px"
+stick.style.top="30px"
+
+moveX=0
+moveZ=0
+
+})
+
+let startX=0
+
+document.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX
+})
+
+document.addEventListener("touchmove",e=>{
+
+let dx=e.touches[0].clientX-startX
+
+camera.rotation.y-=dx*0.004
+
+startX=e.touches[0].clientX
+
+})
+
+</script>
+
+</body>
+  </html>
