@@ -526,25 +526,56 @@ onAuthStateChanged(auth,(user)=>{
 
 <script>
 /* ===== COMMENT ===== */
-function loadComments(){
-  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-  let html = "";
-  comments.forEach((c)=>{ html += `<p>💬 ${c}</p>`; });
-  document.getElementById("commentList").innerHTML = html;
-}
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:bb1fb736aaf9aea21df463"
+};
+
+// Init
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Add comment
 function addComment(){
-  let c = document.getElementById("comment").value.trim();
-  if(c!==""){
-    let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-    comments.push(c);
-    localStorage.setItem("all_comments",JSON.stringify(comments));
-    document.getElementById("comment").value="";
-    loadComments();
-  }
-}
-loadComments();
+  let text = document.getElementById("comment").value;
 
+  if(text==""){
+    alert("Comment टाका");
+    return;
+  }
+
+  db.collection("comments").add({
+    comment: text,
+    time: Date.now()
+  });
+
+  document.getElementById("comment").value = "";
+}
+
+// Load comments (real-time)
+db.collection("comments")
+.orderBy("time","desc")
+.onSnapshot((snapshot)=>{
+  let html = "";
+  snapshot.forEach((doc)=>{
+    let c = doc.data();
+    html += `<p>💬 ${c.comment}</p>`;
+  });
+  document.getElementById("commentList").innerHTML = html;
+});
+</script>
+ <script>
 /* ===== SUVICHAR ===== */
 const suvichars=[
  "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
