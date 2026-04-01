@@ -39,7 +39,7 @@ window.signup = () => {
 
 window.login = () => {
   signInWithEmailAndPassword(auth, email.value, password.value)
-  .then(() => msg.innerText = "Login success")
+  .then(() => location.href = "profile.html")
   .catch(err => msg.innerText = err.message);
 };
 
