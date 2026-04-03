@@ -125,9 +125,16 @@ window.login = function () {
   errorBox.innerText = "";
 
   signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      window.location.href = "profile.html";
-    })
+  .then((userCredential) => {
+    const user = userCredential.user;
+
+    if (!user.emailVerified) {
+      alert("Please verify your email first 📧");
+      return;
+    }
+
+    window.location.href = "profile.html";
+  })
     .catch((error) => {
       errorBox.innerText = error.message;
     });
