@@ -1,72 +1,170 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #38bdf8;
+      color: black;
+    }
+
+    .score {
+      background: #334155;
+      margin: 5px;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    img {
+      border-radius: 50%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
 <body>
 
-<h2>User Profile</h2>
+<h2>Dashboard</h2>
 
-<input id="name" placeholder="Name"><br><br>
-<input id="age" placeholder="Age"><br><br>
+<div class="card">
+  <p id="user"></p>
 
-<button onclick="save()">Save</button>
+  <input type="file" id="photo">
+  <button onclick="uploadPhoto()">Upload Photo</button>
 
-<p id="msg"></p>
+  <br>
+  <img id="profilePic" width="100">
+
+  <br><br>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="card">
+  <h3>Your Scores</h3>
+  <div id="scores"></div>
+</div>
+
+<div class="card">
+  <h3>Leaderboard 🏆</h3>
+  <div id="leaderboard"></div>
+</div>
+
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { 
+  getAuth, onAuthStateChanged, signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+import { 
+  getFirestore, collection, getDocs 
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+import { 
+  getStorage, ref, uploadBytes, getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
   authDomain: "dhannjay-website.firebaseapp.com",
-  projectId: "dhannjay-website"
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-let uid = null;
+// LOGOUT
+window.logout = () => signOut(auth);
 
-// login check
-onAuthStateChanged(auth, (user) => {
-  if(user){
-    uid = user.uid;
-  } else {
-    alert("Login first!");
-    location.href = "login.html";
-  }
-});
+// UPLOAD PHOTO
+window.uploadPhoto = async function () {
+  const file = document.getElementById("photo").files[0];
+  const user = auth.currentUser;
 
-// SAVE FUNCTION (IMPORTANT 🔥)
-window.save = async () => {
-  if(!uid){
-    alert("User not loaded yet!");
-    return;
-  }
+  if (!file) return alert("Select image");
 
-  const userName = document.getElementById("name").value;
-  const userAge = document.getElementById("age").value;
+  const storageRef = ref(storage, "profile/" + user.uid);
 
-  if(userName === "" || userAge === ""){
-    alert("Fill all fields!");
-    return;
-  }
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
 
-  try {
-    await setDoc(doc(db, "users", uid), {
-      name: userName,
-      age: userAge
-    });
-
-    document.getElementById("msg").innerText = "Saved successfully!";
-  } catch(e){
-    document.getElementById("msg").innerText = "Error: " + e.message;
-  }
+  document.getElementById("profilePic").src = url;
+  alert("Photo uploaded ✅");
 };
 
-  </script>
+// AUTH CHECK
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = "login.html";
 
+  // EMAIL VERIFICATION CHECK
+  if (!user.emailVerified) {
+    alert("Verify your email first 📧");
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("user").innerText = user.email;
+
+  // LOAD PHOTO
+  const storageRef = ref(storage, "profile/" + user.uid);
+  getDownloadURL(storageRef)
+    .then(url => document.getElementById("profilePic").src = url)
+    .catch(()=>{});
+
+  // LOAD SCORES
+  const snap = await getDocs(collection(db, "scores"));
+
+  let userHTML = "";
+  let allScores = [];
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    allScores.push(d);
+
+    if (d.email === user.email) {
+      userHTML += `<div class="score">${d.type}: ${d.score}</div>`;
+    }
+  });
+
+  document.getElementById("scores").innerHTML = userHTML;
+
+  // LEADERBOARD
+  allScores.sort((a,b)=>b.score-a.score);
+
+  let top = "";
+  allScores.slice(0,5).forEach((d,i)=>{
+    top += `<div class="score">#${i+1} ${d.email} - ${d.score}</div>`;
+  });
+
+  document.getElementById("leaderboard").innerHTML = top;
+});
+</script>
 
 </body>
 </html>
