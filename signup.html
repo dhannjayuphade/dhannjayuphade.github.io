@@ -1,50 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Dhannjay Portal Sign Up</title>
-<style>
-body { background:#111; color:white; text-align:center; font-family:sans-serif; padding:50px; }
-input { padding:10px; margin:10px; width:70%; border-radius:5px; border:none; }
-button { padding:10px 20px; border:none; border-radius:5px; background:#28a745; color:white; cursor:pointer; }
-#error { color:red; margin-top:15px; }
-</style>
+  <title>Sign Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg,#43e97b,#38f9d7);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 330px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      background: #43e97b;
+      color: white;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+
+    a {
+      display: block;
+      margin-top: 10px;
+      color: #43e97b;
+      text-decoration: none;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Sign Up for Dhannjay Portal</h2>
+<div class="card">
+  <h2>Create Account</h2>
 
-<input type="text" id="username" placeholder="Username"><br>
-<input type="password" id="password" placeholder="Password"><br>
-<button id="signupBtn">Sign Up</button>
-<p id="error"></p>
+  <input type="email" id="email" placeholder="Enter Email">
+  <input type="password" id="password" placeholder="Enter Password">
 
-<script>
-const signupBtn = document.getElementById("signupBtn");
+  <button onclick="signup()">Sign Up</button>
 
-signupBtn.addEventListener("click", () => {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const error = document.getElementById("error");
+  <p class="error" id="error"></p>
 
-  if(!username || !password) {
-    error.innerText = "Please enter username and password!";
-    return;
-  }
+  <a href="login.html">Already have an account? Login</a>
+</div>
 
-  let users = JSON.parse(localStorage.getItem("dhannjay_users")) || [];
-  if(users.find(u => u.username === username)) {
-    error.innerText = "Username already exists!";
-    return;
-  }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-  users.push({ username, password });
-  localStorage.setItem("dhannjay_users", JSON.stringify(users));
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
+};
 
-  alert("Sign up successful! Please login now.");
-  window.location.href = "login.html";
-});
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// SIGNUP FUNCTION
+window.signup = function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorBox = document.getElementById("error");
+
+  errorBox.innerText = "";
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      alert("Account Created Successfully ✅");
+      window.location.href = "login.html";
+    })
+    .catch((error) => {
+      errorBox.innerText = error.message;
+    });
+};
 </script>
-<script src="navbar.js"></script>
+
 </body>
 </html>
