@@ -1,49 +1,149 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
+  <title>Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 330px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .login-btn {
+      background: #667eea;
+      color: white;
+    }
+
+    .google-btn {
+      background: white;
+      border: 1px solid #ccc;
+    }
+
+    .google-btn img {
+      width: 18px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+
+    a {
+      display: block;
+      margin-top: 10px;
+      color: #667eea;
+      text-decoration: none;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>Login</h2>
+<div class="card">
+  <h2>Login</h2>
 
-<input id="email" placeholder="Email"><br><br>
-<input id="password" placeholder="Password"><br><br>
+  <input type="email" id="email" placeholder="Enter Email">
+  <input type="password" id="password" placeholder="Enter Password">
 
-<button onclick="signup()">Sign Up</button>
-<button onclick="login()">Login</button>
+  <button class="login-btn" onclick="login()">Login</button>
 
-<p id="msg"></p>
+  <button class="google-btn" onclick="googleLogin()">
+    <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png">
+    Continue with Google
+  </button>
+
+  <p class="error" id="error"></p>
+
+  <a href="signup.html">Create Account</a>
+</div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup 
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
   authDomain: "dhannjay-website.firebaseapp.com",
   projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-window.signup = () => {
-  createUserWithEmailAndPassword(auth, email.value, password.value)
-  .then(() => msg.innerText = "Signup success")
-  .catch(err => msg.innerText = err.message);
+// Email Login
+window.login = function () {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorBox = document.getElementById("error");
+
+  errorBox.innerText = "";
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      window.location.href = "profile.html";
+    })
+    .catch((error) => {
+      errorBox.innerText = error.message;
+    });
 };
 
-window.login = () => {
-  signInWithEmailAndPassword(auth, email.value, password.value)
-  .then(() => location.href = "profile.html")
-  .catch(err => msg.innerText = err.message);
+// Google Login
+window.googleLogin = function () {
+  signInWithPopup(auth, provider)
+    .then(() => {
+      window.location.href = "profile.html";
+    })
+    .catch((error) => {
+      document.getElementById("error").innerText = error.message;
+    });
 };
-
 </script>
 
 </body>
-</html>
+    </html>
