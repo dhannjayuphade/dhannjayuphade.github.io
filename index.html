@@ -311,7 +311,35 @@ footer{
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
+.comment-box {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
 
+.comment-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+.comment-box button {
+  padding: 10px 15px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.comment {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  color: white;
+      }
 </style>
   
 <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
@@ -486,9 +514,7 @@ onAuthStateChanged(auth,(user)=>{
 </a>
 </div>
 
-  <button class="glow-share-btn" onclick="whatsappShare()">
-  📲 Share on WhatsApp
-  </button>
+  
   <a href="https://wa.me/?text=Check%20out%20my%20website%20https://dhannjayuphade.github.io/" 
    target="_blank"
    style="display:inline-block; background:#25D366; color:white; padding:12px 20px; border-radius:8px; text-decoration:none;">
@@ -514,12 +540,12 @@ onAuthStateChanged(auth,(user)=>{
   </a>
 
 <!-- ===== COMMENT ===== -->
-<div class="card">
-💬 <b>Comments</b><br>
-<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
-<button onclick="addComment()">Post</button>
-<div id="commentList"></div>
+<div class="comment-box">
+  <input type="text" id="commentInput" placeholder="Write a comment...">
+  <button onclick="addComment()">Post</button>
 </div>
+
+<div id="comments"></div>
   
 <h1>Thank you 💕 </h1>
 <footer>© 2026 Dhannjay Uphade</footer>
@@ -805,5 +831,36 @@ body {
   padding-bottom: 60px;
 }
 </style>
-</body>
+  <script>import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+async function addComment() {
+  const input = document.getElementById("commentInput");
+  const text = input.value;
+
+  if (text.trim() === "") return;
+
+  await addDoc(collection(db, "comments"), {
+    text: text,
+    user: "Anonymous",
+    time: new Date()
+  });
+
+  input.value = "";
+    }
+    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"; </script>
+onSnapshot(collection(db, "comments"), (snapshot) => {
+  const container = document.getElementById("comments");
+  container.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+
+    container.innerHTML += `
+      <div class="comment">
+        <strong>${data.user}</strong>
+        <p>${data.text}</p>
+      </div>
+    `;
+  });
+}
+</script> </body>
 </html>
