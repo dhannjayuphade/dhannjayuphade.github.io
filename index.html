@@ -831,12 +831,30 @@ body {
   padding-bottom: 60px;
 }
 </style>
-  <script>import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-async function addComment() {
+  <script> <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+};
+
+// INIT
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ADD COMMENT
+window.addComment = async function () {
   const input = document.getElementById("commentInput");
   const text = input.value;
 
-  if (text.trim() === "") return;
+  if (text.trim() === "") {
+    alert("Comment टाका");
+    return;
+  }
 
   await addDoc(collection(db, "comments"), {
     text: text,
@@ -845,9 +863,12 @@ async function addComment() {
   });
 
   input.value = "";
-    }
-    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"; </script>
-onSnapshot(collection(db, "comments"), (snapshot) => {
+};
+
+// SHOW COMMENTS (REAL-TIME)
+const q = query(collection(db, "comments"), orderBy("time", "desc"));
+
+onSnapshot(q, (snapshot) => {
   const container = document.getElementById("comments");
   container.innerHTML = "";
 
@@ -861,6 +882,7 @@ onSnapshot(collection(db, "comments"), (snapshot) => {
       </div>
     `;
   });
-}
-</script> </body>
+});
+</script></script>
+</body>
 </html>
