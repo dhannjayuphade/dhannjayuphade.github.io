@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Milk Dairy Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    h2 {
+      color: #22c55e;
+    }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 90%;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      border: none;
+      background: #22c55e;
+      color: white;
+      width: 45%;
+    }
+
+    .card {
+      background: #1e293b;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .delete {
+      background: red;
+      margin-top: 5px;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🥛 Milk Dairy App</h2>
+
+<input id="name" placeholder="Customer Name">
+<input id="milk" type="number" placeholder="Milk (Liters)">
+<input id="rate" type="number" placeholder="Rate ₹">
+
+<button onclick="saveData()">Save</button>
+<button onclick="showData()">Show</button>
+
+<button onclick="clearAll()">Clear All</button>
+
+<div id="output"></div>
+
+<script>
+function saveData() {
+  let name = document.getElementById("name").value;
+  let milk = document.getElementById("milk").value;
+  let rate = document.getElementById("rate").value;
+
+  if(!name || !milk || !rate){
+    alert("Fill all fields!");
+    return;
+  }
+
+  let total = milk * rate;
+
+  let data = {
+    name,
+    milk,
+    rate,
+    total,
+    date: new Date().toLocaleDateString()
+  };
+
+  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  records.push(data);
+
+  localStorage.setItem("milkData", JSON.stringify(records));
+
+  alert("Saved!");
+}
+
+function showData() {
+  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  let html = "";
+  let grandTotal = 0;
+
+  records.forEach((r, index) => {
+    grandTotal += r.total;
+
+    html += `
+      <div class="card">
+        <b>${r.name}</b><br>
+        ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
+        📅 ${r.date}
+        <button class="delete" onclick="deleteOne(${index})">Delete</button>
+      </div>
+    `;
+  });
+
+  html += `<h3>Total ₹${grandTotal}</h3>`;
+
+  document.getElementById("output").innerHTML = html;
+}
+
+function deleteOne(index) {
+  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  records.splice(index, 1);
+  localStorage.setItem("milkData", JSON.stringify(records));
+  showData();
+}
+
+function clearAll() {
+  localStorage.removeItem("milkData");
+  showData();
+}
+</script>
+
+</body>
+</html>
