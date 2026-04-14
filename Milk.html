@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Milk Dairy Pro+</title>
+  <title>Milk Dairy Pro Ultimate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
+  <!-- PDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     body {
       font-family: Arial;
-      background: #0f172a;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
       color: white;
       text-align: center;
       padding: 10px;
     }
 
     h2 { color: #22c55e; }
+
+    .box {
+      background: #1e293b;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 12px;
+    }
 
     input, select {
       padding: 10px;
@@ -34,194 +44,233 @@
     }
 
     .card {
-      background: #1e293b;
+      background: #334155;
       margin: 10px 0;
       padding: 10px;
       border-radius: 10px;
     }
 
-    .delete { background: red; width: 100%; }
-    .whatsapp { background: #25D366; width: 100%; }
+    .whatsapp {
+      background: #25D366;
+      width: 100%;
+    }
+
+    .pdf {
+      background: #3b82f6;
+      width: 100%;
+    }
   </style>
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
-<h2>🥛 Milk Dairy Pro+</h2>
+<h2>🥛 Milk Dairy Pro Ultimate</h2>
 
-<!-- Customer Add -->
+<div class="box">
 <h3>Add Customer</h3>
 <input id="cname" placeholder="Customer Name">
 <input id="cmobile" placeholder="Mobile Number">
-<button onclick="addCustomer()">Add Customer</button>
+<button onclick="addCustomer()">Add</button>
+</div>
 
-<hr>
-
-<!-- Entry -->
+<div class="box">
 <h3>Milk Entry</h3>
 <select id="customerSelect"></select>
-<input id="milk" type="number" placeholder="Milk (Liters)">
+<input id="milk" type="number" placeholder="Milk (L)">
 <input id="rate" type="number" placeholder="Rate ₹">
+<button onclick="saveData()">Save</button>
+</div>
 
-<button onclick="saveData()">Save Entry</button>
-<button onclick="showData()">Show Records</button>
-<button onclick="showCustomers()">Customer List</button>
-<button onclick="monthlyBill()">Monthly Bill</button>
+<div class="box">
+<h3>Filter</h3>
+<select id="monthFilter">
+<option value="all">All</option>
+<option value="0">Jan</option>
+<option value="1">Feb</option>
+<option value="2">Mar</option>
+<option value="3">Apr</option>
+<option value="4">May</option>
+<option value="5">Jun</option>
+<option value="6">Jul</option>
+<option value="7">Aug</option>
+<option value="8">Sep</option>
+<option value="9">Oct</option>
+<option value="10">Nov</option>
+<option value="11">Dec</option>
+</select>
+
+<button onclick="showData()">Records</button>
+<button onclick="monthlyReport()">Report</button>
+<button onclick="downloadPDF()">PDF</button>
+</div>
 
 <div id="output"></div>
 
 <script>
 
-// 🔹 Load customers in dropdown
+// Load Customers
 function loadCustomers() {
   let customers = JSON.parse(localStorage.getItem("customers")) || [];
   let select = document.getElementById("customerSelect");
-
   select.innerHTML = "";
 
   customers.forEach(c => {
-    select.innerHTML += `<option value="${c.name}|${c.mobile}">${c.name}</option>`;
+    let option = document.createElement("option");
+    option.value = c.name + "|" + c.mobile;
+    option.textContent = c.name;
+    select.appendChild(option);
   });
 }
 
-// ➕ Add Customer
+// Add Customer
 function addCustomer() {
-  let name = cname.value;
-  let mobile = cmobile.value;
+  let name = document.getElementById("cname").value;
+  let mobile = document.getElementById("cmobile").value;
 
-  if(!name || !mobile){
-    alert("Fill all fields");
-    return;
-  }
+  if (!name || !mobile) return alert("Fill all fields");
 
   let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  customers.push({name, mobile});
+  customers.push({ name, mobile });
 
   localStorage.setItem("customers", JSON.stringify(customers));
-
-  alert("Customer Added!");
   loadCustomers();
+  alert("Customer Added");
 }
 
-// 💾 Save Entry
+// Save Entry
 function saveData() {
-  let selected = customerSelect.value.split("|");
-  let name = selected[0];
-  let mobile = selected[1];
+  let selected = document.getElementById("customerSelect").value;
+  if (!selected) return alert("Add customer first");
 
-  let milk = milkInput.value;
-  let rate = rateInput.value;
+  let [name, mobile] = selected.split("|");
+
+  let milk = document.getElementById("milk").value;
+  let rate = document.getElementById("rate").value;
+
+  if (!milk || !rate) return alert("Fill all fields");
 
   let total = milk * rate;
 
-  let data = {
+  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+
+  records.push({
     name, mobile, milk, rate, total,
     date: new Date().toISOString()
-  };
-
-  let records = JSON.parse(localStorage.getItem("milkData")) || [];
-  records.push(data);
+  });
 
   localStorage.setItem("milkData", JSON.stringify(records));
-
-  alert("Saved!");
+  alert("Saved");
 }
 
-// 📄 Show Records
+// Show Records
 function showData() {
   let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  let month = document.getElementById("monthFilter").value;
+
   let html = "";
+  let totalAll = 0;
 
-  records.forEach((r,i) => {
-    html += `
-      <div class="card">
-        <b>${r.name}</b><br>
-        ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
-        ${new Date(r.date).toLocaleDateString()}
-        <button class="delete" onclick="deleteOne(${i})">Delete</button>
-      </div>
-    `;
+  records.forEach(r => {
+    let m = new Date(r.date).getMonth();
+
+    if (month === "all" || month == m) {
+      totalAll += r.total;
+
+      html += `
+        <div class="card">
+          <b>${r.name}</b><br>
+          ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
+          ${new Date(r.date).toLocaleDateString()}
+        </div>
+      `;
+    }
   });
 
-  output.innerHTML = html;
+  html += `<h3>Total ₹${totalAll}</h3>`;
+  document.getElementById("output").innerHTML = html;
 }
 
-// ❌ Delete Entry
-function deleteOne(i){
+// Monthly Report
+function monthlyReport() {
   let records = JSON.parse(localStorage.getItem("milkData")) || [];
-  records.splice(i,1);
-  localStorage.setItem("milkData", JSON.stringify(records));
-  showData();
-}
-
-// 👥 Customer List
-function showCustomers(){
-  let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  let html = "<h3>Customers</h3>";
-
-  customers.forEach((c,i) => {
-    html += `
-      <div class="card">
-        ${c.name}<br>
-        📞 ${c.mobile}
-        <button class="delete" onclick="deleteCustomer(${i})">Delete</button>
-      </div>
-    `;
-  });
-
-  output.innerHTML = html;
-}
-
-// ❌ Delete Customer
-function deleteCustomer(i){
-  let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  customers.splice(i,1);
-  localStorage.setItem("customers", JSON.stringify(customers));
-  loadCustomers();
-  showCustomers();
-}
-
-// 📊 Monthly Bill
-function monthlyBill() {
-  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  let month = document.getElementById("monthFilter").value;
 
   let result = {};
 
   records.forEach(r => {
-    if(!result[r.name]){
-      result[r.name] = { total: 0, mobile: r.mobile };
+    let m = new Date(r.date).getMonth();
+
+    if (month === "all" || month == m) {
+      if (!result[r.name]) {
+        result[r.name] = { total: 0, mobile: r.mobile };
+      }
+      result[r.name].total += r.total;
     }
-    result[r.name].total += r.total;
   });
 
-  let html = "<h3>Monthly Bills</h3>";
+  let html = "<h3>Monthly Report</h3>";
 
-  for(let name in result){
+  for (let name in result) {
     html += `
       <div class="card">
         <b>${name}</b><br>
         Total: ₹${result[name].total}
-        <button class="whatsapp" onclick="sendWhatsApp('${name}', '${result[name].total}', '${result[name].mobile}')">
-        Send WhatsApp
+        <button class="whatsapp" onclick="sendWhatsApp('${name}','${result[name].total}','${result[name].mobile}')">
+        WhatsApp
         </button>
       </div>
     `;
   }
 
-  output.innerHTML = html;
+  document.getElementById("output").innerHTML = html;
 }
 
-// 📲 WhatsApp
-function sendWhatsApp(name, total, mobile){
+// WhatsApp
+function sendWhatsApp(name, total, mobile) {
   let msg = `Hello ${name}, Your Milk Bill is ₹${total}`;
   let url = `https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 }
 
-// 🔄 Load on start
+// PDF Download
+async function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let records = JSON.parse(localStorage.getItem("milkData")) || [];
+  let month = document.getElementById("monthFilter").value;
+
+  let result = {};
+
+  records.forEach(r => {
+    let m = new Date(r.date).getMonth();
+
+    if (month === "all" || month == m) {
+      if (!result[r.name]) result[r.name] = 0;
+      result[r.name] += r.total;
+    }
+  });
+
+  let y = 10;
+  doc.setFontSize(16);
+  doc.text("Milk Monthly Bill", 20, y);
+
+  y += 10;
+
+  for (let name in result) {
+    doc.setFontSize(12);
+    doc.text(`${name} - ₹${result[name]}`, 20, y);
+    y += 10;
+  }
+
+  doc.save("Milk_Bill.pdf");
+}
+
+// Init
 loadCustomers();
 
 </script>
 
 </body>
-</html>
+  </html>
