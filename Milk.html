@@ -226,18 +226,34 @@ function editCustomer(id){
   let data = get("milkData");
 
   let c = customers.find(x => x.id == id);
-  let total = data
-    .filter(x => x.customerId == id)
-    .reduce((sum,x)=>sum+x.total,0);
+  let entries = data.filter(x => x.customerId == id);
 
-  let msg =
-`Milk Dairy Bill
-Name: ${c.name}
-Total: ₹${total}
-Thank you`;
+  let total = 0;
 
+  let msg = `Milk Dairy Bill\n\n`;
+
+  msg += `Name: ${c.name}\n`;
+  msg += `Mobile: ${c.mobile}\n`;
+  msg += `Place: ${c.place}\n\n`;
+
+  msg += `------------------\n`;
+
+  entries.forEach(r=>{
+    total += r.total;
+
+    let d = new Date(r.date);
+    let day = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
+
+    msg += `${d.toLocaleDateString()} (${day})\n`;
+    msg += `${r.milk}L × ₹${r.rate} = ₹${r.total}\n\n`;
+  });
+
+  msg += `------------------\n`;
+  msg += `TOTAL: ₹${total}\n`;
+
+  // SMS open
   window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
-  }
+              }
 
 // TOGGLE PAID
 function togglePaid(id){
