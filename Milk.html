@@ -1,283 +1,282 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Milk Dairy Pro</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milk Dairy Pro MAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <style>
-    body{
-      font-family: Arial;
-      background:#0f172a;
-      color:white;
-      text-align:center;
-    }
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
 
-    .box{
-      background:#1e293b;
-      margin:10px;
-      padding:10px;
-      border-radius:10px;
-    }
+.box{
+  background:#1e293b;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
 
-    input,select{
-      width:90%;
-      padding:10px;
-      margin:5px;
-      border-radius:8px;
-    }
+input,select{
+  width:90%;
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+}
 
-    button{
-      padding:10px;
-      margin:5px;
-      width:45%;
-      border-radius:8px;
-      border:none;
-      background:#22c55e;
-      color:white;
-    }
+button{
+  padding:10px;
+  margin:5px;
+  width:45%;
+  border-radius:8px;
+  border:none;
+}
 
-    .card{
-      background:#334155;
-      margin:10px;
-      padding:10px;
-      border-radius:10px;
-    }
+.card{
+  background:#334155;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
 
-    .danger{background:red;width:100%;}
-    .wa{background:#25D366;width:100%;}
-    .pdf{background:#3b82f6;width:100%;}
-  </style>
+.green{background:#22c55e;color:white;}
+.red{background:red;color:white;}
+.blue{background:#3b82f6;color:white;}
+.wa{background:#25D366;color:white;width:100%;}
+</style>
 </head>
 
 <body>
 
-<h2>🥛 Milk Dairy Pro</h2>
+<h2>🥛 Milk Dairy Pro MAX</h2>
 
 <!-- CUSTOMER -->
 <div class="box">
-<h3>Add Customer</h3>
-<input id="cname" placeholder="Name">
-<input id="cmobile" placeholder="Mobile">
-<input id="clocation" placeholder="Location">
-<button onclick="addCustomer()">Add</button>
+<h3>Customer</h3>
+<input id="name" placeholder="Name">
+<input id="mobile" placeholder="Mobile">
+<input id="email" placeholder="Email">
+<input id="place" placeholder="Place">
+<button class="green" onclick="addCustomer()">Add</button>
+<button class="blue" onclick="updateCustomer()">Update</button>
 </div>
 
 <!-- ENTRY -->
 <div class="box">
 <h3>Milk Entry</h3>
-<select id="customerSelect"></select>
-<input id="milk" type="number" step="0.1" placeholder="Milk (0.5)">
+<select id="customer"></select>
+<input id="milk" type="number" placeholder="Milk (L)">
 <input id="rate" type="number" value="40">
-<button onclick="saveData()">Save</button>
+<button class="green" onclick="saveMilk()">Save</button>
 </div>
 
-<!-- FILTER -->
+<!-- REPORT -->
 <div class="box">
 <h3>Reports</h3>
-<button onclick="showData()">Show</button>
-<button onclick="monthlyReport()">Monthly</button>
-<button onclick="clearAll()" class="danger">Clear All</button>
+<button onclick="showAll()">Show</button>
+<button onclick="monthly()">Monthly</button>
+<button class="red" onclick="clearAll()">Clear All</button>
 </div>
 
-<div id="output"></div>
+<div id="out"></div>
 
 <script>
 
+function get(key){
+  return JSON.parse(localStorage.getItem(key)) || [];
+}
+
+function save(key,data){
+  localStorage.setItem(key,JSON.stringify(data));
+}
+
+// DAY + DATE FORMAT
+function getDateInfo(dateStr){
+  let d = new Date(dateStr);
+  let days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  return {
+    date: d.toLocaleDateString(),
+    day: days[d.getDay()]
+  };
+}
+
 // LOAD CUSTOMER
-function loadCustomers(){
-  let c = JSON.parse(localStorage.getItem("customers")) || [];
-  let sel = document.getElementById("customerSelect");
+function load(){
+  let c = get("customers");
+  let sel = document.getElementById("customer");
   sel.innerHTML="";
 
   c.forEach(x=>{
     let op = document.createElement("option");
-    op.value = `${x.name}|${x.mobile}|${x.location}`;
-    op.text = `${x.name} - ${x.location}`;
+    op.value = x.id;
+    op.text = x.name + " - " + x.place;
     sel.appendChild(op);
   });
 }
 
-// ADD CUSTOMER
 function addCustomer(){
-  let name = cname.value;
-  let mobile = cmobile.value;
-  let location = clocation.value;
+  let c = get("customers");
 
-  if(!name||!mobile||!location) return alert("Fill all");
+  c.push({
+    id: crypto.randomUUID(),
+    name:name.value,
+    mobile:mobile.value,
+    email:email.value,
+    place:place.value
+  });
 
-  let c = JSON.parse(localStorage.getItem("customers")) || [];
-  c.push({name,mobile,location});
-
-  localStorage.setItem("customers",JSON.stringify(c));
-  loadCustomers();
-
-  cname.value="";cmobile.value="";clocation.value="";
-  alert("Added");
+  save("customers",c);
+  load();
 }
 
-// SAVE DATA (FIXED DECIMAL)
-function saveData(){
-  let val = customerSelect.value;
-  if(!val) return alert("Select customer");
-
-  let [name,mobile,location] = val.split("|");
+function saveMilk(){
+  let m = get("milkData");
 
   let milk = parseFloat(document.getElementById("milk").value);
   let rate = parseFloat(document.getElementById("rate").value);
 
-  if(isNaN(milk)||isNaN(rate)) return alert("Invalid");
-
-  let total = milk * rate;
-
-  let data = JSON.parse(localStorage.getItem("milkData")) || [];
-
-  data.push({
-    name,mobile,location,milk,rate,total,
+  m.push({
+    id:crypto.randomUUID(),
+    customerId:customer.value,
+    milk,
+    rate,
+    total:milk*rate,
     date:new Date().toISOString()
   });
 
-  localStorage.setItem("milkData",JSON.stringify(data));
-
+  save("milkData",m);
   alert("Saved");
-  document.getElementById("milk").value="";
 }
 
-// SHOW DATA
-function showData(){
-  let data = JSON.parse(localStorage.getItem("milkData")) || [];
-  let html="", total=0;
+function showAll(){
+  let m = get("milkData");
+  let c = get("customers");
 
-  data.forEach(r=>{
+  let html="";
+  let total=0;
+
+  m.forEach(r=>{
+    let cust = c.find(x=>x.id==r.customerId) || {};
+
+    let info = getDateInfo(r.date);
+
     total += r.total;
-    html += `<div class="card">
-      <b>${r.name}</b><br>
+
+    html += `
+    <div class="card">
+      <b>${cust.name || "Unknown"}</b><br>
       ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
-      ${new Date(r.date).toLocaleDateString()}
+      📅 ${info.date} (${info.day})
     </div>`;
   });
 
-  html += `<h3>Total ₹${total}</h3>`;
-  output.innerHTML = html;
+  html += "<h3>Total ₹"+total+"</h3>";
+
+  out.innerHTML = html;
 }
 
-// MONTHLY REPORT
-function monthlyReport(){
-  let data = JSON.parse(localStorage.getItem("milkData")) || [];
+function monthly(){
+  let m = get("milkData");
+  let c = get("customers");
+
   let res={};
 
-  data.forEach(r=>{
-    if(!res[r.name]) res[r.name]={total:0,mobile:r.mobile,location:r.location};
-    res[r.name].total += r.total;
+  m.forEach(r=>{
+    if(!res[r.customerId]){
+      res[r.customerId]={total:0};
+    }
+    res[r.customerId].total += r.total;
   });
 
   let html="<h3>Monthly Report</h3>";
 
-  for(let name in res){
-    html += `<div class="card">
-      <b>${name}</b><br>
-      ₹${res[name].total}<br>
-      📍 ${res[name].location}
+  for(let id in res){
+    let cust = c.find(x=>x.id==id)||{};
 
-      <button class="wa" onclick="sendWA('${name}','${res[name].total}','${res[name].mobile}','${res[name].location}')">WhatsApp</button>
+    html += `
+    <div class="card">
+      <b>${cust.name}</b><br>
+      ₹${res[id].total}
 
-      <button class="pdf" onclick="pdf('${name}')">PDF</button>
-
-      <button onclick="sms('${name}','${res[name].total}')">SMS</button>
-
-      <button class="danger" onclick="del('${name}')">Delete</button>
+      <button class="blue" onclick="pdf('${id}')">PDF</button>
     </div>`;
   }
 
-  output.innerHTML = html;
+  out.innerHTML = html;
 }
 
-// WHATSAPP
-function sendWA(name,total,mobile,loc){
-let msg=`*Milk Dairy 🥛*
+// PDF WITH DATE + DAY
+function pdf(id){
+  const {jsPDF} = window.jspdf;
+  let doc = new jsPDF();
 
-${name}
-Total: ₹${total}
-Location: ${loc}
+  let milkData = get("milkData");
+  let customers = get("customers");
 
-https://dhannjayuphade.github.io/`;
+  let cust = customers.find(x => x.id == id);
 
-window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`);
-}
-
-// PDF CLEAN
-function pdf(name){
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF();
-
-  let data=JSON.parse(localStorage.getItem("milkData"))||[];
-  let y=45,total=0;
-
-  let loc="";
-
-  data.forEach(r=>{
-    if(r.name==name) loc=r.location;
-  });
+  let y = 20;
+  let total = 0;
 
   doc.setFontSize(16);
-  doc.text("Milk Dairy",20,10);
+  doc.text("🥛 Milk Dairy Bill", 20, y);
 
-  doc.setFontSize(10);
-  doc.text("Website: dhannjayuphade.github.io",20,15);
+  y += 10;
+  doc.setFontSize(11);
+  doc.text("Customer: " + cust.name, 20, y);
+  y += 7;
+  doc.text("Mobile: " + cust.mobile, 20, y);
+  y += 7;
+  doc.text("Place: " + cust.place, 20, y);
 
-  doc.text("Customer: "+name,20,25);
-  doc.text("Location: "+loc,20,32);
+  y += 10;
+  doc.text("------------------------------------------------", 20, y);
 
-  doc.text("Date  Milk  ₹",20,40);
+  y += 10;
 
-  data.forEach(r=>{
-    if(r.name==name){
-      let d=new Date(r.date).toLocaleDateString();
-      doc.text(`${d}  ${r.milk}L  ₹${r.total}`,20,y);
-      total+=r.total;
-      y+=8;
+  milkData.forEach(r => {
+    if (r.customerId == id) {
+
+      let d = new Date(r.date);
+      let day = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
+      let date = d.toLocaleDateString();
+
+      let lineTotal = r.total;
+      total += lineTotal;
+
+      doc.text(
+        `${date} (${day})  ${r.milk}L × ₹${r.rate} = ₹${lineTotal}`,
+        20,
+        y
+      );
+
+      y += 8;
     }
   });
 
-  doc.text("Total: ₹"+total,20,y+10);
-  doc.text("Signature",140,y+30);
+  y += 10;
 
-  doc.save(name+"_bill.pdf");
-}
+  doc.setFontSize(13);
+  doc.text("TOTAL AMOUNT: ₹" + total, 20, y);
 
-// SMS
-function sms(name,total){
-let msg=`Milk Dairy
-${name}
-Total ₹${total}`;
-window.open(`sms:?body=${encodeURIComponent(msg)}`);
-}
+  y += 15;
+  doc.setFontSize(10);
+  doc.text("Thank you for your business!", 20, y);
 
-// DELETE
-function del(name){
-let c=JSON.parse(localStorage.getItem("customers"))||[];
-let d=JSON.parse(localStorage.getItem("milkData"))||[];
-
-c=c.filter(x=>x.name!=name);
-d=d.filter(x=>x.name!=name);
-
-localStorage.setItem("customers",JSON.stringify(c));
-localStorage.setItem("milkData",JSON.stringify(d));
-
-loadCustomers();
-monthlyReport();
-}
-
-// CLEAR ALL
+  doc.save(cust.name + "_bill.pdf");
+  }
 function clearAll(){
-if(confirm("Delete all?")){
-localStorage.clear();
-location.reload();
-}
+  if(confirm("Delete all data?")){
+    localStorage.clear();
+    location.reload();
+  }
 }
 
-loadCustomers();
+load();
 
 </script>
 
