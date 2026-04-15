@@ -101,77 +101,107 @@
 // Load Customers
 function loadCustomers(){
   let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  customerSelect.innerHTML="";
+  let select = document.getElementById("customerSelect");
+  select.innerHTML="";
+
   customers.forEach(c=>{
-    customerSelect.innerHTML+=`<option value="${c.name}|${c.mobile}">${c.name}</option>`;
+    let option = document.createElement("option");
+    option.value = c.name + "|" + c.mobile;
+    option.textContent = c.name;
+    select.appendChild(option);
   });
 }
 
 // Add Customer
 function addCustomer(){
-  let name=cname.value, mobile=cmobile.value;
-  if(!name||!mobile) return alert("Fill all");
+  let name = document.getElementById("cname").value;
+  let mobile = document.getElementById("cmobile").value;
 
-  let customers=JSON.parse(localStorage.getItem("customers"))||[];
+  if(!name || !mobile) return alert("Fill all fields");
+
+  let customers = JSON.parse(localStorage.getItem("customers")) || [];
   customers.push({name,mobile});
-  localStorage.setItem("customers",JSON.stringify(customers));
+  localStorage.setItem("customers", JSON.stringify(customers));
 
   loadCustomers();
-  alert("Added");
+  alert("Customer Added");
 }
 
-// Save Entry
+// Save Entry (FIXED)
 function saveData(){
-  let [name,mobile]=customerSelect.value.split("|");
-  let milk=milkInput.value, rate=rateInput.value;
+  let selected = document.getElementById("customerSelect").value;
+  if(!selected) return alert("Add customer first");
 
-  if(!milk||!rate) return alert("Fill");
+  let [name, mobile] = selected.split("|");
 
-  let total=milk*rate;
+  let milk = parseFloat(document.getElementById("milk").value);
+  let rate = parseFloat(document.getElementById("rate").value);
 
-  let data=JSON.parse(localStorage.getItem("milkData"))||[];
-  data.push({name,mobile,milk,rate,total,date:new Date().toISOString()});
-  localStorage.setItem("milkData",JSON.stringify(data));
+  if(isNaN(milk) || isNaN(rate)) return alert("Enter valid numbers");
 
-  alert("Saved");
+  let total = milk * rate;
+
+  let data = JSON.parse(localStorage.getItem("milkData")) || [];
+
+  data.push({
+    name, mobile, milk, rate, total,
+    date: new Date().toISOString()
+  });
+
+  localStorage.setItem("milkData", JSON.stringify(data));
+
+  alert("Saved ✅");
+  document.getElementById("milk").value="";
 }
 
 // Show Records
 function showData(){
-  let data=JSON.parse(localStorage.getItem("milkData"))||[];
-  let month=monthFilter.value;
-  let html="",total=0;
+  let data = JSON.parse(localStorage.getItem("milkData")) || [];
+  let month = document.getElementById("monthFilter").value;
+
+  let html="", total=0;
 
   data.forEach(r=>{
-    let m=new Date(r.date).getMonth();
-    if(month=="all"||month==m){
-      total+=r.total;
-      html+=`<div class="card">${r.name}<br>${r.milk}L = ₹${r.total}</div>`;
+    let m = new Date(r.date).getMonth();
+
+    if(month==="all" || month==m){
+      total += r.total;
+
+      html += `
+      <div class="card">
+        <b>${r.name}</b><br>
+        ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
+        ${new Date(r.date).toLocaleDateString()}
+      </div>`;
     }
   });
 
-  html+=`<h3>Total ₹${total}</h3>`;
-  output.innerHTML=html;
+  html += `<h3>Total ₹${total}</h3>`;
+  document.getElementById("output").innerHTML = html;
 }
 
 // Monthly Report
 function monthlyReport(){
-  let data=JSON.parse(localStorage.getItem("milkData"))||[];
-  let month=monthFilter.value;
-  let result={};
+  let data = JSON.parse(localStorage.getItem("milkData")) || [];
+  let month = document.getElementById("monthFilter").value;
+
+  let result = {};
 
   data.forEach(r=>{
-    let m=new Date(r.date).getMonth();
-    if(month=="all"||month==m){
-      if(!result[r.name]) result[r.name]={total:0,mobile:r.mobile};
-      result[r.name].total+=r.total;
+    let m = new Date(r.date).getMonth();
+
+    if(month==="all" || month==m){
+      if(!result[r.name]){
+        result[r.name] = {total:0, mobile:r.mobile};
+      }
+      result[r.name].total += r.total;
     }
   });
 
-  let html="<h3>Report</h3>";
+  let html="<h3>Monthly Report</h3>";
 
   for(let name in result){
-    html+=`
+    html += `
     <div class="card">
       <b>${name}</b><br>
       ₹${result[name].total}
@@ -186,7 +216,7 @@ function monthlyReport(){
     </div>`;
   }
 
-  output.innerHTML=html;
+  document.getElementById("output").innerHTML = html;
 }
 
 // WhatsApp
@@ -205,11 +235,11 @@ window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`);
 
 // PDF
 function generatePDF(name){
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF();
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
 
-  let data=JSON.parse(localStorage.getItem("milkData"))||[];
-  let y=20,total=0;
+  let data = JSON.parse(localStorage.getItem("milkData")) || [];
+  let y=40,total=0;
 
   doc.setFontSize(16);
   doc.text("Dhananjay Milk Dairy",20,10);
@@ -220,15 +250,11 @@ function generatePDF(name){
 
   doc.text("Customer: "+name,20,30);
 
-  y=40;
+  doc.text("Date",20,35);
+  doc.text("Milk",80,35);
+  doc.text("₹",140,35);
 
-  doc.text("Date",20,y);
-  doc.text("Milk",80,y);
-  doc.text("₹",140,y);
-
-  y+=5;
-  doc.line(20,y,180,y);
-  y+=5;
+  doc.line(20,37,180,37);
 
   data.forEach(r=>{
     if(r.name==name){
@@ -255,11 +281,12 @@ function copySMS(name,total){
 let msg=`Dhananjay Milk Dairy
 ${name} - ₹${total}
 Mo:8975881499`;
+
 navigator.clipboard.writeText(msg);
 alert("SMS Copied");
 }
 
-// Delete Customer
+// Delete
 function deleteCustomer(name){
 let customers=JSON.parse(localStorage.getItem("customers"))||[];
 let data=JSON.parse(localStorage.getItem("milkData"))||[];
@@ -274,7 +301,7 @@ loadCustomers();
 monthlyReport();
 }
 
-// Clear All
+// Clear
 function clearAll(){
 if(confirm("Delete all data?")){
 localStorage.clear();
