@@ -1,315 +1,282 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Milk Dairy Pro Ultimate</title>
+  <title>Milk Dairy Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    body {
+    body{
       font-family: Arial;
-      background: linear-gradient(135deg,#0f172a,#1e293b);
-      color: white;
-      text-align: center;
-      padding: 10px;
+      background:#0f172a;
+      color:white;
+      text-align:center;
     }
-    h2 { color:#22c55e; }
 
-    .box {
+    .box{
       background:#1e293b;
-      padding:15px;
       margin:10px;
-      border-radius:12px;
+      padding:10px;
+      border-radius:10px;
     }
 
-    input,select {
-      padding:10px;
-      margin:5px;
+    input,select{
       width:90%;
-      border-radius:8px;
-      border:none;
-    }
-
-    button {
       padding:10px;
       margin:5px;
-      border:none;
       border-radius:8px;
+    }
+
+    button{
+      padding:10px;
+      margin:5px;
+      width:45%;
+      border-radius:8px;
+      border:none;
       background:#22c55e;
       color:white;
-      width:45%;
     }
 
-    .card {
+    .card{
       background:#334155;
       margin:10px;
       padding:10px;
       border-radius:10px;
     }
 
-    .danger { background:red; width:100%; }
-    .whatsapp { background:#25D366; width:100%; }
-    .pdf { background:#3b82f6; width:100%; }
+    .danger{background:red;width:100%;}
+    .wa{background:#25D366;width:100%;}
+    .pdf{background:#3b82f6;width:100%;}
   </style>
 </head>
 
 <body>
 
-<h2>🥛 Dhananjay Milk Dairy</h2>
+<h2>🥛 Milk Dairy Pro</h2>
 
-<!-- Customer -->
+<!-- CUSTOMER -->
 <div class="box">
 <h3>Add Customer</h3>
-<input id="cname" placeholder="Customer Name">
-<input id="cmobile" placeholder="Mobile Number">
+<input id="cname" placeholder="Name">
+<input id="cmobile" placeholder="Mobile">
+<input id="clocation" placeholder="Location">
 <button onclick="addCustomer()">Add</button>
 </div>
 
-<!-- Entry -->
+<!-- ENTRY -->
 <div class="box">
 <h3>Milk Entry</h3>
 <select id="customerSelect"></select>
 <input id="milk" type="number" step="0.1" placeholder="Milk (0.5)">
-<input id="rate" type="number" value="40" placeholder="Rate ₹">
+<input id="rate" type="number" value="40">
 <button onclick="saveData()">Save</button>
 </div>
 
-<!-- Filter -->
+<!-- FILTER -->
 <div class="box">
-<h3>Filter</h3>
-<select id="monthFilter">
-<option value="all">All</option>
-<option value="0">Jan</option><option value="1">Feb</option>
-<option value="2">Mar</option><option value="3">Apr</option>
-<option value="4">May</option><option value="5">Jun</option>
-<option value="6">Jul</option><option value="7">Aug</option>
-<option value="8">Sep</option><option value="9">Oct</option>
-<option value="10">Nov</option><option value="11">Dec</option>
-</select>
-
-<button onclick="showData()">Records</button>
-<button onclick="monthlyReport()">Report</button>
-<button onclick="clearAll()">Clear</button>
+<h3>Reports</h3>
+<button onclick="showData()">Show</button>
+<button onclick="monthlyReport()">Monthly</button>
+<button onclick="clearAll()" class="danger">Clear All</button>
 </div>
 
 <div id="output"></div>
 
 <script>
 
-// Load Customers
+// LOAD CUSTOMER
 function loadCustomers(){
-  let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  let select = document.getElementById("customerSelect");
-  select.innerHTML="";
+  let c = JSON.parse(localStorage.getItem("customers")) || [];
+  let sel = document.getElementById("customerSelect");
+  sel.innerHTML="";
 
-  customers.forEach(c=>{
-    let option = document.createElement("option");
-    option.value = c.name + "|" + c.mobile;
-    option.textContent = c.name;
-    select.appendChild(option);
+  c.forEach(x=>{
+    let op = document.createElement("option");
+    op.value = `${x.name}|${x.mobile}|${x.location}`;
+    op.text = `${x.name} - ${x.location}`;
+    sel.appendChild(op);
   });
 }
 
-// Add Customer
+// ADD CUSTOMER
 function addCustomer(){
-  let name = document.getElementById("cname").value;
-  let mobile = document.getElementById("cmobile").value;
+  let name = cname.value;
+  let mobile = cmobile.value;
+  let location = clocation.value;
 
-  if(!name || !mobile) return alert("Fill all fields");
+  if(!name||!mobile||!location) return alert("Fill all");
 
-  let customers = JSON.parse(localStorage.getItem("customers")) || [];
-  customers.push({name,mobile});
-  localStorage.setItem("customers", JSON.stringify(customers));
+  let c = JSON.parse(localStorage.getItem("customers")) || [];
+  c.push({name,mobile,location});
 
+  localStorage.setItem("customers",JSON.stringify(c));
   loadCustomers();
-  alert("Customer Added");
+
+  cname.value="";cmobile.value="";clocation.value="";
+  alert("Added");
 }
 
-// Save Entry (FIXED)
+// SAVE DATA (FIXED DECIMAL)
 function saveData(){
-  let selected = document.getElementById("customerSelect").value;
-  if(!selected) return alert("Add customer first");
+  let val = customerSelect.value;
+  if(!val) return alert("Select customer");
 
-  let [name, mobile] = selected.split("|");
+  let [name,mobile,location] = val.split("|");
 
   let milk = parseFloat(document.getElementById("milk").value);
   let rate = parseFloat(document.getElementById("rate").value);
 
-  if(isNaN(milk) || isNaN(rate)) return alert("Enter valid numbers");
+  if(isNaN(milk)||isNaN(rate)) return alert("Invalid");
 
   let total = milk * rate;
 
   let data = JSON.parse(localStorage.getItem("milkData")) || [];
 
   data.push({
-    name, mobile, milk, rate, total,
-    date: new Date().toISOString()
+    name,mobile,location,milk,rate,total,
+    date:new Date().toISOString()
   });
 
-  localStorage.setItem("milkData", JSON.stringify(data));
+  localStorage.setItem("milkData",JSON.stringify(data));
 
-  alert("Saved ✅");
+  alert("Saved");
   document.getElementById("milk").value="";
 }
 
-// Show Records
+// SHOW DATA
 function showData(){
   let data = JSON.parse(localStorage.getItem("milkData")) || [];
-  let month = document.getElementById("monthFilter").value;
-
   let html="", total=0;
 
   data.forEach(r=>{
-    let m = new Date(r.date).getMonth();
-
-    if(month==="all" || month==m){
-      total += r.total;
-
-      html += `
-      <div class="card">
-        <b>${r.name}</b><br>
-        ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
-        ${new Date(r.date).toLocaleDateString()}
-      </div>`;
-    }
+    total += r.total;
+    html += `<div class="card">
+      <b>${r.name}</b><br>
+      ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
+      ${new Date(r.date).toLocaleDateString()}
+    </div>`;
   });
 
   html += `<h3>Total ₹${total}</h3>`;
-  document.getElementById("output").innerHTML = html;
+  output.innerHTML = html;
 }
 
-// Monthly Report
+// MONTHLY REPORT
 function monthlyReport(){
   let data = JSON.parse(localStorage.getItem("milkData")) || [];
-  let month = document.getElementById("monthFilter").value;
-
-  let result = {};
+  let res={};
 
   data.forEach(r=>{
-    let m = new Date(r.date).getMonth();
-
-    if(month==="all" || month==m){
-      if(!result[r.name]){
-        result[r.name] = {total:0, mobile:r.mobile};
-      }
-      result[r.name].total += r.total;
-    }
+    if(!res[r.name]) res[r.name]={total:0,mobile:r.mobile,location:r.location};
+    res[r.name].total += r.total;
   });
 
   let html="<h3>Monthly Report</h3>";
 
-  for(let name in result){
-    html += `
-    <div class="card">
+  for(let name in res){
+    html += `<div class="card">
       <b>${name}</b><br>
-      ₹${result[name].total}
+      ₹${res[name].total}<br>
+      📍 ${res[name].location}
 
-      <button class="whatsapp" onclick="sendWhatsApp('${name}','${result[name].total}','${result[name].mobile}')">WhatsApp</button>
+      <button class="wa" onclick="sendWA('${name}','${res[name].total}','${res[name].mobile}','${res[name].location}')">WhatsApp</button>
 
-      <button class="pdf" onclick="generatePDF('${name}')">PDF</button>
+      <button class="pdf" onclick="pdf('${name}')">PDF</button>
 
-      <button onclick="copySMS('${name}','${result[name].total}')">SMS</button>
+      <button onclick="sms('${name}','${res[name].total}')">SMS</button>
 
-      <button class="danger" onclick="deleteCustomer('${name}')">Delete</button>
+      <button class="danger" onclick="del('${name}')">Delete</button>
     </div>`;
   }
 
-  document.getElementById("output").innerHTML = html;
+  output.innerHTML = html;
 }
 
-// WhatsApp
-function sendWhatsApp(name,total,mobile){
-let msg=`*Dhananjay Milk Dairy 🥛*
+// WHATSAPP
+function sendWA(name,total,mobile,loc){
+let msg=`*Milk Dairy 🥛*
 
-Hello ${name}
-Your Bill: ₹${total}
+${name}
+Total: ₹${total}
+Location: ${loc}
 
-Website:
-https://dhannjayuphade.github.io/
-Mo: 8975881499`;
+https://dhannjayuphade.github.io/`;
 
 window.open(`https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`);
 }
 
-// PDF
-function generatePDF(name){
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF();
+// PDF CLEAN
+function pdf(name){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
 
-  let data = JSON.parse(localStorage.getItem("milkData")) || [];
-  let y=40,total=0;
+  let data=JSON.parse(localStorage.getItem("milkData"))||[];
+  let y=45,total=0;
+
+  let loc="";
+
+  data.forEach(r=>{
+    if(r.name==name) loc=r.location;
+  });
 
   doc.setFontSize(16);
-  doc.text("Dhananjay Milk Dairy",20,10);
+  doc.text("Milk Dairy",20,10);
 
   doc.setFontSize(10);
   doc.text("Website: dhannjayuphade.github.io",20,15);
-  doc.text("Mo: 8975881499",20,20);
 
-  doc.text("Customer: "+name,20,30);
+  doc.text("Customer: "+name,20,25);
+  doc.text("Location: "+loc,20,32);
 
-  doc.text("Date",20,35);
-  doc.text("Milk",80,35);
-  doc.text("₹",140,35);
-
-  doc.line(20,37,180,37);
+  doc.text("Date  Milk  ₹",20,40);
 
   data.forEach(r=>{
     if(r.name==name){
       let d=new Date(r.date).toLocaleDateString();
-      doc.text(d,20,y);
-      doc.text(r.milk.toString(),80,y);
-      doc.text("₹"+r.total,140,y);
+      doc.text(`${d}  ${r.milk}L  ₹${r.total}`,20,y);
       total+=r.total;
       y+=8;
     }
   });
 
-  y+=10;
-  doc.text("Total ₹"+total,20,y);
-
-  y+=20;
-  doc.text("Signature",140,y);
+  doc.text("Total: ₹"+total,20,y+10);
+  doc.text("Signature",140,y+30);
 
   doc.save(name+"_bill.pdf");
 }
 
 // SMS
-function copySMS(name,total){
-let msg=`Dhananjay Milk Dairy
-${name} - ₹${total}
-Mo:8975881499`;
-
-navigator.clipboard.writeText(msg);
-alert("SMS Copied");
+function sms(name,total){
+let msg=`Milk Dairy
+${name}
+Total ₹${total}`;
+window.open(`sms:?body=${encodeURIComponent(msg)}`);
 }
 
-// Delete
-function deleteCustomer(name){
-let customers=JSON.parse(localStorage.getItem("customers"))||[];
-let data=JSON.parse(localStorage.getItem("milkData"))||[];
+// DELETE
+function del(name){
+let c=JSON.parse(localStorage.getItem("customers"))||[];
+let d=JSON.parse(localStorage.getItem("milkData"))||[];
 
-customers=customers.filter(c=>c.name!=name);
-data=data.filter(d=>d.name!=name);
+c=c.filter(x=>x.name!=name);
+d=d.filter(x=>x.name!=name);
 
-localStorage.setItem("customers",JSON.stringify(customers));
-localStorage.setItem("milkData",JSON.stringify(data));
+localStorage.setItem("customers",JSON.stringify(c));
+localStorage.setItem("milkData",JSON.stringify(d));
 
 loadCustomers();
 monthlyReport();
 }
 
-// Clear
+// CLEAR ALL
 function clearAll(){
-if(confirm("Delete all data?")){
+if(confirm("Delete all?")){
 localStorage.clear();
 location.reload();
 }
 }
 
-// Init
 loadCustomers();
 
 </script>
