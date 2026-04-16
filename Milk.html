@@ -152,6 +152,13 @@ function openCustomer(id){
     📍 ${c.place}<br>
 
     <button class="blue" onclick="editCustomer('${c.id}')">Edit</button>
+    <button class="wa" onclick="sendWhatsApp('${c.id}')">
+  WhatsApp
+</button>
+
+<button class="blue" onclick="sendSMS('${c.id}')">
+  SMS
+</button>
   </div>
 
   <h3>History</h3>
@@ -173,13 +180,7 @@ function openCustomer(id){
   });
 
   html+=`<h3>Total: ₹${total}</h3>`;
-<button class="wa" onclick="sendWhatsApp('${c.id}')">
-  WhatsApp
-</button>
 
-<button class="blue" onclick="sendSMS('${c.id}')">
-  SMS
-</button>
   output.innerHTML=html;
 }
 
@@ -220,7 +221,7 @@ function editCustomer(id){
   msg += `TOTAL: ₹${total}\n`;
 
   window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
-  }
+      }
   function sendSMS(id){
   let customers = get("customers");
   let data = get("milkData");
@@ -237,7 +238,7 @@ Total: ₹${total}
 Thank you`;
 
   window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
-}
+  }
 
 // TOGGLE PAID
 function togglePaid(id){
