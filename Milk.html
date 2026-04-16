@@ -40,8 +40,7 @@ button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 <select id="customerSelect"></select>
 <input id="milk" type="number" placeholder="Milk (L)">
 <input id="rate" type="number" value="40">
->
-  
+
 <button class="green" onclick="saveMilk()">Save</button>
 <button class="blue" onclick="loadCustomers()">Refresh</button>
 </div>
@@ -124,27 +123,22 @@ function updateCustomer(){
 
 // SAVE MILK
 function saveMilk(){
-  let data = get("milkData");
-
-  let selectedDate = document.getElementById("entryDate").value;
-
-  let dateValue = selectedDate 
-    ? new Date(selectedDate).toISOString()
-    : new Date().toISOString();
+  let data=get("milkData");
 
   data.push({
-    id: crypto.randomUUID(),
-    customerId: customerSelect.value,
-    milk: parseFloat(milk.value),
-    rate: parseFloat(rate.value),
-    total: milk.value * rate.value,
-    date: dateValue,
-    status: "UNPAID"
+    id:crypto.randomUUID(),
+    customerId:customerSelect.value,
+    milk:parseFloat(milk.value),
+    rate:parseFloat(rate.value),
+    total:milk.value*rate.value,
+    date:new Date().toISOString(),
+    status:"UNPAID"
   });
 
-  save("milkData", data);
+  save("milkData",data);
   alert("Saved");
 }
+
 // OPEN CUSTOMER DETAIL
 function openCustomer(id){
   let c=get("customers").find(x=>x.id==id);
@@ -156,13 +150,7 @@ function openCustomer(id){
     <h3>${c.name}</h3>
     📱 ${c.mobile}<br>
     📍 ${c.place}<br>
-<button class="wa" onclick="sendWhatsApp('${c.id}')">
-  WhatsApp
-</button>
 
-<button class="blue" onclick="sendSMS('${c.id}')">
-  SMS
-</button>
     <button class="blue" onclick="editCustomer('${c.id}')">Edit</button>
   </div>
 
@@ -185,31 +173,15 @@ function openCustomer(id){
   });
 
   html+=`<h3>Total: ₹${total}</h3>`;
+<button class="wa" onclick="sendWhatsApp('${c.id}')">
+  WhatsApp
+</button>
 
+<button class="blue" onclick="sendSMS('${c.id}')">
+  SMS
+</button>
   output.innerHTML=html;
 }
-  <button class="red" onclick="deleteCustomer('${c.id}')">
-  Delete Customer
-</button>
-  function deleteCustomer(id){
-
-  if(!confirm("हा customer delete करायचा आहे का?")) return;
-
-  let customers = get("customers");
-  let data = get("milkData");
-
-  // Remove customer
-  customers = customers.filter(c => c.id != id);
-
-  // Remove all milk records of that customer
-  data = data.filter(r => r.customerId != id);
-
-  save("customers", customers);
-  save("milkData", data);
-
-  alert("Customer deleted");
-  loadCustomers();
-    }
 
 // EDIT CUSTOMER
 function editCustomer(id){
@@ -229,7 +201,7 @@ function editCustomer(id){
   let entries = data.filter(x => x.customerId == id);
 
   let total = 0;
-  let msg = `🥛 your Milk Bill\n\n`;
+  let msg = `🥛 Milk Dairy Bill\n\n`;
 
   msg += `Name: ${c.name}\n`;
   msg += `Mobile: ${c.mobile}\n`;
@@ -245,44 +217,27 @@ function editCustomer(id){
   });
 
   msg += `----------------------\n`;
-    msg += `TOTAL: ${milk}\n`;
-    msg += `TOTAL: ₹${total}\n`;
+  msg += `TOTAL: ₹${total}\n`;
 
   window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
-      }
+  }
   function sendSMS(id){
   let customers = get("customers");
   let data = get("milkData");
 
   let c = customers.find(x => x.id == id);
-  let entries = data.filter(x => x.customerId == id);
+  let total = data
+    .filter(x => x.customerId == id)
+    .reduce((sum,x)=>sum+x.total,0);
 
-  let total = 0;
+  let msg =
+`Milk Dairy Bill
+Name: ${c.name}
+Total: ₹${total}
+Thank you`;
 
-  let msg = `your Milk Bill\n\n`;
-
-  msg += `Name: ${c.name}\n`;
-  msg += `Mobile: ${c.mobile}\n`;
-  msg += `Place: ${c.place}\n\n`;
-
-  msg += `------------------\n`;
-
-  entries.forEach(r=>{
-    total += r.total;
-
-    let d = new Date(r.date);
-    let day = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
-
-    msg += `${d.toLocaleDateString()} (${day})\n`;
-    msg += `${r.milk}L × ₹${r.rate} = ₹${r.total}\n\n`;
-  });
-
-  msg += `------------------\n`;
-  msg += `TOTAL: ₹${total}\n`;
-
-  // SMS open
   window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
-              }
+}
 
 // TOGGLE PAID
 function togglePaid(id){
