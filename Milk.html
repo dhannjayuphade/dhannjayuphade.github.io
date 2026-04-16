@@ -44,7 +44,7 @@ button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 <button class="green" onclick="saveMilk()">Save</button>
 <button class="blue" onclick="loadCustomers()">Refresh</button>
 </div>
-
+<input id="entryDate" type="date">
 <!-- OUTPUT -->
 <div id="output"></div>
 
@@ -123,22 +123,27 @@ function updateCustomer(){
 
 // SAVE MILK
 function saveMilk(){
-  let data=get("milkData");
+  let data = get("milkData");
+
+  let selectedDate = document.getElementById("entryDate").value;
+
+  let dateValue = selectedDate 
+    ? new Date(selectedDate).toISOString()
+    : new Date().toISOString();
 
   data.push({
-    id:crypto.randomUUID(),
-    customerId:customerSelect.value,
-    milk:parseFloat(milk.value),
-    rate:parseFloat(rate.value),
-    total:milk.value*rate.value,
-    date:new Date().toISOString(),
-    status:"UNPAID"
+    id: crypto.randomUUID(),
+    customerId: customerSelect.value,
+    milk: parseFloat(milk.value),
+    rate: parseFloat(rate.value),
+    total: milk.value * rate.value,
+    date: dateValue,
+    status: "UNPAID"
   });
 
-  save("milkData",data);
+  save("milkData", data);
   alert("Saved");
 }
-
 // OPEN CUSTOMER DETAIL
 function openCustomer(id){
   let c=get("customers").find(x=>x.id==id);
@@ -182,6 +187,28 @@ function openCustomer(id){
 
   output.innerHTML=html;
 }
+  <button class="red" onclick="deleteCustomer('${c.id}')">
+  Delete Customer
+</button>
+  function deleteCustomer(id){
+
+  if(!confirm("हा customer delete करायचा आहे का?")) return;
+
+  let customers = get("customers");
+  let data = get("milkData");
+
+  // Remove customer
+  customers = customers.filter(c => c.id != id);
+
+  // Remove all milk records of that customer
+  data = data.filter(r => r.customerId != id);
+
+  save("customers", customers);
+  save("milkData", data);
+
+  alert("Customer deleted");
+  loadCustomers();
+    }
 
 // EDIT CUSTOMER
 function editCustomer(id){
