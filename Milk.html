@@ -40,11 +40,12 @@ button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 <select id="customerSelect"></select>
 <input id="milk" type="number" placeholder="Milk (L)">
 <input id="rate" type="number" value="40">
-
+<input id="entryDate" type="date">
+  
 <button class="green" onclick="saveMilk()">Save</button>
 <button class="blue" onclick="loadCustomers()">Refresh</button>
 </div>
-<input id="entryDate" type="date">
+
 <!-- OUTPUT -->
 <div id="output"></div>
 
@@ -244,7 +245,7 @@ function editCustomer(id){
   });
 
   msg += `----------------------\n`;
-    msg += `TOTAL: ${total}\n`;
+    msg += `TOTAL: ${milk}\n`;
     msg += `TOTAL: ₹${total}\n`;
 
   window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
