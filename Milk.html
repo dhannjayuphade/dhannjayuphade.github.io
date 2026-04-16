@@ -201,7 +201,7 @@ function editCustomer(id){
   let entries = data.filter(x => x.customerId == id);
 
   let total = 0;
-  let msg = `🥛 Milk Dairy Bill\n\n`;
+  let msg = `🥛 your Milk Bill\n\n`;
 
   msg += `Name: ${c.name}\n`;
   msg += `Mobile: ${c.mobile}\n`;
@@ -217,7 +217,8 @@ function editCustomer(id){
   });
 
   msg += `----------------------\n`;
-  msg += `TOTAL: ₹${total}\n`;
+    msg += `TOTAL: ${total}\n`;
+    msg += `TOTAL: ₹${total}\n`;
 
   window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
       }
@@ -230,7 +231,7 @@ function editCustomer(id){
 
   let total = 0;
 
-  let msg = `Milk Dairy Bill\n\n`;
+  let msg = `your Milk Bill\n\n`;
 
   msg += `Name: ${c.name}\n`;
   msg += `Mobile: ${c.mobile}\n`;
