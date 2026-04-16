@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Milk Dairy ERP PRO MAX</title>
+<title>Dhananjay Milk Dairy PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
-.box{background:#1e293b;padding:10px;margin:10px;border-radius:10px;}
+.box{background:#1e293b;margin:10px;padding:10px;border-radius:10px;}
 input,select{width:90%;padding:10px;margin:5px;border-radius:8px;}
 button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 .card{background:#334155;margin:10px;padding:10px;border-radius:10px;cursor:pointer;}
@@ -21,7 +19,7 @@ button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 
 <body>
 
-<h2>🥛 Milk Dairy ERP PRO MAX</h2>
+<h2>🥛 Dhananjay Milk Dairy PRO</h2>
 
 <!-- CUSTOMER -->
 <div class="box">
@@ -34,52 +32,54 @@ button{padding:10px;margin:5px;border:none;border-radius:8px;width:45%;}
 <button class="blue" onclick="updateCustomer()">Update</button>
 </div>
 
-<!-- MILK ENTRY -->
+<!-- ENTRY -->
 <div class="box">
 <h3>Milk Entry</h3>
 <select id="customerSelect"></select>
-<input id="milk" type="number" placeholder="Milk (L)">
+<input id="milk" type="number" step="0.1" placeholder="Milk (L)">
 <input id="rate" type="number" value="40">
 
 <button class="green" onclick="saveMilk()">Save</button>
 <button class="blue" onclick="loadCustomers()">Refresh</button>
 </div>
 
-<!-- OUTPUT -->
 <div id="output"></div>
 
 <script>
 
+// STORAGE
 function get(k){ return JSON.parse(localStorage.getItem(k)) || []; }
 function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
 
-// LOAD CUSTOMERS LIST
+// LOAD CUSTOMERS
 function loadCustomers(){
-  let c = get("customers");
-  customerSelect.innerHTML="";
+  let customers = get("customers");
 
-  c.forEach(x=>{
+  let sel = document.getElementById("customerSelect");
+  sel.innerHTML = "<option value=''>Select Customer</option>";
+
+  customers.forEach(c=>{
     let op=document.createElement("option");
-    op.value=x.id;
-    op.text=x.name+" - "+x.place;
-    customerSelect.appendChild(op);
+    op.value=c.id;
+    op.text=c.name+" - "+c.place;
+    sel.appendChild(op);
   });
 
   showCustomers();
 }
 
-// SHOW CUSTOMER CARDS
+// SHOW CUSTOMER LIST
 function showCustomers(){
-  let c = get("customers");
+  let customers=get("customers");
 
   let html="<h3>Customers</h3>";
 
-  c.forEach(x=>{
+  customers.forEach(c=>{
     html+=`
-    <div class="card" onclick="openCustomer('${x.id}')">
-      <b>${x.name}</b><br>
-      📱 ${x.mobile}<br>
-      📍 ${x.place}
+    <div class="card" onclick="openCustomer('${c.id}')">
+      <b>${c.name}</b><br>
+      📱 ${c.mobile}<br>
+      📍 ${c.place}
     </div>`;
   });
 
@@ -88,49 +88,63 @@ function showCustomers(){
 
 // ADD CUSTOMER
 function addCustomer(){
-  let c=get("customers");
+  let name=cname.value;
+  let mobile=cmobile.value;
+  let place=cplace.value;
 
-  c.push({
+  if(!name || !mobile) return alert("Fill all");
+
+  let customers=get("customers");
+
+  customers.push({
     id:crypto.randomUUID(),
-    name:cname.value,
-    mobile:cmobile.value,
-    place:cplace.value
+    name,mobile,place
   });
 
-  save("customers",c);
+  save("customers",customers);
   loadCustomers();
 
-  cname.value="";cmobile.value="";cplace.value="";
+  cname.value=""; cmobile.value=""; cplace.value="";
 }
 
 // UPDATE CUSTOMER
 function updateCustomer(){
   let id=localStorage.getItem("editId");
-  let c=get("customers");
+  if(!id) return alert("Select customer to edit");
 
-  c=c.map(x=>{
-    if(x.id==id){
-      x.name=cname.value;
-      x.mobile=cmobile.value;
-      x.place=cplace.value;
+  let customers=get("customers");
+
+  customers=customers.map(c=>{
+    if(c.id==id){
+      c.name=cname.value;
+      c.mobile=cmobile.value;
+      c.place=cplace.value;
     }
-    return x;
+    return c;
   });
 
-  save("customers",c);
+  save("customers",customers);
   loadCustomers();
 }
 
 // SAVE MILK
 function saveMilk(){
+  let id=customerSelect.value;
+  if(!id) return alert("Select customer");
+
+  let milkVal=parseFloat(milk.value);
+  let rateVal=parseFloat(rate.value);
+
+  if(isNaN(milkVal)||isNaN(rateVal)) return alert("Invalid");
+
   let data=get("milkData");
 
   data.push({
     id:crypto.randomUUID(),
-    customerId:customerSelect.value,
-    milk:parseFloat(milk.value),
-    rate:parseFloat(rate.value),
-    total:milk.value*rate.value,
+    customerId:id,
+    milk:milkVal,
+    rate:rateVal,
+    total:milkVal*rateVal,
     date:new Date().toISOString(),
     status:"UNPAID"
   });
@@ -139,9 +153,11 @@ function saveMilk(){
   alert("Saved");
 }
 
-// OPEN CUSTOMER DETAIL
+// OPEN CUSTOMER
 function openCustomer(id){
   let c=get("customers").find(x=>x.id==id);
+  if(!c) return alert("Customer not found");
+
   let data=get("milkData");
 
   let total=0;
@@ -152,13 +168,8 @@ function openCustomer(id){
     📍 ${c.place}<br>
 
     <button class="blue" onclick="editCustomer('${c.id}')">Edit</button>
-    <button class="wa" onclick="sendWhatsApp('${c.id}')">
-  WhatsApp
-</button>
-
-<button class="blue" onclick="sendSMS('${c.id}')">
-  SMS
-</button>
+    <button class="wa" onclick="sendWhatsApp('${c.id}')">WhatsApp</button>
+    <button class="blue" onclick="sendSMS('${c.id}')">SMS</button>
   </div>
 
   <h3>History</h3>
@@ -174,17 +185,16 @@ function openCustomer(id){
         🥛 ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
         Status: ${r.status}
 
-        <button onclick="togglePaid('${r.id}')">Toggle Paid</button>
+        <button onclick="togglePaid('${r.id}','${id}')">Toggle Paid</button>
       </div>`;
     }
   });
 
   html+=`<h3>Total: ₹${total}</h3>`;
-
   output.innerHTML=html;
 }
 
-// EDIT CUSTOMER
+// EDIT
 function editCustomer(id){
   let c=get("customers").find(x=>x.id==id);
 
@@ -194,81 +204,66 @@ function editCustomer(id){
 
   localStorage.setItem("editId",id);
 }
-  function sendWhatsApp(id){
-  let customers = get("customers");
-  let data = get("milkData");
-
-  let c = customers.find(x => x.id == id);
-  let entries = data.filter(x => x.customerId == id);
-
-  let total = 0;
-  let msg = `🥛 your Milk Bill\n\n`;
-
-  msg += `Name: ${c.name}\n`;
-  msg += `Mobile: ${c.mobile}\n`;
-  msg += `Place: ${c.place}\n\n`;
-
-  msg += `----------------------\n`;
-
-  entries.forEach(r=>{
-    total += r.total;
-
-    let d = new Date(r.date);
-    msg += `${d.toLocaleDateString()} : ${r.milk}L × ₹${r.rate} = ₹${r.total}\n`;
-  });
-
-  msg += `----------------------\n`;
-  msg += `TOTAL: ₹${total}\n`;
-
-  window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
-      }
-  function sendSMS(id){
-  let customers = get("customers");
-  let data = get("milkData");
-
-  let c = customers.find(x => x.id == id);
-  let total = data
-    .filter(x => x.customerId == id)
-    .reduce((sum,x)=>sum+x.total,0);
-
-  let c = customers.find(x => x.id == id);
-  let entries = data.filter(x => x.customerId == id);
-
-  let total = 0;
-  let msg = `🥛 your Milk Bill\n\n`;
-
-  msg += `Name: ${c.name}\n`;
-  msg += `Mobile: ${c.mobile}\n`;
-  msg += `Place: ${c.place}\n\n`;
-
-  msg += `----------------------\n`;
-
-  entries.forEach(r=>{
-    total += r.total;
-
-    let d = new Date(r.date);
-    msg += `${d.toLocaleDateString()} : ${r.milk}L × ₹${r.rate} = ₹${r.total}\n`;
-  });
-
-  msg += `----------------------\n`;
-  msg += `TOTAL: ₹${total}\n`;
-Thank you`;
-
-  window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
-  }
 
 // TOGGLE PAID
-function togglePaid(id){
+function togglePaid(entryId,custId){
   let data=get("milkData");
 
   data=data.map(r=>{
-    if(r.id==id){
+    if(r.id==entryId){
       r.status=r.status==="PAID"?"UNPAID":"PAID";
     }
     return r;
   });
 
   save("milkData",data);
+  openCustomer(custId);
+}
+
+// WHATSAPP
+function sendWhatsApp(id){
+  let customers=get("customers");
+  let data=get("milkData");
+
+  let c=customers.find(x=>x.id==id);
+  let entries=data.filter(x=>x.customerId==id);
+
+  let total=0;
+  let msg=`Milk Dairy 🥛\n\n`;
+
+  msg+=`Name: ${c.name}\n`;
+
+  entries.forEach(r=>{
+    total+=r.total;
+    msg+=`${new Date(r.date).toLocaleDateString()} ₹${r.total}\n`;
+  });
+
+  msg+=`\nTotal: ₹${total}`;
+
+  window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
+}
+
+// SMS
+function sendSMS(id){
+  let customers=get("customers");
+  let data=get("milkData");
+
+  let c=customers.find(x=>x.id==id);
+  let entries=data.filter(x=>x.customerId==id);
+
+  let total=0;
+  let msg=`Milk Dairy 🥛\n\n`;
+
+  msg+=`Name: ${c.name}\n`;
+
+  entries.forEach(r=>{
+    total+=r.total;
+    msg+=`${new Date(r.date).toLocaleDateString()} ₹${r.total}\n`;
+  });
+
+  msg+=`Total: ₹${total}\nThank you`;
+
+  window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
 }
 
 // INIT
