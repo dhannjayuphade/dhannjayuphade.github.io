@@ -249,7 +249,7 @@ function sendWhatsApp(id){
   let data=get("milkData").filter(x=>x.customerId==id);
 
   let total=0;
-  let msg=`🥛 Milk Dairy\n\nName: ${c.name}\n\n`;
+  let msg=`🥛your Milk bill\n\nName: ${c.name}\n\n`;
 
   msg+=`Date | Ltr | Rate | ₹\n`;
   msg+=`----------------------\n`;
@@ -270,10 +270,19 @@ function sendSMS(id){
   let c=get("customers").find(x=>x.id==id);
   let data=get("milkData").filter(x=>x.customerId==id);
 
-  let total=0;
-  data.forEach(r=> total+=r.total);
+let total=0;
+  let msg=`🥛your Milk bill\n\nName: ${c.name}\n\n`;
 
-  let msg=`Milk Dairy\n${c.name}\nTotal: ₹${total}`;
+  msg+=`Date | Ltr | Rate | ₹\n`;
+  msg+=`----------------------\n`;
+
+  data.forEach(r=>{
+    total+=r.total;
+    let d=new Date(r.date).toLocaleDateString();
+    msg+=`${d} | ${r.milk}L | ₹${r.rate} | ₹${r.total}\n`;
+  });
+
+  msg+=`----------------------\nTotal: ₹${total}`;
 
   window.open(`sms:${c.mobile}?body=${encodeURIComponent(msg)}`);
 }
