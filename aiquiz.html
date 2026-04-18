@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quiz Hub Pro Max</title>
+
+<style>
+body{
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,#0f172a,#1e3a8a);
+  color:white;
+  text-align:center;
+}
+.card{
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  padding:20px;
+  border-radius:20px;
+  margin:20px auto;
+  width:90%;
+  max-width:420px;
+}
+button{
+  background: linear-gradient(45deg,#22c55e,#4ade80);
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  color:white;
+}
+.top{position:absolute;top:10px;right:10px;}
+img{width:90px;border-radius:50%;}
+</style>
+
+</head>
+<body>
+
+<!-- FORM -->
+<div id="form" class="card">
+<h2>Enter Details</h2>
+<input id="name" placeholder="Name"><br>
+<input id="mobile" placeholder="Mobile"><br>
+<input id="email" placeholder="Email"><br>
+<button onclick="goLang()">Next</button>
+</div>
+
+<!-- LANGUAGE -->
+<div id="lang" class="card" style="display:none">
+<h2>Select Language</h2>
+<select id="language">
+<option>Marathi</option>
+<option>Hindi</option>
+<option>English</option>
+</select>
+<button onclick="goHome()">Next</button>
+</div>
+
+<!-- HOME -->
+<div id="home" style="display:none">
+
+<div class="top">
+<select onchange="changeLang(this.value)">
+<option>Marathi</option>
+<option>Hindi</option>
+<option>English</option>
+</select>
+</div>
+
+<div class="card">
+<h2>Profile</h2>
+<input type="file" onchange="loadImg(event)">
+<img id="photo"><br>
+<p id="info"></p>
+<button onclick="openCategory()">Start Quiz</button>
+</div>
+
+<div class="card">
+<h2>🏆 Leaderboard</h2>
+<p>GK: <span id="gkS">0</span></p>
+<p>Science: <span id="scS">0</span></p>
+<p>History: <span id="hiS">0</span></p>
+</div>
+
+</div>
+
+<!-- CATEGORY -->
+<div id="category" class="card" style="display:none">
+<h2>Select Quiz</h2>
+<button onclick="startQuiz('GK')">GK</button>
+<button onclick="startQuiz('Science')">Science</button>
+<button onclick="startQuiz('History')">History</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="card" style="display:none">
+<h3 id="q"></h3>
+<div id="opts"></div>
+<p>⏱️ Time: <span id="time">15</span></p>
+<p>Score: <span id="score">0</span></p>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="card" style="display:none">
+<h2>Result</h2>
+<p id="final"></p>
+<button onclick="downloadPDF()">Download Certificate</button>
+</div>
+
+<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+
+let user={},questions=[],i=0,score=0,currentQuiz="";
+let timer,timeLeft=15;
+
+let questionBank={
+GK:[
+{q:{Marathi:"भारताची राजधानी?",Hindi:"भारत की राजधानी?",English:"Capital of India?"},o:["Mumbai","Delhi","Pune","Chennai"],a:"Delhi"}
+],
+Science:[
+{q:{Marathi:"पाण्याचे सूत्र?",Hindi:"पानी का सूत्र?",English:"Water formula?"},o:["H2O","CO2","O2","NaCl"],a:"H2O"}
+],
+History:[
+{q:{Marathi:"भारत स्वातंत्र्य?",Hindi:"भारत स्वतंत्र कब?",English:"India independence?"},o:["1947","1950","1930","1920"],a:"1947"}
+]
+};
+
+function goLang(){
+user.name=name.value;
+user.mobile=mobile.value;
+user.email=email.value;
+form.style.display="none";
+lang.style.display="block";
+}
+
+function goHome(){
+user.lang=language.value;
+lang.style.display="none";
+home.style.display="block";
+info.innerText=`${user.name}\n${user.mobile}\n${user.email}`;
+loadScores();
+}
+
+function loadImg(e){
+photo.src=URL.createObjectURL(e.target.files[0]);
+}
+
+function changeLang(l){user.lang=l;}
+
+function openCategory(){
+home.style.display="none";
+category.style.display="block";
+}
+
+function loadScores(){
+gkS.innerText=localStorage.getItem("GK")||0;
+scS.innerText=localStorage.getItem("Science")||0;
+hiS.innerText=localStorage.getItem("History")||0;
+}
+
+function startQuiz(type){
+currentQuiz=type;
+category.style.display="none";
+quiz.style.display="block";
+questions=questionBank[type];
+i=0;score=0;
+nextQ();
+}
+
+function startTimer(){
+timeLeft=15;
+time.innerText=timeLeft;
+clearInterval(timer);
+timer=setInterval(()=>{
+timeLeft--;
+time.innerText=timeLeft;
+if(timeLeft<=0){
+clearInterval(timer);
+i++;
+nextQ();
+}
+},1000);
+}
+
+function nextQ(){
+if(i>=questions.length){
+quiz.style.display="none";
+result.style.display="block";
+final.innerText="Score: "+score;
+localStorage.setItem(currentQuiz,score);
+loadScores();
+return;
+}
+
+let lang=user.lang;
+q.innerText=questions[i].q[lang];
+opts.innerHTML="";
+
+questions[i].o.forEach(opt=>{
+opts.innerHTML+=`<button onclick="check('${opt}')">${opt}</button>`;
+});
+
+startTimer();
+}
+
+function check(ans){
+clearInterval(timer);
+if(ans===questions[i].a){
+score++;
+document.getElementById("score").innerText=score;
+correctSound.play();
+}else{
+wrongSound.play();
+}
+i++;
+nextQ();
+}
+
+function downloadPDF(){
+const { jsPDF } = window.jspdf;
+let doc=new jsPDF();
+let d=new Date();
+
+doc.text("QUIZ CERTIFICATE",20,20);
+doc.text("Name: "+user.name,20,40);
+doc.text("Quiz: "+currentQuiz,20,50);
+doc.text("Score: "+score,20,60);
+doc.text("Owner: Dhannjay Uphade",20,80);
+doc.text("Date: "+d.toLocaleString(),20,90);
+doc.text("Website: dhannjayuphade.github.io",20,100);
+
+doc.save("certificate.pdf");
+}
+
+</script>
+
+</body>
+</html>
