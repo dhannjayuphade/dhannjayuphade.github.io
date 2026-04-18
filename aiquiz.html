@@ -4,22 +4,16 @@
 <meta charset="UTF-8">
 <title>Dhananjay Pro Quiz</title>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{
-  font-family:sans-serif;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-input,button,select{
-  padding:10px;
-  margin:8px;
-  width:90%;
-  border-radius:10px;
-  border:none;
-}
+body{font-family:sans-serif;background:#0f172a;color:white;text-align:center;}
+input,button,select{padding:10px;margin:8px;width:90%;border-radius:10px;border:none;}
 button{background:#22c55e;color:white;font-weight:bold;}
 .hidden{display:none;}
 .card{background:#1e293b;padding:15px;border-radius:10px;}
@@ -28,6 +22,7 @@ button{background:#22c55e;color:white;font-weight:bold;}
 
 <body>
 
+<!-- LOGIN -->
 <div id="login">
 <h2>Enter Details</h2>
 <input id="name" placeholder="Name">
@@ -36,6 +31,7 @@ button{background:#22c55e;color:white;font-weight:bold;}
 <button onclick="next()">Next</button>
 </div>
 
+<!-- LANGUAGE -->
 <div id="lang" class="hidden">
 <h2>Select Language</h2>
 <select id="language">
@@ -46,6 +42,7 @@ button{background:#22c55e;color:white;font-weight:bold;}
 <button onclick="homePage()">Next</button>
 </div>
 
+<!-- HOME -->
 <div id="home" class="hidden">
 <h2>Profile</h2>
 <input type="file">
@@ -56,38 +53,48 @@ button{background:#22c55e;color:white;font-weight:bold;}
 <option>Hindi</option>
 </select>
 <button onclick="start()">Start Quiz</button>
+
+<div id="leaderboard"></div>
 </div>
 
+<!-- QUIZ TYPE -->
 <div id="quizType" class="hidden">
 <h2>Select Quiz</h2>
-<button onclick="begin('gk')">GK</button>
-<button onclick="begin('science')">Science</button>
-<button onclick="begin('history')">History</button>
+<button onclick="begin()">GK</button>
+<button onclick="begin()">Science</button>
+<button onclick="begin()">History</button>
 </div>
 
+<!-- QUIZ -->
 <div id="quiz" class="hidden">
 <h3 id="timer"></h3>
 <h2 id="q"></h2>
 <div id="opt"></div>
 </div>
 
+<!-- RESULT -->
 <div id="result" class="hidden">
-<h2 id="score"></h2>
+<h2 id="scoreBox"></h2>
 <button onclick="downloadPDF()">Download Certificate</button>
 </div>
 
-<audio id="clickSound" src="https://www.soundjay.com/buttons/button-16.mp3"></audio>
+<audio id="sound" src="https://www.soundjay.com/buttons/button-16.mp3"></audio>
 
 <script>
 
-// Firebase config (replace with your)
+// Firebase Config
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
 };
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-let user={},questions=[],i=0,score=0,time=30,timer;
+// Variables
+let user={},questions=[],i=0,score=0,time=30,t;
 
+// Login
 function next(){
   user.name=name.value;
   user.mobile=mobile.value;
@@ -96,82 +103,115 @@ function next(){
   lang.classList.remove("hidden");
 }
 
+// Home
 function homePage(){
   user.lang=language.value;
   info.innerText=`${user.name} | ${user.mobile}`;
   lang.classList.add("hidden");
   home.classList.remove("hidden");
+  loadLeaderboard();
 }
 
+// Start
 function start(){
   home.classList.add("hidden");
   quizType.classList.remove("hidden");
 }
 
-function begin(type){
+// Quiz Start
+function begin(){
   quizType.classList.add("hidden");
   quiz.classList.remove("hidden");
 
-  // 30 questions
   questions = Array.from({length:30},(_,x)=>({
-    q:`Q${x+1}: 2+2?`,
+    q:`Q${x+1}: 2+2 = ?`,
     o:["3","4","5","6"],
     a:1
   }));
 
   i=0;score=0;
   startTimer();
-  load();
+  loadQ();
 }
 
+// Timer
 function startTimer(){
   time=30;
-  timer=setInterval(()=>{
-    timerBox.innerText="Time: "+time;
+  t=setInterval(()=>{
+    timer.innerText="Time: "+time;
     time--;
-    if(time<0){clearInterval(timer);nextQ();}
+    if(time<0){
+      nextQ();
+    }
   },1000);
 }
 
-function load(){
+// Load Question
+function loadQ(){
   let qu=questions[i];
   q.innerText=qu.q;
   opt.innerHTML="";
   qu.o.forEach((o,idx)=>{
     let b=document.createElement("button");
     b.innerText=o;
-    b.onclick=()=>ans(idx);
+    b.onclick=()=>check(idx);
     opt.appendChild(b);
   });
 }
 
-function ans(idx){
-  clickSound.play();
-  if(idx===questions[i].a)score++;
+// Answer
+function check(idx){
+  sound.play();
+  if(idx===questions[i].a) score++;
   nextQ();
 }
 
+// Next
 function nextQ(){
   i++;
   if(i<questions.length){
-    load();
+    loadQ();
   }else{
+    clearInterval(t);
     showResult();
   }
 }
 
+// Result
 function showResult(){
   quiz.classList.add("hidden");
   result.classList.remove("hidden");
 
-  score.innerText=`Score: ${score}/30`;
+  scoreBox.innerText=`Score: ${score}/30`;
 
-  // Leaderboard save
-  let lb=JSON.parse(localStorage.getItem("lb")||"[]");
-  lb.push({name:user.name,score});
-  localStorage.setItem("lb",JSON.stringify(lb));
+  saveScore();
 }
 
+// Save Firebase
+function saveScore(){
+  db.collection("scores").add({
+    name:user.name,
+    score:score,
+    date:new Date().toLocaleString()
+  });
+}
+
+// Leaderboard
+function loadLeaderboard(){
+  db.collection("scores")
+  .orderBy("score","desc")
+  .limit(5)
+  .get()
+  .then(snap=>{
+    leaderboard.innerHTML="<h3>Top Players</h3>";
+    snap.forEach(doc=>{
+      let d=doc.data();
+      leaderboard.innerHTML+=`<p>${d.name} - ${d.score}</p>`;
+    });
+  });
+}
+
+// PDF
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   let doc=new jsPDF();
