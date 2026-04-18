@@ -2,239 +2,190 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Quiz Hub Pro Max</title>
-
-<style>
-body{
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg,#0f172a,#1e3a8a);
-  color:white;
-  text-align:center;
-}
-.card{
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(15px);
-  padding:20px;
-  border-radius:20px;
-  margin:20px auto;
-  width:90%;
-  max-width:420px;
-}
-button{
-  background: linear-gradient(45deg,#22c55e,#4ade80);
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  color:white;
-}
-.top{position:absolute;top:10px;right:10px;}
-img{width:90px;border-radius:50%;}
-</style>
-
-</head>
-<body>
-
-<!-- FORM -->
-<div id="form" class="card">
-<h2>Enter Details</h2>
-<input id="name" placeholder="Name"><br>
-<input id="mobile" placeholder="Mobile"><br>
-<input id="email" placeholder="Email"><br>
-<button onclick="goLang()">Next</button>
-</div>
-
-<!-- LANGUAGE -->
-<div id="lang" class="card" style="display:none">
-<h2>Select Language</h2>
-<select id="language">
-<option>Marathi</option>
-<option>Hindi</option>
-<option>English</option>
-</select>
-<button onclick="goHome()">Next</button>
-</div>
-
-<!-- HOME -->
-<div id="home" style="display:none">
-
-<div class="top">
-<select onchange="changeLang(this.value)">
-<option>Marathi</option>
-<option>Hindi</option>
-<option>English</option>
-</select>
-</div>
-
-<div class="card">
-<h2>Profile</h2>
-<input type="file" onchange="loadImg(event)">
-<img id="photo"><br>
-<p id="info"></p>
-<button onclick="openCategory()">Start Quiz</button>
-</div>
-
-<div class="card">
-<h2>🏆 Leaderboard</h2>
-<p>GK: <span id="gkS">0</span></p>
-<p>Science: <span id="scS">0</span></p>
-<p>History: <span id="hiS">0</span></p>
-</div>
-
-</div>
-
-<!-- CATEGORY -->
-<div id="category" class="card" style="display:none">
-<h2>Select Quiz</h2>
-<button onclick="startQuiz('GK')">GK</button>
-<button onclick="startQuiz('Science')">Science</button>
-<button onclick="startQuiz('History')">History</button>
-</div>
-
-<!-- QUIZ -->
-<div id="quiz" class="card" style="display:none">
-<h3 id="q"></h3>
-<div id="opts"></div>
-<p>⏱️ Time: <span id="time">15</span></p>
-<p>Score: <span id="score">0</span></p>
-</div>
-
-<!-- RESULT -->
-<div id="result" class="card" style="display:none">
-<h2>Result</h2>
-<p id="final"></p>
-<button onclick="downloadPDF()">Download Certificate</button>
-</div>
-
-<audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-<audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+<title>Dhananjay Pro Quiz</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<style>
+body{
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+input,button,select{
+  padding:10px;
+  margin:8px;
+  width:90%;
+  border-radius:10px;
+  border:none;
+}
+button{background:#22c55e;color:white;font-weight:bold;}
+.hidden{display:none;}
+.card{background:#1e293b;padding:15px;border-radius:10px;}
+</style>
+</head>
+
+<body>
+
+<div id="login">
+<h2>Enter Details</h2>
+<input id="name" placeholder="Name">
+<input id="mobile" placeholder="Mobile">
+<input id="email" placeholder="Email">
+<button onclick="next()">Next</button>
+</div>
+
+<div id="lang" class="hidden">
+<h2>Select Language</h2>
+<select id="language">
+<option>English</option>
+<option>Marathi</option>
+<option>Hindi</option>
+</select>
+<button onclick="homePage()">Next</button>
+</div>
+
+<div id="home" class="hidden">
+<h2>Profile</h2>
+<input type="file">
+<p id="info"></p>
+<select onchange="changeLang(this.value)">
+<option>English</option>
+<option>Marathi</option>
+<option>Hindi</option>
+</select>
+<button onclick="start()">Start Quiz</button>
+</div>
+
+<div id="quizType" class="hidden">
+<h2>Select Quiz</h2>
+<button onclick="begin('gk')">GK</button>
+<button onclick="begin('science')">Science</button>
+<button onclick="begin('history')">History</button>
+</div>
+
+<div id="quiz" class="hidden">
+<h3 id="timer"></h3>
+<h2 id="q"></h2>
+<div id="opt"></div>
+</div>
+
+<div id="result" class="hidden">
+<h2 id="score"></h2>
+<button onclick="downloadPDF()">Download Certificate</button>
+</div>
+
+<audio id="clickSound" src="https://www.soundjay.com/buttons/button-16.mp3"></audio>
+
 <script>
 
-let user={},questions=[],i=0,score=0,currentQuiz="";
-let timer,timeLeft=15;
-
-let questionBank={
-GK:[
-{q:{Marathi:"भारताची राजधानी?",Hindi:"भारत की राजधानी?",English:"Capital of India?"},o:["Mumbai","Delhi","Pune","Chennai"],a:"Delhi"}
-],
-Science:[
-{q:{Marathi:"पाण्याचे सूत्र?",Hindi:"पानी का सूत्र?",English:"Water formula?"},o:["H2O","CO2","O2","NaCl"],a:"H2O"}
-],
-History:[
-{q:{Marathi:"भारत स्वातंत्र्य?",Hindi:"भारत स्वतंत्र कब?",English:"India independence?"},o:["1947","1950","1930","1920"],a:"1947"}
-]
+// Firebase config (replace with your)
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
 };
+firebase.initializeApp(firebaseConfig);
 
-function goLang(){
-user.name=name.value;
-user.mobile=mobile.value;
-user.email=email.value;
-form.style.display="none";
-lang.style.display="block";
+let user={},questions=[],i=0,score=0,time=30,timer;
+
+function next(){
+  user.name=name.value;
+  user.mobile=mobile.value;
+  user.email=email.value;
+  login.classList.add("hidden");
+  lang.classList.remove("hidden");
 }
 
-function goHome(){
-user.lang=language.value;
-lang.style.display="none";
-home.style.display="block";
-info.innerText=`${user.name}\n${user.mobile}\n${user.email}`;
-loadScores();
+function homePage(){
+  user.lang=language.value;
+  info.innerText=`${user.name} | ${user.mobile}`;
+  lang.classList.add("hidden");
+  home.classList.remove("hidden");
 }
 
-function loadImg(e){
-photo.src=URL.createObjectURL(e.target.files[0]);
+function start(){
+  home.classList.add("hidden");
+  quizType.classList.remove("hidden");
 }
 
-function changeLang(l){user.lang=l;}
+function begin(type){
+  quizType.classList.add("hidden");
+  quiz.classList.remove("hidden");
 
-function openCategory(){
-home.style.display="none";
-category.style.display="block";
-}
+  // 30 questions
+  questions = Array.from({length:30},(_,x)=>({
+    q:`Q${x+1}: 2+2?`,
+    o:["3","4","5","6"],
+    a:1
+  }));
 
-function loadScores(){
-gkS.innerText=localStorage.getItem("GK")||0;
-scS.innerText=localStorage.getItem("Science")||0;
-hiS.innerText=localStorage.getItem("History")||0;
-}
-
-function startQuiz(type){
-currentQuiz=type;
-category.style.display="none";
-quiz.style.display="block";
-questions=questionBank[type];
-i=0;score=0;
-nextQ();
+  i=0;score=0;
+  startTimer();
+  load();
 }
 
 function startTimer(){
-timeLeft=15;
-time.innerText=timeLeft;
-clearInterval(timer);
-timer=setInterval(()=>{
-timeLeft--;
-time.innerText=timeLeft;
-if(timeLeft<=0){
-clearInterval(timer);
-i++;
-nextQ();
+  time=30;
+  timer=setInterval(()=>{
+    timerBox.innerText="Time: "+time;
+    time--;
+    if(time<0){clearInterval(timer);nextQ();}
+  },1000);
 }
-},1000);
+
+function load(){
+  let qu=questions[i];
+  q.innerText=qu.q;
+  opt.innerHTML="";
+  qu.o.forEach((o,idx)=>{
+    let b=document.createElement("button");
+    b.innerText=o;
+    b.onclick=()=>ans(idx);
+    opt.appendChild(b);
+  });
+}
+
+function ans(idx){
+  clickSound.play();
+  if(idx===questions[i].a)score++;
+  nextQ();
 }
 
 function nextQ(){
-if(i>=questions.length){
-quiz.style.display="none";
-result.style.display="block";
-final.innerText="Score: "+score;
-localStorage.setItem(currentQuiz,score);
-loadScores();
-return;
+  i++;
+  if(i<questions.length){
+    load();
+  }else{
+    showResult();
+  }
 }
 
-let lang=user.lang;
-q.innerText=questions[i].q[lang];
-opts.innerHTML="";
+function showResult(){
+  quiz.classList.add("hidden");
+  result.classList.remove("hidden");
 
-questions[i].o.forEach(opt=>{
-opts.innerHTML+=`<button onclick="check('${opt}')">${opt}</button>`;
-});
+  score.innerText=`Score: ${score}/30`;
 
-startTimer();
-}
-
-function check(ans){
-clearInterval(timer);
-if(ans===questions[i].a){
-score++;
-document.getElementById("score").innerText=score;
-correctSound.play();
-}else{
-wrongSound.play();
-}
-i++;
-nextQ();
+  // Leaderboard save
+  let lb=JSON.parse(localStorage.getItem("lb")||"[]");
+  lb.push({name:user.name,score});
+  localStorage.setItem("lb",JSON.stringify(lb));
 }
 
 function downloadPDF(){
-const { jsPDF } = window.jspdf;
-let doc=new jsPDF();
-let d=new Date();
+  const { jsPDF } = window.jspdf;
+  let doc=new jsPDF();
 
-doc.text("QUIZ CERTIFICATE",20,20);
-doc.text("Name: "+user.name,20,40);
-doc.text("Quiz: "+currentQuiz,20,50);
-doc.text("Score: "+score,20,60);
-doc.text("Owner: Dhannjay Uphade",20,80);
-doc.text("Date: "+d.toLocaleString(),20,90);
-doc.text("Website: dhannjayuphade.github.io",20,100);
+  doc.text("QUIZ CERTIFICATE",20,20);
+  doc.text(`Name: ${user.name}`,20,40);
+  doc.text(`Score: ${score}/30`,20,50);
+  doc.text(`Owner: Dhannjay Uphade`,20,60);
+  doc.text(`Date: ${new Date().toLocaleString()}`,20,70);
 
-doc.save("certificate.pdf");
+  doc.save("certificate.pdf");
 }
 
 </script>
 
 </body>
-</html>
+  </html>
