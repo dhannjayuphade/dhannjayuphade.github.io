@@ -1,1 +1,142 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mobile Calculator</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial;
+}
+
+/* Phone Frame */
+.phone {
+  width: 320px;
+  height: 600px;
+  background: black;
+  border-radius: 40px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Display */
+#display {
+  color: white;
+  font-size: 40px;
+  text-align: right;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+/* Buttons Grid */
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* Button Base */
+button {
+  height: 65px;
+  border-radius: 50%;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Colors */
+.gray {
+  background: #a5a5a5;
+  color: black;
+}
+
+.dark {
+  background: #333;
+  color: white;
+}
+
+.orange {
+  background: #ff9500;
+  color: white;
+}
+
+/* Special Zero Button */
+.zero {
+  grid-column: span 2;
+  border-radius: 35px;
+  text-align: left;
+  padding-left: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+  <div id="display">0</div>
+
+  <div class="buttons">
+    <button class="gray" onclick="clearDisplay()">AC</button>
+    <button class="gray" onclick="deleteLast()">⌫</button>
+    <button class="gray" onclick="append('%')">%</button>
+    <button class="orange" onclick="append('/')">÷</button>
+
+    <button class="dark" onclick="append('7')">7</button>
+    <button class="dark" onclick="append('8')">8</button>
+    <button class="dark" onclick="append('9')">9</button>
+    <button class="orange" onclick="append('*')">×</button>
+
+    <button class="dark" onclick="append('4')">4</button>
+    <button class="dark" onclick="append('5')">5</button>
+    <button class="dark" onclick="append('6')">6</button>
+    <button class="orange" onclick="append('-')">−</button>
+
+    <button class="dark" onclick="append('1')">1</button>
+    <button class="dark" onclick="append('2')">2</button>
+    <button class="dark" onclick="append('3')">3</button>
+    <button class="orange" onclick="calculate()">=</button>
+
+    <button class="dark zero" onclick="append('0')">0</button>
+    <button class="dark" onclick="append('.')">.</button>
+    <button class="orange" onclick="append('+')">+</button>
+  </div>
+</div>
+
+<script>
+let display = document.getElementById("display");
+
+function append(value) {
+  if(display.innerText === "0") display.innerText = "";
+  display.innerText += value;
+}
+
+function clearDisplay() {
+  display.innerText = "0";
+}
+
+function deleteLast() {
+  display.innerText = display.innerText.slice(0, -1) || "0";
+}
+
+function calculate() {
+  try {
+    let result = eval(display.innerText.replace(/÷/g,'/').replace(/×/g,'*'));
+    display.innerText = result;
+  } catch {
+    display.innerText = "Error";
+  }
+}
+</script>
+
+</body>
+      </html>
