@@ -272,14 +272,7 @@ history:[
 let current=[],i=0,score=0;
 
 // START QUIZ
-function startQuiz(topic){
-current=questions[topic];
-i=0;score=0;
-homeBox.style.display="none";
-quizBox.style.display="block";
-showQ();
-timerStart();
-}
+
 let currentTopic = "";
 
 function startQuiz(topic){
@@ -333,7 +326,7 @@ loadLeaderboard();
 }
 
 function goHome(){showHome();}
-<script>
+
 async function generatePDF(){
 
   document.getElementById("certificateBox").style.display="block";
