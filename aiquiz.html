@@ -126,7 +126,41 @@ window.loadLeaderboard = function(){
 <button onclick="generatePDF()">🎓 Certificate</button>
 <button onclick="goHome()">Home</button>
 </div>
+<div id="certificateBox" style="display:none;">
 
+<div id="certificate" style="
+width:800px;
+padding:30px;
+background:white;
+color:black;
+text-align:center;
+border:10px solid orange;
+border-radius:15px;
+font-family:Georgia;
+">
+
+<h2>Certificate of Participation</h2>
+
+<h3 id="quizTitle"></h3>
+
+<p>This certificate is proudly presented to</p>
+
+<h1 id="certName" style="color:black;"></h1>
+
+<p id="certText"></p>
+
+<p>Date: <span id="certDate"></span></p>
+
+<hr>
+
+<p>Instagram: @dhannjayuphade</p>
+<p>Website: dhannjayuphade.github.io</p>
+<p>Email: dhannjayuphade5@gmail.com</p>
+
+<h4 style="color:orange;">Dhananjay Uphade</h4>
+
+</div>
+</div>
 <!-- LEADERBOARD -->
 <ul id="leaderList"></ul>
 
@@ -246,7 +280,20 @@ quizBox.style.display="block";
 showQ();
 timerStart();
 }
+let currentTopic = "";
 
+function startQuiz(topic){
+  currentTopic = topic;   // 🔥 ADD THIS
+  current = questions[topic];
+  i=0; score=0;
+
+  homeBox.style.display="none";
+  quizBox.style.display="block";
+
+  showQ();
+  timerStart();
+  }
+  
 // SHOW QUESTION
 function showQ(){
 if(i>=current.length){showResult();return;}
@@ -286,6 +333,55 @@ loadLeaderboard();
 }
 
 function goHome(){showHome();}
+<script>
+async function generatePDF(){
+
+  document.getElementById("certificateBox").style.display="block";
+
+  let user = localStorage.getItem("user");
+  let score = localStorage.getItem("score");
+
+  // 👉 NAME
+  document.getElementById("certName").innerText = user;
+
+  // 👉 DATE
+  document.getElementById("certDate").innerText =
+    new Date().toLocaleDateString();
+
+  // 👉 QUIZ TYPE BASED TEXT
+  let title = "";
+  let text = "";
+
+  if(currentTopic === "science"){
+    title = "Science Quiz Certificate";
+    text = `For scoring ${score} marks in Science Quiz`;
+  }
+  else if(currentTopic === "history"){
+    title = "History Quiz Certificate";
+    text = `For scoring ${score} marks in History Quiz`;
+  }
+  else{
+    title = "GK Quiz Certificate";
+    text = `For scoring ${score} marks in GK Quiz`;
+  }
+
+  document.getElementById("quizTitle").innerText = title;
+  document.getElementById("certText").innerText = text;
+
+  // 👉 PDF GENERATE
+  const cert = document.getElementById("certificate");
+  const canvas = await html2canvas(cert);
+  const imgData = canvas.toDataURL("image/png");
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('landscape');
+
+  pdf.addImage(imgData, 'PNG', 10, 10, 270, 180);
+
+  pdf.save(title + ".pdf");
+
+  document.getElementById("certificateBox").style.display="none";
+}
 
 // PDF
 async function generatePDF(){
