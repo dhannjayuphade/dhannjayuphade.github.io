@@ -150,7 +150,7 @@ font-family:Georgia;
 <p id="certText"></p>
 
 <p>Date: <span id="certDate"></span></p>
-
+<p>🆔 Certificate ID: <span id="certID"></span></p>
 <hr>
 
 <p>Instagram: @dhannjayuphade</p>
@@ -376,17 +376,10 @@ async function generatePDF(){
   document.getElementById("certificateBox").style.display="none";
 }
 
-// PDF
-async function generatePDF(){
-const { jsPDF } = window.jspdf;
-let pdf=new jsPDF();
-pdf.text("Certificate",80,20);
-pdf.text("Name: "+localStorage.getItem("user"),20,50);
-pdf.text("Score: "+localStorage.getItem("score"),20,70);
-pdf.save("certificate.pdf");
-}
+
+
 
 </script>
-<foter>© Dhannjay uphade 🇮🇳 </foter>
+<footer>© Dhannjay uphade 🇮🇳 </footer>
 </body>
   </html>
