@@ -144,10 +144,95 @@ userName.innerText=localStorage.getItem("user");
 }
 
 // QUESTIONS
-let questions={
-gk:[{q:"Capital of India?",o:["Mumbai","Delhi","Pune","Nagpur"],a:"Delhi"}],
-science:[{q:"Water formula?",o:["CO2","H2O","O2","NaCl"],a:"H2O"}],
-history:[{q:"First PM India?",o:["Nehru","Gandhi","Patel","Modi"],a:"Nehru"}]
+let questions = {
+
+// 🌍 GK (25 Questions)
+gk:[
+{q:"Capital of India?",o:["Mumbai","Delhi","Pune","Nagpur"],a:"Delhi"},
+{q:"National animal?",o:["Lion","Tiger","Dog","Cat"],a:"Tiger"},
+{q:"National bird?",o:["Crow","Peacock","Parrot","Sparrow"],a:"Peacock"},
+{q:"Currency of India?",o:["Dollar","Rupee","Yen","Euro"],a:"Rupee"},
+{q:"Largest ocean?",o:["Atlantic","Pacific","Indian","Arctic"],a:"Pacific"},
+{q:"Independence year?",o:["1947","1950","1930","1960"],a:"1947"},
+{q:"Largest country?",o:["India","USA","Russia","China"],a:"Russia"},
+{q:"Smallest continent?",o:["Asia","Europe","Australia","Africa"],a:"Australia"},
+{q:"Mount Everest location?",o:["India","Nepal","China","USA"],a:"Nepal"},
+{q:"National flower?",o:["Rose","Lotus","Sunflower","Lily"],a:"Lotus"},
+{q:"National fruit?",o:["Apple","Mango","Banana","Orange"],a:"Mango"},
+{q:"National river?",o:["Ganga","Yamuna","Krishna","Godavari"],a:"Ganga"},
+{q:"Fastest animal?",o:["Tiger","Cheetah","Lion","Dog"],a:"Cheetah"},
+{q:"Which is festival?",o:["Diwali","Monday","Table","Book"],a:"Diwali"},
+{q:"Which is city?",o:["Mumbai","Asia","Earth","River"],a:"Mumbai"},
+{q:"Which is country?",o:["India","City","River","Ocean"],a:"India"},
+{q:"Which is continent?",o:["Asia","India","Delhi","Sea"],a:"Asia"},
+{q:"Which is river?",o:["Ganga","Hill","Tree","Road"],a:"Ganga"},
+{q:"Which is ocean?",o:["Pacific","River","Lake","Hill"],a:"Pacific"},
+{q:"National game India?",o:["Hockey","Cricket","Football","Kabaddi"],a:"Hockey"},
+{q:"National song?",o:["Vande Mataram","Jana Gana Mana","Saare Jahan","None"],a:"Vande Mataram"},
+{q:"Indian flag colors?",o:["2","3","4","5"],a:"3"},
+{q:"Largest desert?",o:["Sahara","Thar","Gobi","Kalahari"],a:"Sahara"},
+{q:"Fastest train India?",o:["Vande Bharat","Rajdhani","Metro","Duronto"],a:"Vande Bharat"},
+{q:"Which is planet?",o:["Mars","Delhi","India","River"],a:"Mars"}
+],
+
+// 🔬 SCIENCE (25 Questions)
+science:[
+{q:"Water formula?",o:["CO2","H2O","O2","NaCl"],a:"H2O"},
+{q:"Sun is?",o:["Planet","Star","Moon","Rock"],a:"Star"},
+{q:"Gas for breathing?",o:["Oxygen","CO2","Hydrogen","Nitrogen"],a:"Oxygen"},
+{q:"Boiling point water?",o:["100°C","50°C","0°C","200°C"],a:"100°C"},
+{q:"Earth shape?",o:["Round","Flat","Square","Triangle"],a:"Round"},
+{q:"Human heart chambers?",o:["2","3","4","5"],a:"4"},
+{q:"Largest organ?",o:["Skin","Heart","Brain","Liver"],a:"Skin"},
+{q:"Energy unit?",o:["Joule","Watt","Volt","Amp"],a:"Joule"},
+{q:"Force unit?",o:["Newton","Joule","Watt","Volt"],a:"Newton"},
+{q:"Gravity by?",o:["Newton","Einstein","Tesla","Edison"],a:"Newton"},
+{q:"Acid taste?",o:["Sour","Sweet","Bitter","Salty"],a:"Sour"},
+{q:"Liquid metal?",o:["Mercury","Iron","Gold","Silver"],a:"Mercury"},
+{q:"Brain part?",o:["Nervous","Digestive","Respiratory","Circulatory"],a:"Nervous"},
+{q:"Solar system center?",o:["Sun","Earth","Moon","Mars"],a:"Sun"},
+{q:"Green pigment?",o:["Chlorophyll","Melanin","Hemoglobin","None"],a:"Chlorophyll"},
+{q:"Air mainly contains?",o:["Nitrogen","Oxygen","CO2","Hydrogen"],a:"Nitrogen"},
+{q:"Eye function?",o:["Seeing","Hearing","Touch","Smell"],a:"Seeing"},
+{q:"Sound travels fastest in?",o:["Solid","Air","Water","Vacuum"],a:"Solid"},
+{q:"DNA full form?",o:["Deoxyribonucleic Acid","Digital Net","None","Data Net"],a:"Deoxyribonucleic Acid"},
+{q:"Which is gas?",o:["Oxygen","Iron","Water","Stone"],a:"Oxygen"},
+{q:"Which is liquid?",o:["Water","Air","Stone","Gas"],a:"Water"},
+{q:"Which is solid?",o:["Iron","Air","Water","Gas"],a:"Iron"},
+{q:"Speed of light?",o:["Fastest","Slow","Medium","Zero"],a:"Fastest"},
+{q:"Photosynthesis produces?",o:["Oxygen","CO2","Water","Nitrogen"],a:"Oxygen"},
+{q:"Heart pumps?",o:["Blood","Air","Water","Food"],a:"Blood"}
+],
+
+// 🏛 HISTORY (25 Questions)
+history:[
+{q:"First PM India?",o:["Nehru","Gandhi","Patel","Modi"],a:"Nehru"},
+{q:"Taj Mahal by?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
+{q:"1857 revolt?",o:["War","Game","Festival","None"],a:"War"},
+{q:"Father of Nation?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
+{q:"Quit India year?",o:["1942","1947","1930","1920"],a:"1942"},
+{q:"Ashoka empire?",o:["Maurya","Gupta","Mughal","Delhi"],a:"Maurya"},
+{q:"Red Fort by?",o:["Shah Jahan","Akbar","Babur","Ashoka"],a:"Shah Jahan"},
+{q:"First President?",o:["Rajendra Prasad","Nehru","Gandhi","Patel"],a:"Rajendra Prasad"},
+{q:"British left India?",o:["1947","1950","1930","1920"],a:"1947"},
+{q:"Ramayana writer?",o:["Valmiki","Vyasa","Kalidas","None"],a:"Valmiki"},
+{q:"Mahabharata writer?",o:["Vyasa","Valmiki","Kalidas","None"],a:"Vyasa"},
+{q:"Jallianwala Bagh year?",o:["1919","1920","1930","1940"],a:"1919"},
+{q:"Mughal founder?",o:["Babur","Akbar","Shah","Aurang"],a:"Babur"},
+{q:"Delhi Sultanate founder?",o:["Aibak","Akbar","Babur","Ashoka"],a:"Aibak"},
+{q:"Shivaji Maharaj?",o:["King","Scientist","Writer","None"],a:"King"},
+{q:"Panipat battles?",o:["3","2","1","4"],a:"3"},
+{q:"Qutub Minar built by?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
+{q:"Golden age India?",o:["Gupta","Mughal","British","None"],a:"Gupta"},
+{q:"Salt March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
+{q:"Akbar was?",o:["King","Writer","Scientist","None"],a:"King"},
+{q:"Babur came from?",o:["Central Asia","India","China","USA"],a:"Central Asia"},
+{q:"First war independence?",o:["1857","1947","1930","1920"],a:"1857"},
+{q:"Who built Qutub Minar?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
+{q:"Who led Dandi March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
+{q:"Who was last Mughal?",o:["Bahadur Shah Zafar","Akbar","Babur","Aurangzeb"],a:"Bahadur Shah Zafar"}
+]
+
 };
 
 let current=[],i=0,score=0;
