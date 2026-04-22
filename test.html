@@ -1,828 +1,300 @@
-<!DOCTYPE html>  
-<html lang="mr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta name="google-site-verification" content="3Z7LnXDIo3tVXmducysqPVlukJr3j4-zwR2cFzb791k" />
-  
 <meta charset="UTF-8">
-<title>Dhannjay Uphade official creator website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
-<link rel="manifest" href="manifest.json">
-<meta property="og:title" content="Dhannjay Uphade – Official Website">
-<meta property="og:description" content="Daily Suvichar, YouTube links, GK Quiz & More!">
-<meta property="og:image" content="https://dhannjayuphade.github.io/share.jpg">
+<title>Quiz Hub Pro</title>
 
-  <meta property="og:image" content="https://dhannjayuphade.github.io/share.jpg">
-   
-
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-<script>
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
-    OneSignal.init({
-      appId: "8b3c9ee5-fa61-4f72-9587-188e1fde0e2c",
-      notifyButton: {
-        enable: true,
-      }
-    });
-  });
-</script>
-  
-  <style>
-    /* ===== Announcement Bar ===== */
-.announcement {
-  background:#ff5722;
-  color:white;
-  overflow:hidden;
-  white-space:nowrap;
-  position:relative;
-}
-
-.announcement-text {
-  display:inline-block;
-  padding:10px 0;
-  padding-left:100%;
-  font-weight:bold;
-  animation: scrollText 25s linear infinite;
-}
-
-/* Animation */
-@keyframes scrollText {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-    .action-card{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:15px;
-  margin:15px auto;
-  width:90%;
-  max-width:450px;
-  background:rgba(255,255,255,0.18);
-  backdrop-filter:blur(6px);
-  border-radius:12px;
-  cursor:pointer;
-  box-shadow:0 0 15px rgba(255,105,180,0.4);
-}
-.action-card .icon{font-size:30px;}
-.share-card{border-left:5px solid #ff4da6;}
-    
-/* ===== BODY + ANIMATED BACKGROUND ===== */
-body{
-  font-family: Arial, sans-serif;
-  margin:0;
-  text-align:center;
-  color:white;
-  min-height:100vh;
-  background: linear-gradient(-45deg,#1a001a,#330033,#ff1fa3,#ff66cc);
-  background-size:400% 400%;
-  animation:gradientBG 12s ease infinite;
-}
-@keyframes gradientBG{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-
-/* ===== HEADER ===== */
-header{padding:25px;}
-.logo{
-  width:140px;
-  border-radius:50%;
-  box-shadow:0 0 25px #ff4da6;
-}
-
-/* ===== CARD ===== */
-.card{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
-  margin:15px auto;
-  padding:15px;
-  border-radius:12px;
-  width:90%;
-  max-width:450px;
-  box-shadow:0 0 15px rgba(255,105,180,0.4);
-}
-
-/* ===== LINKS ===== */
-a{color:#ffccff;text-decoration:none;font-weight:bold;}
-
-/* ===== BUTTON ===== */
-button{
-  padding:8px 18px;
-  margin:6px;
-  cursor:pointer;
-  background:#ff4da6;
-  color:white;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,77,166,.6);}
-  70%{box-shadow:0 0 0 15px rgba(255,77,166,0);}
-  100%{box-shadow:0 0 0 0 rgba(255,77,166,0);}
-}
-
-/* ===== TEXTAREA ===== */
-textarea{
-  width:85%;
-  padding:7px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-}
-
-/* ===== FOOTER ===== */
-footer{
-  background:#000;
-  padding:10px;
-  font-size:13px;
-  margin-top:20px;
-}
-
-/* ===== SUVICHAR SPECIAL ===== */
-.suvichar-card{
-  border:2px solid #ff66cc;
-  box-shadow:0 0 30px rgba(255,102,204,0.9);
-  animation:glowBox 3s infinite alternate;
-}
-@keyframes glowBox{
-  from{ box-shadow:0 0 15px rgba(255,102,204,0.5); }
-  to{ box-shadow:0 0 35px rgba(255,102,204,1); }
-}
-.suvichar-text{
-  font-size:18px;
-  margin:15px 0;
-  padding:15px;
-  background:rgba(0,0,0,0.3);
-  border-radius:12px;
-  line-height:1.6;
-}
-
-/* ===== GLOWING SUVICHAR BUTTON ===== */
-.glow-suvichar-btn{
-  font-size:18px;
-  padding:12px 30px;
-  border:none;
-  border-radius:40px;
-  color:white;
-  cursor:pointer;
-  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
-  background-size:300% 300%;
-  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
-  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
-  margin:5px;
-}
-@keyframes glowMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-@keyframes glowPulse{
-  0%{box-shadow:0 0 10px #ff4da6;}
-  50%{box-shadow:0 0 35px #ff66cc;}
-  100%{box-shadow:0 0 10px #ff4da6;}
-}
-.glow-suvichar-btn:hover{transform:scale(1.08);}
-    /* ===== GLOW EFFECT FOR SHARE CARD ===== */
-.share-card{
-  border-left:5px solid #ff4da6;
-  animation: shareGlow 2s infinite;
-}
-
-@keyframes shareGlow{
-  0%{
-    box-shadow:0 0 10px rgba(255,77,166,0.6);
-  }
-  50%{
-    box-shadow:0 0 30px rgba(255,102,204,1);
-  }
-  100%{
-    box-shadow:0 0 10px rgba(255,77,166,0.6);
-  }
-      }
-    .glow-share-btn{
-  font-size:18px;
-  padding:12px 30px;
-  border:none;
-  border-radius:40px;
-  color:white;
-  cursor:pointer;
-  background:linear-gradient(45deg,#ff0080,#ff66cc,#ff0080);
-  background-size:300% 300%;
-  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
-  box-shadow:0 0 15px #ff4da6, 0 0 30px #ff4da6;
-  margin:5px;
-}
-.glow-share-btn:hover{transform:scale(1.08);}
-
-    /* ===== WHATSAPP SHARE BUTTON STYLE ===== */
-.glow-share-btn{
-  font-size:18px;
-  padding:12px 30px;
-  border:none;
-  border-radius:40px;
-  color:white;
-  cursor:pointer;
-  background:linear-gradient(45deg,#25D366,#128C7E,#25D366);
-  background-size:300% 300%;
-  animation:glowMove 3s infinite, glowPulse 1.5s infinite;
-  box-shadow:0 0 15px #25D366, 0 0 30px #25D366;
-  margin:5px;
-}
-.glow-share-btn:hover{
-  transform:scale(1.08);
-  }
-    
-</style>
-  <style>
-.dark-mode {
-  background-color:#121212;
-  color:white;
-}
-
-.dark-mode a {
-  color:#4fc3f7;
-}
-  </style>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 
 <style>
-
-/* Top Static Navbar */
-.navbar {
-  padding:15px;
-  background:white;   /* White background */
-  color:#1a73e8;         /* Blue text */
-  text-align:center;
-  font-weight:bold;
-  font-size:20px;
-  position:sticky;
-  top:0;
-  z-index:1000;
-  box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Moving Menu Bar */
-.moving-bar {
-  background:linear-gradient(90deg,#11998e,#38ef7d);
-  overflow:hidden;
-  white-space:nowrap;
-}
-
-.moving-content {
-  display:inline-block;
-  padding:10px 0;
-  animation: scrollLeft 35s linear infinite;
-}
-
-.moving-content a {
-  display:inline-block;   /* IMPORTANT */
-  color:white;
-  text-decoration:none;
-  margin:0 30px;
-  font-weight:bold;
-}
-
-.moving-content a:hover {
-  color:black;
-}
-
-@keyframes scrollLeft {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
+body{margin:0;font-family:Poppins;background:linear-gradient(135deg,#1f1c2c,#928dab);color:white;text-align:center}
+.app{max-width:400px;margin:auto;padding:15px}
+button{padding:10px;margin:5px;border:none;border-radius:10px;background:#00ffcc}
+.card{background:#222;padding:10px;margin:10px;border-radius:10px;cursor:pointer}
 </style>
-  <style>
-#festivalArea{
-text-align:center;
-font-size:22px;
-padding:15px;
-font-weight:bold;
-}
 
-.festival-btn{
-padding:10px 20px;
-margin-top:10px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-font-size:16px;
-}
-  </style>
-  
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, push, onValue, set }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+const db = getDatabase(app);
+
+// LOGIN
+window.googleLogin = async function(){
+  const result = await signInWithPopup(auth, provider);
+  localStorage.setItem("user", result.user.displayName);
+  showHome();
+};
+
+// AUTO LOGIN
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    localStorage.setItem("user", user.displayName);
+    showHome();
+  }
+});
+
+// LOGOUT
+window.logout = function(){
+  signOut(auth);
+  localStorage.clear();
+  location.reload();
+};
+
+// SAVE SCORE
+window.saveScore = function(score){
+  push(ref(db,"leaderboard"),{
+    name: localStorage.getItem("user"),
+    score: score
+  });
+};
+
+// LOAD LEADERBOARD
+window.loadLeaderboard = function(){
+  onValue(ref(db,"leaderboard"),(snap)=>{
+    let data = snap.val();
+    let list = document.getElementById("leaderList");
+    list.innerHTML = "";
+
+    if(data){
+      let arr = Object.values(data);
+      arr.sort((a,b)=>b.score-a.score);
+
+      arr.slice(0,10).forEach((p,i)=>{
+        list.innerHTML += `<li>#${i+1} ${p.name} - ${p.score}</li>`;
+      });
+    }
+  });
+};
+
+// ✅ GLOBAL PDF FUNCTION (FIXED)
+window.generatePDF = async function(){
+
+  document.getElementById("certificateBox").style.display="block";
+
+  let user = localStorage.getItem("user");
+  let score = localStorage.getItem("score");
+
+  document.getElementById("certName").innerText = user;
+
+  let today = new Date().toLocaleDateString();
+  document.getElementById("certDate").innerText = today;
+
+  let id = "QUIZ-" + currentTopic + "-" + Date.now();
+  document.getElementById("certID").innerText = id;
+
+  set(ref(db,"certificates/"+id),{
+    name:user,
+    score:score,
+    topic:currentTopic,
+    date:today
+  });
+
+  let title = currentTopic.toUpperCase() + " QUIZ CERTIFICATE";
+  let text = `Scored ${score} marks in ${currentTopic.toUpperCase()} quiz`;
+
+  document.getElementById("quizTitle").innerText = title;
+  document.getElementById("certText").innerText = text;
+
+  await new Promise(r=>setTimeout(r,500));
+
+  const cert = document.getElementById("certificate");
+  const canvas = await html2canvas(cert);
+  const imgData = canvas.toDataURL("image/png");
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("landscape");
+
+  pdf.addImage(imgData,'PNG',10,10,270,180);
+  pdf.save(title + ".pdf");
+
+  document.getElementById("certificateBox").style.display="none";
+};
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 
 <body>
 
-<h1> welcome </h1>
+<div class="app">
 
-<header>
-
-  <img src="logo.png" class="logo"><br>
-  <h2>Dhannjay Uphade 🇮🇳</h2>
-  <p>official creator website
-   welcome to creator studio 2.0</p>
-</header>
-<div class="announcement">
-  <div class="announcement-text">
-    🔥 welcome to Dhannjay uphade 🇮🇳 official website | New GK Quiz Live |  
-    📢 Daily Suvichar Updated | 📱 Join WhatsApp Group | Download app|
-  </div>
+<!-- LOGIN -->
+<div id="loginBox">
+<h2>Quiz App</h2>
+<button onclick="googleLogin()">Login with Google</button>
 </div>
 
-<nav class="navbar">
-  welcome to my website 
-</nav>
-  <div class="moving-bar">
-  <div class="moving-content">
-    <a href="index.html">🏠 Home</a>
-    <a href="suvichar/">📜 Suvichar</a>
-    <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">📷 Instagram</a>
-    <a href="https://youtube.com/@dhannjayuphade?si=jNJymHUFvh-r6lVq" target="_blank">▶ YouTube</a>
-    <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank">📱 WhatsApp</a>
-       <a href="https://dhannjayuphade.github.io/shivjayanti-quiz.html" target="_blank">📱 Shiv jayanti special quiz</a>
-       <a href="https://dhannjayuphade.github.io/quiz.html" target="_blank">📱 solve any quiz</a>
-           <a href="https://www.appsgeyser.com/19569718" target="_blank">📱 Download my official app</a>
-  </div>
-  </div>
-  <button onclick="toggleDarkMode()" 
-        style="position:fixed; top:15px; right:15px; padding:8px 12px; border:none; border-radius:20px; cursor:pointer;">
-   🌙
-  </button>
-  <div id="festivalArea"></div>
+<!-- HOME -->
+<div id="homeBox" style="display:none;">
+<h3>Hello, <span id="userName"></span></h3>
 
-    
-<!-- ===== Back to Home ===== -->
-<div class="card">
-🏠 <b>go to to second Website</b><br>
-<a href="https://dhannjayuphade.github.io/index2.html#/" target="_blank">
-  <button class="glow-suvichar-btn">🏠 Go to Home</button>
-</a>
-</div>
-  <!-- =====Download app===== -->
-<div class="card">
-💻 <b>Download official app</b><br>
-<a href="https://www.appsgeyser.com/19569718" target="_blank">
-  <button class="glow-suvichar-btn">⬇️Download app</button>
-</a>
+<div class="card" onclick="startQuiz('gk')">GK Quiz</div>
+<div class="card" onclick="startQuiz('science')">Science Quiz</div>
+<div class="card" onclick="startQuiz('history')">History Quiz</div>
+
+<div class="card" onclick="loadLeaderboard()">Leaderboard</div>
+
+<button onclick="logout()">Logout</button>
 </div>
 
-  
-  <!-- ===== YOUTUBE CHANNELS ===== -->
-
-<div class="card">
-  ▶️ <b>YouTube – Official Channel</b><br>
-  <a href="https://youtube.com/@dhannjayuphade?si=Naj449CiB-WCo7Ea" target="_blank">
-    <button>Subscribe</button>
-  </a>
+<!-- QUIZ -->
+<div id="quizBox" style="display:none;">
+<h3 id="timer">5:00</h3>
+<h2 id="question"></h2>
+<div id="options"></div>
 </div>
 
-<div class="card">
-  🎮 <b>YouTube – Gaming 2.0</b><br>
-  <a href="https://youtube.com/@dhannjaygaming2.0?si=k8BWvHs0wU2JVRle" target="_blank">
-    <button>Subscribe</button>
-  </a>
-</div>
-  <div class="card">
-  📸 <b>Instagram</b><br>
-  <a href="https://www.instagram.com/dhannjayuphade?igsh=YzljYTk1ODg3Zg==" target="_blank">
-    <button>Follow</button>
-  </a>
+<!-- RESULT -->
+<div id="resultBox" style="display:none;">
+<h2 id="scoreText"></h2>
+<button onclick="generatePDF()">Download Certificate</button>
 </div>
 
-  <div class="card">
-  📸 <b>join snap</b><br>
-  <a href="https://www.snapchat.com/add/dhannjayuphade?share_id=Yok2d17E1Y8&locale=mr-IN" target="_blank">
-    <button>join snap</button>
-  </a>
-  </div>
+<!-- CERTIFICATE -->
+<div id="certificateBox" style="display:none;">
+<div id="certificate" style="width:800px;padding:30px;background:white;color:black;text-align:center;border:10px solid orange;border-radius:15px;font-family:Georgia;">
+<h2>Certificate of Participation</h2>
 
-<div class="card">
-  📧 <b>Email</b><br>
-  <a href="mailto:dhannjayuphade5@gmail.com">
-    <button>Send Email</button>
-  </a>
-</div>
-<!-- ===== SUVICHAR ===== -->
-<div class="card suvichar-card">
-🌟 <h3>Daily Suvichar</h3>
-<div id="suvicharText" class="suvichar-text">
-  स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.
-</div>
-❤️ Likes: <span id="suvLike">0</span><br><br>
+<h3 id="quizTitle"></h3>
 
-<button class="glow-suvichar-btn" onclick="likeSuvichar()">❤️ Like</button>
-<button class="glow-suvichar-btn" onclick="shareSuvichar()">📤 Share</button>
-<br><br>
-<a href="suvichar/">
-  <button class="glow-suvichar-btn">✨ Read More Suvichar ✨</button>
-</a>
+<p>This certificate is awarded to</p>
+
+<h1 id="certName"></h1>
+
+<p id="certText"></p>
+
+<p>Date: <span id="certDate"></span></p>
+<p>ID: <span id="certID"></span></p>
+
+<hr>
+
+<p>Instagram: @dhannjayuphade</p>
+<p>Email: dhannjayuphade5@gmail.com</p>
+
+<h4 style="color:orange;">Dhananjay Uphade</h4>
+</div>
 </div>
 
-<!-- ===== GK Quiz Form ===== -->
-<div class="card">
-🧠 <b>GK Quiz</b><br>
-<p>तुमचा ज्ञान तपासा! Quiz भरायला खाली क्लिक करा:</p>
-<a href="https://docs.google.com/forms/d/e/1FAIpQLScZVyLv5GxG3ir7z1QX4sZ9JjZ9VFiBbxFYjLSq8ekJKcTFFg/viewform" target="_blank">
-<button class="glow-suvichar-btn">Start Quiz ✨</button>
-</a>
- 
-  <a href="quizhub.html">
-  <button class="glow-suvichar-btn">📝 go quiz hub </button>
-  </a>
+<ul id="leaderList"></ul>
+
 </div>
-
-  <!-- ===== go to gamehub ===== -->
-<div class="card">
-<b>go to game hub</b><br>
-<a href="https://dhannjayuphade.github.io/gamehub.html" target="_blank">
-  <button class="glow-suvichar-btn">go to play game</button>
-</a>
-</div>
-
-  <button class="glow-share-btn" onclick="whatsappShare()">
-  📲 Share on WhatsApp
-  </button>
-  <a href="https://wa.me/?text=Check%20out%20my%20website%20https://dhannjayuphade.github.io/" 
-   target="_blank"
-   style="display:inline-block; background:#25D366; color:white; padding:12px 20px; border-radius:8px; text-decoration:none;">
-   📲 Share This Website
-  </a>
-
-
-
-  
-  <!-- ===== WEBSITE SUBSCRIBE ===== -->
-<div class="card">
-  🔔 <b>Website Subscribe</b><br>
-  <p>नवीन अपडेट्ससाठी Subscribe करा</p>
-  <button onclick="subscribeSite()">Subscribe</button>
-  <p id="subStatus"></p>
-</div>
-
-  
-  <a href="https://chat.whatsapp.com/EKjuiqqvqBNGtPCYrRSPad" target="_blank" style="text-decoration:none;">
-  <div style="display:inline-block; background:#25D366; color:white; padding:12px 18px; border-radius:30px; font-weight:bold;">
-    📱 WhatsApp Group Join करा
-  </div>
-  </a>
-
-<!-- ===== COMMENT ===== -->
-<div class="card">
-💬 <b>Comments</b><br>
-<textarea id="comment" rows="3" placeholder="आपला comment लिहा..."></textarea><br>
-<button onclick="addComment()">Post</button>
-<div id="commentList"></div>
-</div>
-  
-<h1>Thank you 💕 </h1>
-<footer>© 2026 Dhannjay Uphade</footer>
-  <script>
-
-const today = new Date();
-const month = today.getMonth()+1;
-const day = today.getDate();
-
-const festivalArea = document.getElementById("festivalArea");
-
-const festivals = [
-
-/* January */
-{m:1,d:1,msg:"🎉 Happy New Year",color:"#000",btn:"Celebrate"},
-{m:1,d:12,msg:"👩‍💻 National Youth Day",color:"#ff9800",btn:"Learn"},
-{m:1,d:26,msg:"🇮🇳 Happy Republic Day",color:"#ff9933",btn:"Jai Hind"},
-
-/* February */
-{m:2,d:14,msg:"❤️ Valentine's Day",color:"#ff4d6d",btn:"Send Love"},
-{m:2,d:28,msg:"🔬 National Science Day",color:"#0b7285",btn:"Explore Science"},
-
-/* March */
-{m:3,d:8,msg:"👩 International Women's Day",color:"#ff69b4",btn:"Respect"},
-{m:3,d:14,msg:"🥧 Pi Day (π = 3.14)",color:"#1e1e2f",btn:"Math Fun"},
-{m:3,d:20,msg:"🌍 International Happiness Day",color:"#f4a261",btn:"Be Happy"},
-
-/* April */
-{m:4,d:1,msg:"😂 April Fool's Day",color:"#f7b801",btn:"Prank"},
-{m:4,d:22,msg:"🌎 Earth Day",color:"#2a9d8f",btn:"Save Earth"},
-
-/* May */
-{m:5,d:1,msg:"👷 Labour Day",color:"#6a4c93",btn:"Respect Workers"},
-{m:5,d:11,msg:"👩 Mother's Day",color:"#ff8fab",btn:"Thank Mom"},
-
-/* June */
-{m:6,d:5,msg:"🌳 World Environment Day",color:"#2b9348",btn:"Plant Tree"},
-{m:6,d:21,msg:"🧘 International Yoga Day",color:"#f9844a",btn:"Do Yoga"},
-
-/* July */
-{m:7,d:11,msg:"👨 World Population Day",color:"#577590",btn:"Know More"},
-
-/* August */
-{m:8,d:15,msg:"🇮🇳 Happy Independence Day",color:"#00a86b",btn:"Freedom"},
-{m:8,d:29,msg:"🏑 National Sports Day",color:"#118ab2",btn:"Play"},
-
-/* September */
-{m:9,d:5,msg:"👩‍🏫 Teacher's Day",color:"#ffd166",btn:"Thank Teacher"},
-{m:9,d:15,msg:"👨‍💻 Engineers Day",color:"#06d6a0",btn:"Innovation"},
-
-/* October */
-{m:10,d:2,msg:"🕊️ Gandhi Jayanti",color:"#e9c46a",btn:"Peace"},
-{m:10,d:31,msg:"🎃 Halloween",color:"#ff7f11",btn:"Spooky"},
-
-/* November */
-{m:11,d:14,msg:"👶 Children's Day",color:"#ffb703",btn:"Play Game"},
-
-/* December */
-{m:12,d:4,msg:"⚓ Navy Day",color:"#457b9d",btn:"Salute"},
-{m:12,d:22,msg:"➗ National Mathematics Day",color:"#2a9d8f",btn:"Math Time"},
-{m:12,d:25,msg:"🎄 Merry Christmas",color:"#006400",btn:"Open Gift"}
-
-  /* Indian Festivals */
-
-{m:1,d:14,msg:"🪁 Happy Makar Sankranti",color:"#f4a261",btn:"Fly Kite"},
-{m:3,d:25,msg:"🌈 Happy Holi",color:"#ff006e",btn:"Throw Colors"},
-{m:4,d:17,msg:"🪔 Ram Navami",color:"#ffb703",btn:"Celebrate"},
-{m:8,d:19,msg:"🪔 Raksha Bandhan",color:"#ffafcc",btn:"Tie Rakhi"},
-{m:9,d:7,msg:"🐘 Ganesh Chaturthi",color:"#ff7f11",btn:"Ganpati Bappa"},
-{m:10,d:12,msg:"🏹 Dussehra",color:"#e76f51",btn:"Victory"},
-{m:11,d:1,msg:"🪔 Happy Diwali",color:"#2c003e",btn:"Burst Crackers"},
-{m:11,d:15,msg:" भाई दूज",color:"#ffc8dd",btn:"Celebrate"}
-];
-
-festivals.forEach(f=>{
-if(f.m===month && f.d===day){
-document.body.style.background=f.color;
-festivalArea.innerHTML = `
-${f.msg}<br>
-<button class="festival-btn" onclick="alert('${f.msg}')">${f.btn}</button>
-`;
-}
-});
-
-  </script>
-
 
 <script>
-  
-/* ===== COMMENT ===== */
-function loadComments(){
-  let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-  let html = "";
-  comments.forEach((c)=>{ html += `<p>💬 ${c}</p>`; });
-  document.getElementById("commentList").innerHTML = html;
+
+// GLOBAL VARIABLES
+let current=[],i=0,score=0;
+let currentTopic="";
+
+// HOME
+function showHome(){
+  loginBox.style.display="none";
+  homeBox.style.display="block";
+  quizBox.style.display="none";
+  resultBox.style.display="none";
+  userName.innerText = localStorage.getItem("user");
 }
 
-function addComment(){
-  let c = document.getElementById("comment").value.trim();
-  if(c!==""){
-    let comments = JSON.parse(localStorage.getItem("all_comments")||"[]");
-    comments.push(c);
-    localStorage.setItem("all_comments",JSON.stringify(comments));
-    document.getElementById("comment").value="";
-    loadComments();
-  }
+// QUESTIONS (same structure)
+let questions = {
+gk:[
+{q:"Capital of India?",o:["Mumbai","Delhi","Pune","Nagpur"],a:"Delhi"},
+{q:"National animal?",o:["Lion","Tiger","Dog","Cat"],a:"Tiger"}
+],
+science:[
+{q:"Water formula?",o:["CO2","H2O","O2","NaCl"],a:"H2O"},
+{q:"Sun is?",o:["Planet","Star","Moon","Rock"],a:"Star"}
+],
+history:[
+{q:"First PM India?",o:["Nehru","Gandhi","Patel","Modi"],a:"Nehru"},
+{q:"Taj Mahal built by?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"}
+]
+};
+
+// START QUIZ
+function startQuiz(topic){
+  currentTopic = topic;
+  current = questions[topic];
+  i=0; score=0;
+
+  homeBox.style.display="none";
+  quizBox.style.display="block";
+
+  showQ();
+  timerStart();
 }
-loadComments();
 
-/* ===== SUVICHAR ===== */
-const suvichars=[
- "स्वतःवर विश्वास ठेवा, यश नक्की मिळेल.",
- "परिश्रमाशिवाय यश मिळत नाही.",
- "आजचा संघर्ष उद्याच्या यशाची तयारी असते.",
- "स्वप्न मोठी ठेवा, मेहनत त्याहून मोठी करा.",
- "अपयशातूनच यशाचा मार्ग जातो."
-];
-let day = new Date().getDate();
-document.getElementById("suvicharText").innerText = suvichars[day % suvichars.length];
+// SHOW QUESTION
+function showQ(){
+  if(i>=current.length){showResult();return;}
 
-let suvLike = parseInt(localStorage.getItem("suv_like")||0);
-document.getElementById("suvLike").innerText = suvLike;
+  question.innerText = current[i].q;
+  options.innerHTML = "";
 
-function likeSuvichar(){ suvLike++; localStorage.setItem("suv_like",suvLike); document.getElementById("suvLike").innerText = suvLike; }
-function shareSuvichar(){
-  let text = document.getElementById("suvicharText").innerText;
-  window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
+  current[i].o.forEach(v=>{
+    let btn = document.createElement("button");
+    btn.innerText = v;
+    btn.onclick = ()=>check(v);
+    options.appendChild(btn);
+  });
 }
-</script>
-  <script>
-function subscribeSite(){
-  if(!("Notification" in window)){
-    alert("तुमचा browser notifications support करत नाही");
-    return;
-  }
 
-  Notification.requestPermission().then(permission=>{
-    if(permission==="granted"){
-      localStorage.setItem("site_subscribed","yes");
-      document.getElementById("subStatus").innerText="✅ Subscribed Successfully!";
-      new Notification("🎉 Dhannjay Uphade Website",{
-        body:"तुम्ही website ला subscribe केलं आहे. Updates लवकरच येतील!"
-      });
-    }else{
-      alert("❌ Notification permission deny केली");
+// CHECK ANSWER
+function check(ans){
+  if(ans === current[i].a) score++;
+  i++;
+  showQ();
+}
+
+// TIMER
+function timerStart(){
+  let time = 300;
+
+  let t = setInterval(()=>{
+    time--;
+
+    let m = Math.floor(time/60);
+    let s = time%60;
+
+    timer.innerText = `${m}:${s<10?"0"+s:s}`;
+
+    if(time<=0){
+      clearInterval(t);
+      showResult();
     }
-  });
+  },1000);
 }
 
-window.onload=function(){
-  if(localStorage.getItem("site_subscribed")==="yes"){
-    document.getElementById("subStatus").innerText="🔔 You are already subscribed";
-  }
-}
-    if(localStorage.getItem("site_subscribed")==="yes"){
-  new Notification("🆕 New Update!",{
-    body:"Website वर नवीन Suvichar / Feature add केलं आहे"
-  });
-    }
-  </script>
+// RESULT
+function showResult(){
+  quizBox.style.display="none";
+  resultBox.style.display="block";
+  scoreText.innerText = "Score: " + score;
 
-  <script>
-function whatsappShare(){
-  const text = " website  👇\nhttps://dhannjayuphade.github.io/";
-  const url = "https://wa.me/?text=" + encodeURIComponent(text);
-  window.open(url, "_blank");
+  localStorage.setItem("score",score);
+  saveScore(score);
+  loadLeaderboard();
 }
-    <div style="text-align:center; margin-top:20px;">
-  <h3>👀 Total Visitors: <span id="visitor-count">Loading...</span></h3>
-</div>
 
-<script>
-fetch('https://api.countapi.xyz/hit/dhannjayuphade.github.io/visits')
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('visitor-count').innerText = data.value;
-  });
 </script>
-  </script>
-  <script>
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-}
-  </script>
-  <button id="installBtn" 
-        style="display:none; position:fixed; bottom:80px; right:20px; padding:10px 15px; border:none; border-radius:20px; background:#2196f3; color:white; cursor:pointer;">
-  📲 Install App
-  </button>
-  <script>
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "block";
-});
-
-installBtn.addEventListener("click", () => {
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then((choiceResult) => {
-    if (choiceResult.outcome === "accepted") {
-      console.log("User accepted install");
-    }
-    deferredPrompt = null;
-  });
-});
-        </script>
-  <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(() => console.log("Service Worker Registered"));
-}
-  </script>
-<script>
-  // EmailJS initialize
-  emailjs.init("4yXhs5Vh8xS1RW-Vl"); // EmailJS Public Key
-
-  const form = document.getElementById('emailForm');
-  const status = document.getElementById('status');
-
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    emailjs.sendForm('service_2v58rjb', 'template_template_f6gitrf', this)
-      .then(() => {
-        status.textContent = "✅ Welcome Email Sent Successfully!";
-        form.reset();
-      })
-      .catch(err => {
-        console.error(err);
-        status.textContent = "❌ Something went wrong.";
-      });
-  });
-</script>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    
-    authDomain: "dhannjay-website.firebaseapp.com",
-    projectId: "dhannjay-website",
-    storageBucket: "dhannjay-website.firebasestorage.app",
-    messagingSenderId: "73314948186",
-    appId: "1:73314948186:web:e7d64f04ba3221a21df463",
-    measurementId: "G-Y76NHS7ZV8"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  </script>
-  <div id="welcomePopup" class="popup">
-  <div class="popup-content">
-    <h2>Welcome to Dhannjay Hub 🎮</h2>
-    <p>Enjoy Games, Quiz & Updates</p>
-    <button onclick="closePopup()">Enter</button>
-  </div>
-</div>
-
-<style>
-.popup {
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.6);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-.popup-content {
-  background:pink;
-  padding:20px;
-  border-radius:10px;
-  text-align:center;
-}
-.popup button {
-  padding:8px 15px;
-}
-</style>
-
-<script>
-function closePopup(){
-  document.getElementById("welcomePopup").style.display="none";
-}
-</script>
-  <!-- Bottom Navigation Bar -->
-<div class="bottom-nav">
-  <a href="index.html">🏠<span>Home</span></a>
-  <a href="index2.html">🏠<span>second home</span></a>
-    <a href="https://dhannjayuphade.github.io/suvichar/">📚<span>suvichar</span></a>
-  <a href="gamehub.html">🎮<span>game hub</span></a>
-  <a href="quizhub.html">🧠<span>Quiz</span></a>
-  <a href="ai.html">🤖<span>AI</span></a>
-  <a href="login.html">🔐<span>Login</span></a>
-  
-</div>
-
-<style>
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #111;
-  display: flex;
-  justify-content: space-around;
-  padding: 8px 0;
-  border-top: 1px solid #333;
-  z-index: 1000;
-}
-
-.bottom-nav a {
-  text-decoration: none;
-  color: white;
-  font-size: 17px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-
-.bottom-nav a span {
-  font-size: 11px;
-}
-.bottom-nav a:hover {
-  color: #28a745;       /* icon/label hover color */
-  transform: scale(1.2); /* slightly enlarge icon */
-  transition: 0.2s;      /* smooth animation */
-  }
-body {
-  padding-bottom: 60px;
-}
-</style>
 </body>
   </html>
