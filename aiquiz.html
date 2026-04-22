@@ -123,7 +123,7 @@ window.loadLeaderboard = function(){
 <!-- RESULT -->
 <div id="resultBox" style="display:none;">
 <h2 id="scoreText"></h2>
-<button onclick="generatePDF()">🎓 Certificate</button>
+<button onclick="generatePDF()">🎓 Certificate Download</button>
 <button onclick="goHome()">Home</button>
 </div>
 <div id="certificateBox" style="display:none;">
@@ -323,12 +323,8 @@ function showResult(){
   localStorage.setItem("score",score);
   saveScore(score);
   loadLeaderboard();
-<button onclick="generatePDF()">🎓 Certificate Download</button>
-  // 👉 AUTO PDF DOWNLOAD
-  setTimeout(() => {
-    generatePDF();
-  }, 800);
-                     }
+
+  
 
 async function generatePDF(){
 
