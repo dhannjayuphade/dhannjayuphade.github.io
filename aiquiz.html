@@ -316,14 +316,19 @@ if(time<=0){clearInterval(t);showResult();}
 
 // RESULT
 function showResult(){
-quizBox.style.display="none";
-resultBox.style.display="block";
-scoreText.innerText="Score: "+score;
+  quizBox.style.display="none";
+  resultBox.style.display="block";
+  scoreText.innerText="Score: "+score;
 
-localStorage.setItem("score",score);
-saveScore(score);
-loadLeaderboard();
-}
+  localStorage.setItem("score",score);
+  saveScore(score);
+  loadLeaderboard();
+
+  // 👉 AUTO PDF DOWNLOAD
+  setTimeout(() => {
+    generatePDF();
+  }, 800);
+                     }
 
 async function generatePDF(){
 
