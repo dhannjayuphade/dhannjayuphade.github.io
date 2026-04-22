@@ -325,8 +325,6 @@ saveScore(score);
 loadLeaderboard();
 }
 
-function goHome(){showHome();}
-
 async function generatePDF(){
 
   document.getElementById("certificateBox").style.display="block";
@@ -338,11 +336,22 @@ async function generatePDF(){
   document.getElementById("certName").innerText = user;
 
   // 👉 DATE
-  document.getElementById("certDate").innerText =
-    new Date().toLocaleDateString();
-  let id = "QUIZ-" + currentTopic + "-" + Date.now();
+  let today = new Date().toLocaleDateString();
+  document.getElementById("certDate").innerText = today;
 
-  // 👉 QUIZ TYPE BASED TEXT
+  // 👉 CERTIFICATE ID
+  let id = "QUIZ-" + currentTopic + "-" + Date.now();
+  document.getElementById("certID").innerText = id;
+
+  // 👉 SAVE TO FIREBASE
+  set(ref(db, "certificates/" + id), {
+    name: user,
+    score: score,
+    topic: currentTopic,
+    date: today
+  });
+
+  // 👉 QUIZ TYPE TEXT
   let title = "";
   let text = "";
 
@@ -371,15 +380,10 @@ async function generatePDF(){
   const pdf = new jsPDF('landscape');
 
   pdf.addImage(imgData, 'PNG', 10, 10, 270, 180);
-
   pdf.save(title + ".pdf");
 
   document.getElementById("certificateBox").style.display="none";
 }
-
-
-
-
 </script>
 <footer>© Dhannjay uphade 🇮🇳 </footer>
 </body>
