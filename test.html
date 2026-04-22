@@ -161,7 +161,10 @@ document.getElementById("certificateBox").style.display="none";
 
 <div id="resultBox" style="display:none;">
 <h2 id="scoreText"></h2>
+
 <button onclick="generatePDF()">Download Certificate</button>
+<button onclick="goHome()">Home</button>
+
 </div>
 
 <div id="certificateBox" style="display:none;">
@@ -348,7 +351,10 @@ document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
 if(t<=0){clearInterval(x);showResult();}
 },1000);
 }
-
+function goHome(){
+  document.getElementById("resultBox").style.display="none";
+  document.getElementById("homeBox").style.display="block";
+}
 function showResult(){
 document.getElementById("quizBox").style.display="none";
 document.getElementById("resultBox").style.display="block";
