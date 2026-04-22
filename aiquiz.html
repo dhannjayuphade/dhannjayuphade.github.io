@@ -323,7 +323,7 @@ function showResult(){
   localStorage.setItem("score",score);
   saveScore(score);
   loadLeaderboard();
-
+<button onclick="generatePDF()">🎓 Certificate Download</button>
   // 👉 AUTO PDF DOWNLOAD
   setTimeout(() => {
     generatePDF();
