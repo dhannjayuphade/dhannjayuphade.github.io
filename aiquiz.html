@@ -340,6 +340,7 @@ async function generatePDF(){
   // 👉 DATE
   document.getElementById("certDate").innerText =
     new Date().toLocaleDateString();
+  let id = "QUIZ-" + currentTopic + "-" + Date.now();
 
   // 👉 QUIZ TYPE BASED TEXT
   let title = "";
