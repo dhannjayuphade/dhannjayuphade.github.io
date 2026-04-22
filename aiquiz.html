@@ -370,7 +370,8 @@ async function generatePDF(){
 
   document.getElementById("quizTitle").innerText = title;
   document.getElementById("certText").innerText = text;
-
+  
+await new Promise(r => setTimeout(r, 500));
   // 👉 PDF GENERATE
   const cert = document.getElementById("certificate");
   const canvas = await html2canvas(cert);
