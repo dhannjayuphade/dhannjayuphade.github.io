@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,384 +9,363 @@
 
 <style>
 body{margin:0;font-family:Poppins;background:linear-gradient(135deg,#1f1c2c,#928dab);color:white;text-align:center}
-.app{max-width:400px;margin:auto;padding:15px}
+.app{max-width:420px;margin:auto;padding:15px}
 button{padding:10px;margin:5px;border:none;border-radius:10px;background:#00ffcc}
-.card{background:#222;padding:10px;margin:10px;border-radius:10px}
+.card{background:#222;padding:10px;margin:10px;border-radius:10px;cursor:pointer}
 </style>
 
-<!-- Firebase + Auth + DB -->
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getDatabase, ref, push, onValue, set }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-  
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
-  projectId: "dhannjay-website"
+apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+authDomain:"dhannjay-website.firebaseapp.com",
+databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
+projectId:"dhannjay-website"
 };
 
 const app = initializeApp(firebaseConfig);
-
-// AUTH
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
-// DATABASE
 const db = getDatabase(app);
 
-// GOOGLE LOGIN
+/* LOGIN */
 window.googleLogin = async function(){
-  const result = await signInWithPopup(auth, provider);
-  localStorage.setItem("user", result.user.displayName);
-  showHome();
-}
+const result = await signInWithPopup(auth, provider);
+localStorage.setItem("user", result.user.displayName);
+showHome();
+};
 
-// AUTO LOGIN
 onAuthStateChanged(auth,(user)=>{
-  if(user){
-    localStorage.setItem("user", user.displayName);
-    showHome();
-  }
+if(user){
+localStorage.setItem("user",user.displayName);
+showHome();
+}
 });
 
-// LOGOUT
-window.logout = function(){
-  signOut(auth);
-  localStorage.removeItem("user");
-  location.reload();
-}
+/* LOGOUT */
+window.logout=function(){
+signOut(auth);
+localStorage.clear();
+location.reload();
+};
 
-// SAVE SCORE
-window.saveScore = function(score){
-  push(ref(db,"leaderboard"),{
-    name:localStorage.getItem("user"),
-    score:score
-  });
-}
+/* SCORE */
+window.saveScore=function(score){
+push(ref(db,"leaderboard"),{
+name:localStorage.getItem("user"),
+score:score
+});
+};
 
-// LOAD LEADERBOARD
-window.loadLeaderboard = function(){
-  onValue(ref(db,"leaderboard"),(snap)=>{
-    let data=snap.val();
-    let list=document.getElementById("leaderList");
-    list.innerHTML="";
-    if(data){
-      let arr=Object.values(data);
-      arr.sort((a,b)=>b.score-a.score);
-      arr.slice(0,10).forEach((p,i)=>{
-        list.innerHTML+=`<li>#${i+1} ${p.name} - ${p.score}</li>`;
-      });
-    }
-  });
-}
+/* LEADERBOARD FIX */
+window.loadLeaderboard=function(){
+const list=document.getElementById("leaderList");
+
+onValue(ref(db,"leaderboard"),snap=>{
+let data=snap.val();
+list.innerHTML="";
+if(!data)return;
+
+let arr=Object.values(data);
+arr.sort((a,b)=>b.score-a.score);
+
+arr.slice(0,10).forEach((p,i)=>{
+list.innerHTML+=`<li>#${i+1} ${p.name} - ${p.score}</li>`;
+});
+});
+};
+
+/* CERTIFICATE FIX */
+window.generatePDF=async function(){
+
+document.getElementById("certificateBox").style.display="block";
+
+let user=localStorage.getItem("user");
+let score=localStorage.getItem("score");
+
+document.getElementById("certName").innerText=user;
+
+let today=new Date().toLocaleDateString();
+document.getElementById("certDate").innerText=today;
+
+let id="QUIZ-"+currentTopic+"-"+Date.now();
+document.getElementById("certID").innerText=id;
+
+set(ref(db,"certificates/"+id),{
+name:user,
+score:score,
+topic:currentTopic,
+date:today
+});
+
+let title=currentTopic.toUpperCase()+" QUIZ CERTIFICATE";
+let text=`Score ${score} in ${currentTopic.toUpperCase()}`;
+
+document.getElementById("quizTitle").innerText=title;
+document.getElementById("certText").innerText=text;
+
+await new Promise(r=>setTimeout(r,500));
+
+const cert=document.getElementById("certificate");
+const canvas=await html2canvas(cert);
+const img=canvas.toDataURL("image/png");
+
+const {jsPDF}=window.jspdf;
+const pdf=new jsPDF("landscape");
+
+pdf.addImage(img,'PNG',10,10,270,180);
+pdf.save(title+".pdf");
+
+document.getElementById("certificateBox").style.display="none";
+};
+
 </script>
 
-<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 
 <body>
+
 <div class="app">
 
-<!-- LOGIN -->
 <div id="loginBox">
-<h2>Quiz App</h2>
-<button onclick="googleLogin()">🔐 Login with Google</button>
+<h2>Quiz Hub Pro</h2>
+<button onclick="googleLogin()">Login with Google</button>
 </div>
 
-<!-- HOME -->
 <div id="homeBox" style="display:none;">
-<h3>👋 <span id="userName"></span></h3>
+<h3>Hello <span id="userName"></span></h3>
 
 <div class="card" onclick="startQuiz('gk')">GK Quiz</div>
 <div class="card" onclick="startQuiz('science')">Science Quiz</div>
 <div class="card" onclick="startQuiz('history')">History Quiz</div>
 
-<div class="card" onclick="loadLeaderboard()">🏆 Leaderboard</div>
+<div class="card" onclick="loadLeaderboard()">Leaderboard</div>
 
 <button onclick="logout()">Logout</button>
 </div>
 
-<!-- QUIZ -->
 <div id="quizBox" style="display:none;">
 <h3 id="timer">5:00</h3>
 <h2 id="question"></h2>
 <div id="options"></div>
 </div>
 
-<!-- RESULT -->
 <div id="resultBox" style="display:none;">
 <h2 id="scoreText"></h2>
-<button onclick="generatePDF()">🎓 Certificate Download</button>
+
+<button onclick="generatePDF()">Download Certificate</button>
 <button onclick="goHome()">Home</button>
+
 </div>
+
 <div id="certificateBox" style="display:none;">
-
-<div id="certificate" style="
-width:800px;
-padding:30px;
-background:white;
-color:black;
-text-align:center;
-border:10px solid orange;
-border-radius:15px;
-font-family:Georgia;
-">
-
+<div id="certificate" style="width:800px;padding:30px;background:white;color:black;text-align:center;border:10px solid orange;border-radius:15px;font-family:Georgia;">
 <h2>Certificate of Participation</h2>
-
 <h3 id="quizTitle"></h3>
-
-<p>This certificate is proudly presented to</p>
-
-<h1 id="certName" style="color:black;"></h1>
-
+<p>Presented to</p>
+<h1 id="certName"></h1>
 <p id="certText"></p>
-
 <p>Date: <span id="certDate"></span></p>
-<p>🆔 Certificate ID: <span id="certID"></span></p>
+<p>ID: <span id="certID"></span></p>
 <hr>
+<h4 style="color:orange;">Quiz Hub Pro</h4>
+  <hr>
 
-<p>Instagram: @dhannjayuphade</p>
-<p>Website: dhannjayuphade.github.io</p>
-<p>Email: dhannjayuphade5@gmail.com</p>
+<h4 style="color:orange;">Quiz Hub Pro</h4>
 
-<h4 style="color:orange;">Dhananjay Uphade</h4>
+<p>🌐 Website:
+<a href="https://dhannjayuphade.github.io" target="_blank">
+dhannjayuphade.github.io
+</a>
+</p>
 
+<p>📧 Email:
+<a href="mailto:dhannjayuphade5@gmail.com">
+dhannjayuphade5@gmail.com
+</a>
+</p>
+
+<p>📸 Instagram:
+<a href="https://www.instagram.com/dhannjayuphade" target="_blank">
+Follow @dhannjayuphade
+</a>
+</p>
 </div>
 </div>
-<!-- LEADERBOARD -->
+
 <ul id="leaderList"></ul>
 
 </div>
 
 <script>
 
-// HOME UI
+/* GAME CORE */
+let current=[],i=0,score=0;
+let currentTopic="";
+
 function showHome(){
-loginBox.style.display="none";
-homeBox.style.display="block";
-quizBox.style.display="none";
-resultBox.style.display="none";
-userName.innerText=localStorage.getItem("user");
+document.getElementById("loginBox").style.display="none";
+document.getElementById("homeBox").style.display="block";
+document.getElementById("quizBox").style.display="none";
+document.getElementById("resultBox").style.display="none";
+document.getElementById("userName").innerText=localStorage.getItem("user");
 }
-
-// QUESTIONS
-let questions = {
-
-// 🌍 GK (25 Questions)
+  /* 75 QUESTIONS FULL SET */
+let questions={
 gk:[
 {q:"Capital of India?",o:["Mumbai","Delhi","Pune","Nagpur"],a:"Delhi"},
 {q:"National animal?",o:["Lion","Tiger","Dog","Cat"],a:"Tiger"},
-{q:"National bird?",o:["Crow","Peacock","Parrot","Sparrow"],a:"Peacock"},
 {q:"Currency of India?",o:["Dollar","Rupee","Yen","Euro"],a:"Rupee"},
-{q:"Largest ocean?",o:["Atlantic","Pacific","Indian","Arctic"],a:"Pacific"},
+{q:"National bird?",o:["Crow","Peacock","Parrot","Sparrow"],a:"Peacock"},
+{q:"Largest ocean?",o:["Pacific","Atlantic","Indian","Arctic"],a:"Pacific"},
 {q:"Independence year?",o:["1947","1950","1930","1960"],a:"1947"},
 {q:"Largest country?",o:["India","USA","Russia","China"],a:"Russia"},
 {q:"Smallest continent?",o:["Asia","Europe","Australia","Africa"],a:"Australia"},
-{q:"Mount Everest location?",o:["India","Nepal","China","USA"],a:"Nepal"},
-{q:"National flower?",o:["Rose","Lotus","Sunflower","Lily"],a:"Lotus"},
+{q:"Mount Everest located in?",o:["India","Nepal","China","USA"],a:"Nepal"},
+{q:"National flower?",o:["Rose","Lotus","Lily","Sunflower"],a:"Lotus"},
 {q:"National fruit?",o:["Apple","Mango","Banana","Orange"],a:"Mango"},
 {q:"National river?",o:["Ganga","Yamuna","Krishna","Godavari"],a:"Ganga"},
 {q:"Fastest animal?",o:["Tiger","Cheetah","Lion","Dog"],a:"Cheetah"},
-{q:"Which is festival?",o:["Diwali","Monday","Table","Book"],a:"Diwali"},
-{q:"Which is city?",o:["Mumbai","Asia","Earth","River"],a:"Mumbai"},
-{q:"Which is country?",o:["India","City","River","Ocean"],a:"India"},
-{q:"Which is continent?",o:["Asia","India","Delhi","Sea"],a:"Asia"},
-{q:"Which is river?",o:["Ganga","Hill","Tree","Road"],a:"Ganga"},
-{q:"Which is ocean?",o:["Pacific","River","Lake","Hill"],a:"Pacific"},
 {q:"National game India?",o:["Hockey","Cricket","Football","Kabaddi"],a:"Hockey"},
 {q:"National song?",o:["Vande Mataram","Jana Gana Mana","Saare Jahan","None"],a:"Vande Mataram"},
-{q:"Indian flag colors?",o:["2","3","4","5"],a:"3"},
 {q:"Largest desert?",o:["Sahara","Thar","Gobi","Kalahari"],a:"Sahara"},
-{q:"Fastest train India?",o:["Vande Bharat","Rajdhani","Metro","Duronto"],a:"Vande Bharat"},
-{q:"Which is planet?",o:["Mars","Delhi","India","River"],a:"Mars"}
+{q:"Fastest train India?",o:["Vande Bharat","Rajdhani","Duronto","Metro"],a:"Vande Bharat"},
+{q:"Which is planet?",o:["Mars","Delhi","River","Tree"],a:"Mars"},
+{q:"Number of states in India?",o:["28","29","30","31"],a:"28"},
+{q:"Which is festival?",o:["Diwali","Monday","Table","Chair"],a:"Diwali"},
+{q:"Which is city?",o:["Mumbai","Asia","Ocean","River"],a:"Mumbai"},
+{q:"Which is continent?",o:["Asia","India","Delhi","Sea"],a:"Asia"},
+{q:"Which is river?",o:["Ganga","Hill","Road","Tree"],a:"Ganga"},
+{q:"Which is ocean?",o:["Pacific","Lake","River","Hill"],a:"Pacific"},
+{q:"Indian flag colors?",o:["3","2","4","5"],a:"3"}
 ],
 
-// 🔬 SCIENCE (25 Questions)
 science:[
 {q:"Water formula?",o:["CO2","H2O","O2","NaCl"],a:"H2O"},
 {q:"Sun is?",o:["Planet","Star","Moon","Rock"],a:"Star"},
 {q:"Gas for breathing?",o:["Oxygen","CO2","Hydrogen","Nitrogen"],a:"Oxygen"},
-{q:"Boiling point water?",o:["100°C","50°C","0°C","200°C"],a:"100°C"},
+{q:"Boiling point of water?",o:["100°C","50°C","0°C","200°C"],a:"100°C"},
 {q:"Earth shape?",o:["Round","Flat","Square","Triangle"],a:"Round"},
 {q:"Human heart chambers?",o:["2","3","4","5"],a:"4"},
 {q:"Largest organ?",o:["Skin","Heart","Brain","Liver"],a:"Skin"},
 {q:"Energy unit?",o:["Joule","Watt","Volt","Amp"],a:"Joule"},
-{q:"Force unit?",o:["Newton","Joule","Watt","Volt"],a:"Newton"},
-{q:"Gravity by?",o:["Newton","Einstein","Tesla","Edison"],a:"Newton"},
+{q:"Force unit?",o:["Newton","Joule","Volt","Watt"],a:"Newton"},
+{q:"Gravity discovered by?",o:["Newton","Einstein","Tesla","Edison"],a:"Newton"},
 {q:"Acid taste?",o:["Sour","Sweet","Bitter","Salty"],a:"Sour"},
 {q:"Liquid metal?",o:["Mercury","Iron","Gold","Silver"],a:"Mercury"},
-{q:"Brain part?",o:["Nervous","Digestive","Respiratory","Circulatory"],a:"Nervous"},
+{q:"Brain controls?",o:["Nervous","Digestive","Respiratory","Circulatory"],a:"Nervous"},
 {q:"Solar system center?",o:["Sun","Earth","Moon","Mars"],a:"Sun"},
 {q:"Green pigment?",o:["Chlorophyll","Melanin","Hemoglobin","None"],a:"Chlorophyll"},
 {q:"Air mainly contains?",o:["Nitrogen","Oxygen","CO2","Hydrogen"],a:"Nitrogen"},
 {q:"Eye function?",o:["Seeing","Hearing","Touch","Smell"],a:"Seeing"},
 {q:"Sound travels fastest in?",o:["Solid","Air","Water","Vacuum"],a:"Solid"},
-{q:"DNA full form?",o:["Deoxyribonucleic Acid","Digital Net","None","Data Net"],a:"Deoxyribonucleic Acid"},
-{q:"Which is gas?",o:["Oxygen","Iron","Water","Stone"],a:"Oxygen"},
-{q:"Which is liquid?",o:["Water","Air","Stone","Gas"],a:"Water"},
-{q:"Which is solid?",o:["Iron","Air","Water","Gas"],a:"Iron"},
-{q:"Speed of light?",o:["Fastest","Slow","Medium","Zero"],a:"Fastest"},
+{q:"DNA full form?",o:["Deoxyribonucleic Acid","Data Network","None","Digital Net"],a:"Deoxyribonucleic Acid"},
 {q:"Photosynthesis produces?",o:["Oxygen","CO2","Water","Nitrogen"],a:"Oxygen"},
-{q:"Heart pumps?",o:["Blood","Air","Water","Food"],a:"Blood"}
+{q:"Heart pumps?",o:["Blood","Air","Water","Food"],a:"Blood"},
+{q:"Speed of light?",o:["Fastest","Slow","Medium","Zero"],a:"Fastest"},
+{q:"Which is gas?",o:["Oxygen","Iron","Stone","Water"],a:"Oxygen"},
+{q:"Which is solid?",o:["Iron","Air","Gas","Water"],a:"Iron"},
+{q:"Which is liquid?",o:["Water","Gas","Stone","Air"],a:"Water"}
 ],
 
-// 🏛 HISTORY (25 Questions)
 history:[
 {q:"First PM India?",o:["Nehru","Gandhi","Patel","Modi"],a:"Nehru"},
-{q:"Taj Mahal by?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
+{q:"Taj Mahal built by?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
 {q:"1857 revolt?",o:["War","Game","Festival","None"],a:"War"},
 {q:"Father of Nation?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
 {q:"Quit India year?",o:["1942","1947","1930","1920"],a:"1942"},
 {q:"Ashoka empire?",o:["Maurya","Gupta","Mughal","Delhi"],a:"Maurya"},
-{q:"Red Fort by?",o:["Shah Jahan","Akbar","Babur","Ashoka"],a:"Shah Jahan"},
+{q:"Red Fort built by?",o:["Shah Jahan","Akbar","Babur","Ashoka"],a:"Shah Jahan"},
 {q:"First President?",o:["Rajendra Prasad","Nehru","Gandhi","Patel"],a:"Rajendra Prasad"},
 {q:"British left India?",o:["1947","1950","1930","1920"],a:"1947"},
 {q:"Ramayana writer?",o:["Valmiki","Vyasa","Kalidas","None"],a:"Valmiki"},
 {q:"Mahabharata writer?",o:["Vyasa","Valmiki","Kalidas","None"],a:"Vyasa"},
 {q:"Jallianwala Bagh year?",o:["1919","1920","1930","1940"],a:"1919"},
 {q:"Mughal founder?",o:["Babur","Akbar","Shah","Aurang"],a:"Babur"},
-{q:"Delhi Sultanate founder?",o:["Aibak","Akbar","Babur","Ashoka"],a:"Aibak"},
-{q:"Shivaji Maharaj?",o:["King","Scientist","Writer","None"],a:"King"},
+{q:"Shivaji was?",o:["King","Scientist","Writer","None"],a:"King"},
 {q:"Panipat battles?",o:["3","2","1","4"],a:"3"},
-{q:"Qutub Minar built by?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
-{q:"Golden age India?",o:["Gupta","Mughal","British","None"],a:"Gupta"},
-{q:"Salt March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
+{q:"Qutub Minar builder?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
+{q:"Golden age?",o:["Gupta","Mughal","British","None"],a:"Gupta"},
+{q:"Salt March led by?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
 {q:"Akbar was?",o:["King","Writer","Scientist","None"],a:"King"},
 {q:"Babur came from?",o:["Central Asia","India","China","USA"],a:"Central Asia"},
 {q:"First war independence?",o:["1857","1947","1930","1920"],a:"1857"},
-{q:"Who built Qutub Minar?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
-{q:"Who led Dandi March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
-{q:"Who was last Mughal?",o:["Bahadur Shah Zafar","Akbar","Babur","Aurangzeb"],a:"Bahadur Shah Zafar"}
+{q:"Last Mughal?",o:["Bahadur Shah Zafar","Akbar","Babur","Aurangzeb"],a:"Bahadur Shah Zafar"},
+{q:"Delhi Sultanate founder?",o:["Aibak","Akbar","Babur","Ashoka"],a:"Aibak"},
+{q:"Who built Taj Mahal?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
+{q:"Who led Dandi March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"}
 ]
-
 };
 
-let current=[],i=0,score=0;
-
-// START QUIZ
-
-let currentTopic = "";
-
+/* QUIZ */
 function startQuiz(topic){
-  currentTopic = topic;   // 🔥 ADD THIS
-  current = questions[topic];
-  i=0; score=0;
+currentTopic=topic;
+current=questions[topic];
+i=0;score=0;
 
-  homeBox.style.display="none";
-  quizBox.style.display="block";
+document.getElementById("homeBox").style.display="none";
+document.getElementById("quizBox").style.display="block";
 
-  showQ();
-  timerStart();
-  }
-  
-// SHOW QUESTION
+showQ();
+timerStart();
+}
+
 function showQ(){
 if(i>=current.length){showResult();return;}
-question.innerText=current[i].q;
-options.innerHTML="";
+
+document.getElementById("question").innerText=current[i].q;
+let opt=document.getElementById("options");
+opt.innerHTML="";
+
 current[i].o.forEach(v=>{
-options.innerHTML+=`<button onclick="check('${v}')">${v}</button>`;
+let b=document.createElement("button");
+b.innerText=v;
+b.onclick=()=>check(v);
+opt.appendChild(b);
 });
 }
 
-// CHECK
 function check(ans){
-if(ans===current[i].a) score++;
-i++;showQ();
+if(ans===current[i].a)score++;
+i++;
+showQ();
 }
 
-// TIMER
-let t;
 function timerStart(){
-let time=300;
-t=setInterval(()=>{
-time--;
-timer.innerText=Math.floor(time/60)+":"+time%60;
-if(time<=0){clearInterval(t);showResult();}
+let t=300;
+let x=setInterval(()=>{
+t--;
+let m=Math.floor(t/60);
+let s=t%60;
+document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
+if(t<=0){clearInterval(x);showResult();}
 },1000);
 }
-
-// RESULT
-function showResult(){
-  quizBox.style.display="none";
-  resultBox.style.display="block";
-  scoreText.innerText="Score: "+score;
-
-  localStorage.setItem("score",score);
-  saveScore(score);
-  loadLeaderboard();
-
-  
-
-async function generatePDF(){
-
-  document.getElementById("certificateBox").style.display="block";
-
-  let user = localStorage.getItem("user");
-  let score = localStorage.getItem("score");
-
-  // 👉 NAME
-  document.getElementById("certName").innerText = user;
-
-  // 👉 DATE
-  let today = new Date().toLocaleDateString();
-  document.getElementById("certDate").innerText = today;
-
-  // 👉 CERTIFICATE ID
-  let id = "QUIZ-" + currentTopic + "-" + Date.now();
-  document.getElementById("certID").innerText = id;
-
-  // 👉 SAVE TO FIREBASE
-  set(ref(db, "certificates/" + id), {
-    name: user,
-    score: score,
-    topic: currentTopic,
-    date: today
-  });
-
-  // 👉 QUIZ TYPE TEXT
-  let title = "";
-  let text = "";
-
-  if(currentTopic === "science"){
-    title = "Science Quiz Certificate";
-    text = `For scoring ${score} marks in Science Quiz`;
-  }
-  else if(currentTopic === "history"){
-    title = "History Quiz Certificate";
-    text = `For scoring ${score} marks in History Quiz`;
-  }
-  else{
-    title = "GK Quiz Certificate";
-    text = `For scoring ${score} marks in GK Quiz`;
-  }
-
-  document.getElementById("quizTitle").innerText = title;
-  document.getElementById("certText").innerText = text;
-  
-await new Promise(r => setTimeout(r, 500));
-  // 👉 PDF GENERATE
-  const cert = document.getElementById("certificate");
-  const canvas = await html2canvas(cert);
-  const imgData = canvas.toDataURL("image/png");
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('landscape');
-
-  pdf.addImage(imgData, 'PNG', 10, 10, 270, 180);
-  pdf.save(title + ".pdf");
-
-  document.getElementById("certificateBox").style.display="none";
+function goHome(){
+  document.getElementById("resultBox").style.display="none";
+  document.getElementById("homeBox").style.display="block";
 }
+function showResult(){
+document.getElementById("quizBox").style.display="none";
+document.getElementById("resultBox").style.display="block";
+document.getElementById("scoreText").innerText="Score: "+score;
+
+localStorage.setItem("score",score);
+saveScore(score);
+loadLeaderboard();
+}
+
 </script>
-<footer>© Dhannjay uphade 🇮🇳 </footer>
+  <footer>© Dhannjay uphade 🇮🇳 2026</footer>
+
 </body>
-  </html>
+</html>
