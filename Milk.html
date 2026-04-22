@@ -63,6 +63,9 @@ function loadCustomers(){
   });
 
   showCustomers();
+  window.onload = () => {
+  loadCustomers();
+};
 }
 
 // SHOW LIST
@@ -146,7 +149,9 @@ function saveMilk(){
   save("milkData",data);
   alert("Saved");
 }
-
+save("milkData",data);
+alert("Saved");
+loadCustomers(); // ADD THIS
 // OPEN CUSTOMER
 function openCustomer(id){
   let c=get("customers").find(x=>x.id==id);
