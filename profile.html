@@ -1,181 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
+<title>Login System</title>
 
-    .card {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 12px;
-      margin: 10px auto;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: #38bdf8;
-      color: black;
-    }
-
-    .score {
-      background: #334155;
-      margin: 5px;
-      padding: 8px;
-      border-radius: 8px;
-    }
-
-    img {
-      border-radius: 50%;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-
-<body>
-
-<h2>Dashboard</h2>
-
-<div class="card">
-  <p id="user"></p>
-
-  <input type="file" id="photo">
-  <button onclick="uploadPhoto()">Upload Photo</button>
-
-  <br>
-  <img id="profilePic" width="100">
-
-  <br><br>
-  <button onclick="logout()">Logout</button>
-</div>
-
-<div class="card">
-  <h3>Your Scores</h3>
-  <div id="scores"></div>
-</div>
-
-<div class="card">
-  <h3>Leaderboard 🏆</h3>
-  <div id="leaderboard"></div>
-</div>
+<style>
+body{
+font-family:Poppins;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:20px;
+}
+.box{
+background:#222;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+img{
+border-radius:50%;
+}
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+background:#00ffcc;
+margin:10px;
+}
+</style>
 
 <script type="module">
-  import { updateProfile } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-updateProfile(auth.currentUser, {
-  photoURL: url
-});
-import { initializeApp } from"https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { 
-  getAuth, onAuthStateChanged, signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import { 
-  getFirestore, collection, getDocs 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-import { 
-  getStorage, ref, uploadBytes, getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, push }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  projectId: "dhannjay-website",
-  storageBucket: "dhannjay-website.firebasestorage.app",
-  messagingSenderId: "73314948186",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
+apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+authDomain:"dhannjay-website.firebaseapp.com",
+databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
+projectId:"dhannjay-website"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const provider = new GoogleAuthProvider();
+const db = getDatabase(app);
 
-// LOGOUT
-window.logout = () => {
-  signOut(auth).then(() => {
-    window.location.href = "login.html";
-  });
-};
+// 🔐 LOGIN
+window.login = async function(){
 
-// UPLOAD PHOTO
-window.uploadPhoto = async function () {
-  const file = document.getElementById("photo").files[0];
-  const user = auth.currentUser;
+const result = await signInWithPopup(auth, provider);
 
-  if (!file) return alert("Select image");
+const user = result.user;
 
-  const storageRef = ref(storage, "profile/" + user.uid);
+// SAVE LOCAL
+localStorage.setItem("user", user.displayName);
+localStorage.setItem("email", user.email);
+localStorage.setItem("photo", user.photoURL);
 
-  await uploadBytes(storageRef, file);
-  const url = await getDownloadURL(storageRef);
-
-  document.getElementById("profilePic").src = url;
-  alert("Photo uploaded ✅");
-};
-
-// AUTH CHECK
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return window.location.href = "login.html";
-
-  // EMAIL VERIFICATION CHECK
-await user.reload();  // 🔥 add this line
-
-if (!user.emailVerified) {
-  alert("Verify your email first 📧");
-  window.location.href = "login.html";
-  return;
-  }
-
-  document.getElementById("user").innerText = user.email;
-
-  // LOAD PHOTO
-  const storageRef = ref(storage, "profile/" + user.uid + ".jpg");
-  getDownloadURL(storageRef)
-    .then(url => document.getElementById("profilePic").src = url)
-    .catch(()=>{});
-
-  // LOAD SCORES
-  const snap = await getDocs(collection(db, "scores"));
-
-  let userHTML = "";
-  let allScores = [];
-
-  snap.forEach(doc => {
-    const d = doc.data();
-    allScores.push(d);
-
-    if (d.email === user.email) {
-      userHTML += `<div class="score">${d.type}: ${d.score}</div>`;
-    }
-  });
-
-  document.getElementById("scores").innerHTML = userHTML;
-
-  // LEADERBOARD
-  allScores.sort((a,b)=>b.score-a.score);
-
-  let top = "";
-  allScores.slice(0,5).forEach((d,i)=>{
-    top += `<div class="score">#${i+1} ${d.email} - ${d.score}</div>`;
-  });
-
-  document.getElementById("leaderboard").innerHTML = top;
+// SAVE FIREBASE
+push(ref(db,"users"),{
+name:user.displayName,
+email:user.email,
+photo:user.photoURL,
+time:Date.now()
 });
+
+showProfile();
+};
+
+// 🔁 AUTO LOGIN
+onAuthStateChanged(auth,(user)=>{
+if(user){
+localStorage.setItem("user", user.displayName);
+localStorage.setItem("email", user.email);
+localStorage.setItem("photo", user.photoURL);
+showProfile();
+}
+});
+
+// 🚪 LOGOUT
+window.logout=function(){
+signOut(auth);
+localStorage.clear();
+location.reload();
+};
+
+// 👤 PROFILE
+function showProfile(){
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("profileBox").style.display="block";
+
+document.getElementById("name").innerText = localStorage.getItem("user");
+document.getElementById("email").innerText = localStorage.getItem("email");
+document.getElementById("photo").src = localStorage.getItem("photo");
+}
+
 </script>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox" class="box">
+<h2>Login</h2>
+<button onclick="login()">Login with Google</button>
+</div>
+
+<!-- PROFILE -->
+<div id="profileBox" class="box" style="display:none;">
+
+<h2>👤 Profile</h2>
+
+<img id="photo" width="100"><br>
+
+<p>Name: <span id="name"></span></p>
+<p>Email: <span id="email"></span></p>
+
+<button onclick="logout()">Logout</button>
+
+</div>
 
 </body>
 </html>
