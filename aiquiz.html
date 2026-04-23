@@ -120,8 +120,7 @@ let text=`Score ${score} in ${currentTopic.toUpperCase()}`;
 document.getElementById("quizTitle").innerText=title;
 document.getElementById("certText").innerText=text;
 
-await new Promise(r=>setTimeout(r,500));
-
+await new Promise(r=>setTimeout(r,1200));
 const cert=document.getElementById("certificate");
 const canvas=await html2canvas(cert);
 const img=canvas.toDataURL("image/png");
@@ -186,6 +185,7 @@ document.getElementById("certificateBox").style.display="none";
 <p id="certText"></p>
 <p>Date: <span id="certDate"></span></p>
 <p>ID: <span id="certID"></span></p>
+  <div id="qrcode" style="margin-top:20px;"></div>
 <hr>
 <h4 style="color:orange;">Quiz Hub Pro</h4>
   <hr>
