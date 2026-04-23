@@ -94,11 +94,10 @@ function showProfile(){
 document.getElementById("loginBox").style.display="none";
 document.getElementById("profileBox").style.display="block";
 
+  document.getElementById("photo").src = localStorage.getItem("photo"); 
 document.getElementById("name").innerText = localStorage.getItem("user");
 document.getElementById("email").innerText = localStorage.getItem("email");
-document.getElementById("photo").src = localStorage.getItem("photo");
 }
-
 </script>
 
 </head>
