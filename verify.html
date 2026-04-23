@@ -2,9 +2,34 @@
 <html>
 <head>
 <title>Verify Certificate</title>
+
 <style>
-body{font-family:Poppins;text-align:center;background:#111;color:white;padding:20px}
-.box{background:#222;padding:20px;border-radius:10px}
+body{
+font-family:Poppins;
+text-align:center;
+background:#111;
+color:white;
+padding:20px;
+}
+.box{
+background:#222;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+input{
+padding:10px;
+width:80%;
+border-radius:8px;
+border:none;
+margin:10px;
+}
+button{
+padding:10px;
+border:none;
+border-radius:8px;
+background:#00ffcc;
+}
 </style>
 
 <script type="module">
@@ -21,23 +46,26 @@ projectId:"dhannjay-website"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// GET ID FROM URL
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+// 🔥 FUNCTION
+window.verifyNow = async function(id){
 
-window.onload = async function(){
+let result = document.getElementById("result");
 
 if(!id){
-document.getElementById("result").innerText="❌ No ID found";
+result.innerText="❌ Enter Certificate ID";
 return;
 }
+
+result.innerText="Checking...";
+
+try{
 
 const snap = await get(ref(db,"certificates/"+id));
 
 if(snap.exists()){
 let d = snap.val();
 
-document.getElementById("result").innerHTML = `
+result.innerHTML = `
 <div class="box">
 <h2>✅ Certificate Verified</h2>
 <p><b>Name:</b> ${d.name}</p>
@@ -48,7 +76,24 @@ document.getElementById("result").innerHTML = `
 </div>
 `;
 }else{
-document.getElementById("result").innerText="❌ Invalid Certificate";
+result.innerText="❌ Invalid Certificate ID";
+}
+
+}catch(e){
+result.innerText="❌ Error loading data";
+}
+
+}
+
+// 🔥 AUTO VERIFY (QR)
+window.onload = function(){
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+if(id){
+document.getElementById("verifyID").value = id;
+verifyNow(id);
 }
 
 }
@@ -59,7 +104,15 @@ document.getElementById("result").innerText="❌ Invalid Certificate";
 <body>
 
 <h1>🔍 Certificate Verification</h1>
-<div id="result">Checking...</div>
+
+<!-- 🔥 MANUAL INPUT -->
+<input id="verifyID" placeholder="Enter Certificate ID">
+<br>
+<button onclick="verifyNow(document.getElementById('verifyID').value)">
+Verify
+</button>
+
+<p id="result"></p>
 
 </body>
-  </html>
+</html>
