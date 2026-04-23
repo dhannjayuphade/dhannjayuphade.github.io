@@ -96,6 +96,16 @@ document.getElementById("certDate").innerText=today;
 
 let id="QUIZ-"+currentTopic+"-"+Date.now();
 document.getElementById("certID").innerText=id;
+  let verifyURL = "https://dhannjayuphade.github.io/verify.html?id=" + id;
+
+// QR generate
+document.getElementById("qrcode").innerHTML = "";
+
+new QRCode(document.getElementById("qrcode"), {
+  text: verifyURL,
+  width: 100,
+  height: 100
+});
 
 set(ref(db,"certificates/"+id),{
 name:user,
@@ -129,7 +139,7 @@ document.getElementById("certificateBox").style.display="none";
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
