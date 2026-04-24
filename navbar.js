@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <a href="quizhub.html">🧠<span>Quiz</span></a>
     <a href="ai.html">🤖<span>AI</span></a>
     <a href="profile.html">👤<span>Profile</span></a>
-  </div>
+  </div> 
 
   <style>
   .bottom-nav {
