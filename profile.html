@@ -3,247 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Hub Pro</title>
+<title>Profile</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 
 <style>
-body{margin:0;font-family:Poppins;background:#0f172a;color:white;text-align:center}
+body{
+margin:0;
+font-family:Poppins;
+background:#0f172a;
+color:white;
+text-align:center;
+}
 .app{max-width:420px;margin:auto;padding:15px}
-.card{background:#222;padding:10px;margin:10px;border-radius:10px}
-button{padding:10px;margin:5px;border:none;border-radius:10px;background:#00ffcc}
-img{border-radius:50%}
+
+.card{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+padding:15px;
+margin:10px;
+border-radius:15px;
+}
+
+button{
+padding:10px;
+border:none;
+border-radius:10px;
+background:#00ffcc;
+margin:5px;
+}
+
+img{
+border-radius:50%;
+border:3px solid #00ffcc;
+}
 </style>
 
+<!-- Chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- Firebase -->
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, push, onValue, set, get }
+import { getDatabase, ref, onValue }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const app = initializeApp({
-apiKey:"AIzaSy...",
+const firebaseConfig = {
+apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
 authDomain:"dhannjay-website.firebaseapp.com",
 databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
 projectId:"dhannjay-website"
-});
-
-const auth=getAuth(app);
-const provider=new GoogleAuthProvider();
-const db=getDatabase(app);
-
-/* LOGIN */
-window.login=async()=>{
-let res=await signInWithPopup(auth,provider);
-let u=res.user;
-
-localStorage.setItem("user",u.displayName);
-localStorage.setItem("email",u.email);
-localStorage.setItem("photo",u.photoURL);
-
-showHome();
 };
 
-/* AUTO LOGIN */
-onAuthStateChanged(auth,u=>{
-if(u){
-localStorage.setItem("user",u.displayName);
-localStorage.setItem("email",u.email);
-localStorage.setItem("photo",u.photoURL);
-showHome();
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* LOAD PROFILE */
+window.onload = function(){
+
+let user = localStorage.getItem("user");
+let email = localStorage.getItem("email");
+let photo = localStorage.getItem("photo");
+
+if(!user){
+alert("Login first");
+location.href="index.html";
+return;
 }
-});
 
-/* LOGOUT */
-window.logout=()=>{
-signOut(auth);
-localStorage.clear();
-location.reload();
+// show profile
+document.getElementById("name").innerText = user;
+document.getElementById("email").innerText = email;
+document.getElementById("photo").src = photo || "https://via.placeholder.com/100";
+
+loadStats();
+
 };
 
-/* SAVE SCORE */
-window.saveScore=(score)=>{
-push(ref(db,"leaderboard"),{
-name:localStorage.getItem("user"),
-email:localStorage.getItem("email"),
-score:score,
-time:Date.now()
-});
-};
+/* LOAD STATS */
+function loadStats(){
 
-/* CERTIFICATE */
-window.generatePDF=async()=>{
-let user=localStorage.getItem("user");
-let score=localStorage.getItem("score");
-let id="QUIZ-"+Date.now();
+let email = localStorage.getItem("email");
 
-set(ref(db,"certificates/"+id),{
-name:user,
-email:localStorage.getItem("email"),
-score:score,
-date:new Date().toLocaleDateString()
-});
+onValue(ref(db,"leaderboard"), snap => {
 
-let cert=document.getElementById("certificate");
-cert.innerHTML=`<h2>${user}</h2><p>Score: ${score}</p><p>ID:${id}</p>`;
+let data = snap.val();
+if(!data) return;
 
-let canvas=await html2canvas(cert);
-let img=canvas.toDataURL("image/png");
+let total = 0, count = 0, best = 0;
+let scores = [];
+let userTotals = {};
 
-const {jsPDF}=window.jspdf;
-let pdf=new jsPDF();
-pdf.addImage(img,'PNG',10,10,180,100);
-pdf.save("certificate.pdf");
-};
+Object.values(data).forEach(d => {
 
-/* PROFILE DATA */
-window.loadProfile=()=>{
-let email=localStorage.getItem("email");
+// rank calculation
+if(!userTotals[d.email]) userTotals[d.email] = 0;
+userTotals[d.email] += Number(d.score);
 
-onValue(ref(db,"leaderboard"),snap=>{
-let data=snap.val();
-if(!data)return;
+// current user
+if(d.email === email){
 
-let total=0,count=0,best=0;
-let scores=[];
-let totals={};
-
-Object.values(data).forEach(d=>{
-if(!totals[d.email])totals[d.email]=0;
-totals[d.email]+=d.score;
-
-if(d.email===email){
-total+=d.score;
+total += Number(d.score);
 count++;
 scores.push(d.score);
-if(d.score>best)best=d.score;
+
+if(d.score > best) best = d.score;
 }
+
 });
 
-document.getElementById("total").innerText=total;
-document.getElementById("count").innerText=count;
+// UI update
+document.getElementById("totalScore").innerText = total;
+document.getElementById("quizCount").innerText = count;
 
-let sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-let rank=sorted.findIndex(x=>x[0]===email)+1;
-document.getElementById("rank").innerText="#"+rank;
+// rank
+let sorted = Object.entries(userTotals).sort((a,b)=>b[1]-a[1]);
+let rank = sorted.findIndex(u => u[0] === email) + 1;
+document.getElementById("rank").innerText = "#"+rank;
 
+// graph
 drawGraph(scores);
+
+// badges
 loadBadges(total,count,best,rank);
 
 });
-};
+
+}
 
 /* GRAPH */
 function drawGraph(scores){
-new Chart(document.getElementById("chart"),{
+
+const ctx = document.getElementById("chart");
+
+new Chart(ctx,{
 type:"line",
-data:{labels:scores.map((_,i)=>i+1),datasets:[{data:scores}]}
+data:{
+labels:scores.map((_,i)=>"Quiz "+(i+1)),
+datasets:[{
+label:"Score",
+data:scores
+}]
+}
 });
+
 }
 
 /* BADGES */
-function loadBadges(t,c,b,r){
-let box=document.getElementById("badges");
-box.innerHTML="";
-if(c>=1)box.innerHTML+="🟢 Beginner ";
-if(c>=5)box.innerHTML+="🔵 Explorer ";
-if(c>=10)box.innerHTML+="🟣 Master ";
-if(b>=20)box.innerHTML+="🟡 Genius ";
-if(r==1)box.innerHTML+="🔴 Champion ";
+function loadBadges(total,count,best,rank){
+
+let b = document.getElementById("badges");
+b.innerHTML = "";
+
+if(count>=1) b.innerHTML += "🟢 Beginner ";
+if(count>=5) b.innerHTML += "🔵 Explorer ";
+if(count>=10) b.innerHTML += "🟣 Master ";
+if(best>=20) b.innerHTML += "🟡 Genius ";
+if(rank===1) b.innerHTML += "🔴 Champion ";
+
 }
 
-/* NAV */
-window.showHome=()=>{
-hideAll();
-home.style.display="block";
-name.innerText=localStorage.getItem("user");
-};
-
-window.showProfile=()=>{
-hideAll();
-profile.style.display="block";
-photo.src=localStorage.getItem("photo");
-pname.innerText=localStorage.getItem("user");
-pemail.innerText=localStorage.getItem("email");
-loadProfile();
-};
-
-window.showCert=()=>{
-hideAll();
-certPage.style.display="block";
-
-onValue(ref(db,"certificates"),snap=>{
-let data=snap.val();
-list.innerHTML="";
-Object.entries(data||{}).forEach(([id,c])=>{
-if(c.email===localStorage.getItem("email")){
-list.innerHTML+=`<div class="card">
-${c.name}<br>Score:${c.score}<br>
-<button onclick="verify('${id}')">Verify</button>
-</div>`;
-}
-});
-});
-};
-
-window.verify=async(id)=>{
-let snap=await get(ref(db,"certificates/"+id));
-alert(snap.exists()?"Valid Certificate":"Invalid");
-};
-
-function hideAll(){
-login.style.display="none";
-home.style.display="none";
-profile.style.display="none";
-certPage.style.display="none";
-}
 </script>
+
 </head>
 
 <body>
+
 <div class="app">
 
-<div id="login">
-<h2>Login</h2>
-<button onclick="login()">Google Login</button>
+<!-- PROFILE -->
+<div class="card">
+
+<img id="photo" width="90"><br><br>
+
+<h2 id="name"></h2>
+<p id="email"></p>
+
 </div>
 
-<div id="home" style="display:none">
-<h3 id="name"></h3>
-<div class="card" onclick="showProfile()">Profile</div>
-<div class="card" onclick="showCert()">Certificates</div>
-<button onclick="logout()">Logout</button>
+<!-- STATS -->
+<div class="card">
+
+<h3>📊 Stats</h3>
+
+<p>Total Score: <span id="totalScore">0</span></p>
+<p>Quizzes Played: <span id="quizCount">0</span></p>
+<p>🏆 Rank: <span id="rank">-</span></p>
+
 </div>
 
-<div id="profile" style="display:none">
-<img id="photo" width="80">
-<h2 id="pname"></h2>
-<p id="pemail"></p>
+<!-- BADGES -->
+<div class="card">
 
-<p>Total: <span id="total"></span></p>
-<p>Played: <span id="count"></span></p>
-<p>Rank: <span id="rank"></span></p>
-
+<h3>🏅 Badges</h3>
 <div id="badges"></div>
 
+</div>
+
+<!-- GRAPH -->
+<div class="card">
+
+<h3>📈 Score Graph</h3>
 <canvas id="chart"></canvas>
 
-<button onclick="showHome()">Back</button>
 </div>
 
-<div id="certPage" style="display:none">
-<h2>Certificates</h2>
-<div id="list"></div>
-<button onclick="showHome()">Back</button>
+<!-- ACTIONS -->
+<div class="card">
+
+<button onclick="location.href='certificates.html'">
+📜 My Certificates
+</button>
+
+<button onclick="location.href='aiquiz.html'">
+🎯 Play Quiz
+</button>
+
 </div>
 
-<div id="certificate" style="display:none"></div>
-
 </div>
+
 </body>
-  </html>
+</html>
