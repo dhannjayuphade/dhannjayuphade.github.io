@@ -1,371 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
+<title>Milk Dairy Ultimate PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Hub Pro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{margin:0;font-family:Poppins;background:linear-gradient(135deg,#1f1c2c,#928dab);color:white;text-align:center}
-.app{max-width:420px;margin:auto;padding:15px}
-button{padding:10px;margin:5px;border:none;border-radius:10px;background:#00ffcc}
-.card{background:#222;padding:10px;margin:10px;border-radius:10px;cursor:pointer}
-</style>
-
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, push, onValue, set }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-const firebaseConfig = {
-apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-authDomain:"dhannjay-website.firebaseapp.com",
-databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
-projectId:"dhannjay-website"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const db = getDatabase(app);
-
-/* LOGIN */
-window.googleLogin = async function(){
-const result = await signInWithPopup(auth, provider);
-localStorage.setItem("user", result.user.displayName);
-showHome();
-};
-
-onAuthStateChanged(auth,(user)=>{
-if(user){
-localStorage.setItem("user",user.displayName);
-showHome();
+body{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  text-align:center;
+  font-family:Arial;
 }
-});
 
-/* LOGOUT */
-window.logout=function(){
-signOut(auth);
-localStorage.clear();
-location.reload();
-};
-
-/* SCORE */
-window.saveScore=function(score){
-push(ref(db,"leaderboard"),{
-name:localStorage.getItem("user"),
-score:score
-});
-};
-
-/* LEADERBOARD FIX */
-window.loadLeaderboard=function(){
-const list=document.getElementById("leaderList");
-
-onValue(ref(db,"leaderboard"),snap=>{
-let data=snap.val();
-list.innerHTML="";
-if(!data)return;
-
-let arr=Object.values(data);
-arr.sort((a,b)=>b.score-a.score);
-
-arr.slice(0,10).forEach((p,i)=>{
-list.innerHTML+=`<li>#${i+1} ${p.name} - ${p.score}</li>`;
-});
-});
-};
-
-/* CERTIFICATE FIX */
-window.generatePDF=async function(){
-
-document.getElementById("certificateBox").style.display="block";
-
-let user=localStorage.getItem("user");
-let score=localStorage.getItem("score");
-
-document.getElementById("certName").innerText=user;
-
-let today=new Date().toLocaleDateString();
-document.getElementById("certDate").innerText=today;
-
-let id="QUIZ-"+currentTopic+"-"+Date.now();
-document.getElementById("certID").innerText=id;
-
-set(ref(db,"certificates/"+id),{
-name:user,
-score:score,
-topic:currentTopic,
-date:today
-});
-
-let title=currentTopic.toUpperCase()+" QUIZ CERTIFICATE";
-let text=`Score ${score} in ${currentTopic.toUpperCase()}`;
-
-document.getElementById("quizTitle").innerText=title;
-document.getElementById("certText").innerText=text;
-
-await new Promise(r=>setTimeout(r,500));
-
-const cert=document.getElementById("certificate");
-const canvas=await html2canvas(cert);
-const img=canvas.toDataURL("image/png");
-
-const {jsPDF}=window.jspdf;
-const pdf=new jsPDF("landscape");
-
-pdf.addImage(img,'PNG',10,10,270,180);
-pdf.save(title+".pdf");
-
-document.getElementById("certificateBox").style.display="none";
-};
-
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+.box{background:#1e293b;margin:10px;padding:12px;border-radius:10px;}
+.card{background:#334155;margin:10px;padding:10px;border-radius:10px;}
+button{padding:8px;margin:5px;border:none;border-radius:6px;}
+input,select{padding:8px;margin:5px;border-radius:6px;border:none;width:90%;}
+.green{background:#22c55e;color:white;}
+.blue{background:#3b82f6;color:white;}
+.red{background:#ef4444;color:white;}
+</style>
 
 </head>
 
 <body>
 
-<div class="app">
+<h2>🥛 Milk Dairy Ultimate PRO</h2>
 
-<div id="loginBox">
-<h2>Quiz Hub Pro</h2>
-<button onclick="googleLogin()">Login with Google</button>
+<button id="installBtn" class="blue" style="display:none;width:90%">📱 Install App</button>
+
+<div class="box">
+<h3>Customer</h3>
+<input id="cname" placeholder="Name">
+<input id="cmobile" placeholder="Mobile">
+<input id="cplace" placeholder="Place">
+<button class="green" onclick="addCustomer()">Add</button>
 </div>
 
-<div id="homeBox" style="display:none;">
-<h3>Hello <span id="userName"></span></h3>
-
-<div class="card" onclick="startQuiz('gk')">GK Quiz</div>
-<div class="card" onclick="startQuiz('science')">Science Quiz</div>
-<div class="card" onclick="startQuiz('history')">History Quiz</div>
-
-<div class="card" onclick="loadLeaderboard()">Leaderboard</div>
-
-<button onclick="logout()">Logout</button>
+<div class="box">
+<h3>Milk Entry</h3>
+<select id="customerSelect"></select>
+<input id="milk" placeholder="Milk (L)">
+<input id="rate" value="40">
+<input id="date" type="date">
+<button class="green" onclick="saveMilk()">Save</button>
 </div>
 
-<div id="quizBox" style="display:none;">
-<h3 id="timer">5:00</h3>
-<h2 id="question"></h2>
-<div id="options"></div>
-</div>
+<div id="output"></div>
 
-<div id="resultBox" style="display:none;">
-<h2 id="scoreText"></h2>
+<script type="module">
 
-<button onclick="generatePDF()">Download Certificate</button>
-<button onclick="goHome()">Home</button>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove, update } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-</div>
-
-<div id="certificateBox" style="display:none;">
-<div id="certificate" style="width:800px;padding:30px;background:white;color:black;text-align:center;border:10px solid orange;border-radius:15px;font-family:Georgia;">
-<h2>Certificate of Participation</h2>
-<h3 id="quizTitle"></h3>
-<p>Presented to</p>
-<h1 id="certName"></h1>
-<p id="certText"></p>
-<p>Date: <span id="certDate"></span></p>
-<p>ID: <span id="certID"></span></p>
-<hr>
-<h4 style="color:orange;">Quiz Hub Pro</h4>
-  <hr>
-
-<h4 style="color:orange;">Quiz Hub Pro</h4>
-
-<p>🌐 Website:
-<a href="https://dhannjayuphade.github.io" target="_blank">
-dhannjayuphade.github.io
-</a>
-</p>
-
-<p>📧 Email:
-<a href="mailto:dhannjayuphade5@gmail.com">
-dhannjayuphade5@gmail.com
-</a>
-</p>
-
-<p>📸 Instagram:
-<a href="https://www.instagram.com/dhannjayuphade" target="_blank">
-Follow @dhannjayuphade
-</a>
-</p>
-</div>
-</div>
-
-<ul id="leaderList"></ul>
-
-</div>
-
-<script>
-
-/* GAME CORE */
-let current=[],i=0,score=0;
-let currentTopic="";
-
-function showHome(){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("homeBox").style.display="block";
-document.getElementById("quizBox").style.display="none";
-document.getElementById("resultBox").style.display="none";
-document.getElementById("userName").innerText=localStorage.getItem("user");
-}
-
-/* 75 QUESTIONS FULL SET */
-let questions={
-gk:[
-{q:"Capital of India?",o:["Mumbai","Delhi","Pune","Nagpur"],a:"Delhi"},
-{q:"National animal?",o:["Lion","Tiger","Dog","Cat"],a:"Tiger"},
-{q:"Currency of India?",o:["Dollar","Rupee","Yen","Euro"],a:"Rupee"},
-{q:"National bird?",o:["Crow","Peacock","Parrot","Sparrow"],a:"Peacock"},
-{q:"Largest ocean?",o:["Pacific","Atlantic","Indian","Arctic"],a:"Pacific"},
-{q:"Independence year?",o:["1947","1950","1930","1960"],a:"1947"},
-{q:"Largest country?",o:["India","USA","Russia","China"],a:"Russia"},
-{q:"Smallest continent?",o:["Asia","Europe","Australia","Africa"],a:"Australia"},
-{q:"Mount Everest located in?",o:["India","Nepal","China","USA"],a:"Nepal"},
-{q:"National flower?",o:["Rose","Lotus","Lily","Sunflower"],a:"Lotus"},
-{q:"National fruit?",o:["Apple","Mango","Banana","Orange"],a:"Mango"},
-{q:"National river?",o:["Ganga","Yamuna","Krishna","Godavari"],a:"Ganga"},
-{q:"Fastest animal?",o:["Tiger","Cheetah","Lion","Dog"],a:"Cheetah"},
-{q:"National game India?",o:["Hockey","Cricket","Football","Kabaddi"],a:"Hockey"},
-{q:"National song?",o:["Vande Mataram","Jana Gana Mana","Saare Jahan","None"],a:"Vande Mataram"},
-{q:"Largest desert?",o:["Sahara","Thar","Gobi","Kalahari"],a:"Sahara"},
-{q:"Fastest train India?",o:["Vande Bharat","Rajdhani","Duronto","Metro"],a:"Vande Bharat"},
-{q:"Which is planet?",o:["Mars","Delhi","River","Tree"],a:"Mars"},
-{q:"Number of states in India?",o:["28","29","30","31"],a:"28"},
-{q:"Which is festival?",o:["Diwali","Monday","Table","Chair"],a:"Diwali"},
-{q:"Which is city?",o:["Mumbai","Asia","Ocean","River"],a:"Mumbai"},
-{q:"Which is continent?",o:["Asia","India","Delhi","Sea"],a:"Asia"},
-{q:"Which is river?",o:["Ganga","Hill","Road","Tree"],a:"Ganga"},
-{q:"Which is ocean?",o:["Pacific","Lake","River","Hill"],a:"Pacific"},
-{q:"Indian flag colors?",o:["3","2","4","5"],a:"3"}
-],
-
-science:[
-{q:"Water formula?",o:["CO2","H2O","O2","NaCl"],a:"H2O"},
-{q:"Sun is?",o:["Planet","Star","Moon","Rock"],a:"Star"},
-{q:"Gas for breathing?",o:["Oxygen","CO2","Hydrogen","Nitrogen"],a:"Oxygen"},
-{q:"Boiling point of water?",o:["100°C","50°C","0°C","200°C"],a:"100°C"},
-{q:"Earth shape?",o:["Round","Flat","Square","Triangle"],a:"Round"},
-{q:"Human heart chambers?",o:["2","3","4","5"],a:"4"},
-{q:"Largest organ?",o:["Skin","Heart","Brain","Liver"],a:"Skin"},
-{q:"Energy unit?",o:["Joule","Watt","Volt","Amp"],a:"Joule"},
-{q:"Force unit?",o:["Newton","Joule","Volt","Watt"],a:"Newton"},
-{q:"Gravity discovered by?",o:["Newton","Einstein","Tesla","Edison"],a:"Newton"},
-{q:"Acid taste?",o:["Sour","Sweet","Bitter","Salty"],a:"Sour"},
-{q:"Liquid metal?",o:["Mercury","Iron","Gold","Silver"],a:"Mercury"},
-{q:"Brain controls?",o:["Nervous","Digestive","Respiratory","Circulatory"],a:"Nervous"},
-{q:"Solar system center?",o:["Sun","Earth","Moon","Mars"],a:"Sun"},
-{q:"Green pigment?",o:["Chlorophyll","Melanin","Hemoglobin","None"],a:"Chlorophyll"},
-{q:"Air mainly contains?",o:["Nitrogen","Oxygen","CO2","Hydrogen"],a:"Nitrogen"},
-{q:"Eye function?",o:["Seeing","Hearing","Touch","Smell"],a:"Seeing"},
-{q:"Sound travels fastest in?",o:["Solid","Air","Water","Vacuum"],a:"Solid"},
-{q:"DNA full form?",o:["Deoxyribonucleic Acid","Data Network","None","Digital Net"],a:"Deoxyribonucleic Acid"},
-{q:"Photosynthesis produces?",o:["Oxygen","CO2","Water","Nitrogen"],a:"Oxygen"},
-{q:"Heart pumps?",o:["Blood","Air","Water","Food"],a:"Blood"},
-{q:"Speed of light?",o:["Fastest","Slow","Medium","Zero"],a:"Fastest"},
-{q:"Which is gas?",o:["Oxygen","Iron","Stone","Water"],a:"Oxygen"},
-{q:"Which is solid?",o:["Iron","Air","Gas","Water"],a:"Iron"},
-{q:"Which is liquid?",o:["Water","Gas","Stone","Air"],a:"Water"}
-],
-
-history:[
-{q:"First PM India?",o:["Nehru","Gandhi","Patel","Modi"],a:"Nehru"},
-{q:"Taj Mahal built by?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
-{q:"1857 revolt?",o:["War","Game","Festival","None"],a:"War"},
-{q:"Father of Nation?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
-{q:"Quit India year?",o:["1942","1947","1930","1920"],a:"1942"},
-{q:"Ashoka empire?",o:["Maurya","Gupta","Mughal","Delhi"],a:"Maurya"},
-{q:"Red Fort built by?",o:["Shah Jahan","Akbar","Babur","Ashoka"],a:"Shah Jahan"},
-{q:"First President?",o:["Rajendra Prasad","Nehru","Gandhi","Patel"],a:"Rajendra Prasad"},
-{q:"British left India?",o:["1947","1950","1930","1920"],a:"1947"},
-{q:"Ramayana writer?",o:["Valmiki","Vyasa","Kalidas","None"],a:"Valmiki"},
-{q:"Mahabharata writer?",o:["Vyasa","Valmiki","Kalidas","None"],a:"Vyasa"},
-{q:"Jallianwala Bagh year?",o:["1919","1920","1930","1940"],a:"1919"},
-{q:"Mughal founder?",o:["Babur","Akbar","Shah","Aurang"],a:"Babur"},
-{q:"Shivaji was?",o:["King","Scientist","Writer","None"],a:"King"},
-{q:"Panipat battles?",o:["3","2","1","4"],a:"3"},
-{q:"Qutub Minar builder?",o:["Aibak","Akbar","Ashoka","None"],a:"Aibak"},
-{q:"Golden age?",o:["Gupta","Mughal","British","None"],a:"Gupta"},
-{q:"Salt March led by?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"},
-{q:"Akbar was?",o:["King","Writer","Scientist","None"],a:"King"},
-{q:"Babur came from?",o:["Central Asia","India","China","USA"],a:"Central Asia"},
-{q:"First war independence?",o:["1857","1947","1930","1920"],a:"1857"},
-{q:"Last Mughal?",o:["Bahadur Shah Zafar","Akbar","Babur","Aurangzeb"],a:"Bahadur Shah Zafar"},
-{q:"Delhi Sultanate founder?",o:["Aibak","Akbar","Babur","Ashoka"],a:"Aibak"},
-{q:"Who built Taj Mahal?",o:["Shah Jahan","Akbar","Babur","Aurangzeb"],a:"Shah Jahan"},
-{q:"Who led Dandi March?",o:["Gandhi","Nehru","Patel","Bose"],a:"Gandhi"}
-]
+// 🔥 PASTE YOUR CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_ID"
 };
 
-/* QUIZ */
-function startQuiz(topic){
-currentTopic=topic;
-current=questions[topic];
-i=0;score=0;
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-document.getElementById("homeBox").style.display="none";
-document.getElementById("quizBox").style.display="block";
+let customers = {};
+let milkData = {};
 
-showQ();
-timerStart();
-}
-
-function showQ(){
-if(i>=current.length){showResult();return;}
-
-document.getElementById("question").innerText=current[i].q;
-let opt=document.getElementById("options");
-opt.innerHTML="";
-
-current[i].o.forEach(v=>{
-let b=document.createElement("button");
-b.innerText=v;
-b.onclick=()=>check(v);
-opt.appendChild(b);
+// LOAD DATA
+onValue(ref(db,"customers"), snap=>{
+  customers = snap.val() || {};
+  loadCustomers();
 });
+
+onValue(ref(db,"milkData"), snap=>{
+  milkData = snap.val() || {};
+});
+
+// INIT
+window.onload = () => {
+  loadCustomers();
+  let today = new Date().toISOString().split("T")[0];
+  date.value = today;
+};
+
+// LOAD
+function loadCustomers(){
+  customerSelect.innerHTML="<option>Select Customer</option>";
+
+  Object.keys(customers).forEach(id=>{
+    customerSelect.innerHTML+=`<option value="${id}">${customers[id].name}</option>`;
+  });
+
+  showCustomers();
 }
 
-function check(ans){
-if(ans===current[i].a)score++;
-i++;
-showQ();
+// SHOW
+function showCustomers(){
+  let html="<h3>Customers</h3>";
+
+  Object.keys(customers).forEach(id=>{
+    let c=customers[id];
+
+    html+=`
+    <div class="card" onclick="openCustomer('${id}')">
+      <b>${c.name}</b><br>
+      📱 ${c.mobile}<br>
+      📍 ${c.place}
+    </div>`;
+  });
+
+  output.innerHTML=html;
 }
 
-function timerStart(){
-let t=300;
-let x=setInterval(()=>{
-t--;
-let m=Math.floor(t/60);
-let s=t%60;
-document.getElementById("timer").innerText=`${m}:${s<10?"0"+s:s}`;
-if(t<=0){clearInterval(x);showResult();}
-},1000);
-}
-function goHome(){
-  document.getElementById("resultBox").style.display="none";
-  document.getElementById("homeBox").style.display="block";
-}
-function showResult(){
-document.getElementById("quizBox").style.display="none";
-document.getElementById("resultBox").style.display="block";
-document.getElementById("scoreText").innerText="Score: "+score;
+// ADD
+window.addCustomer=()=>{
+  if(!cname.value||!cmobile.value) return alert("Fill all");
 
-localStorage.setItem("score",score);
-saveScore(score);
-loadLeaderboard();
-}
+  push(ref(db,"customers"),{
+    name:cname.value,
+    mobile:cmobile.value,
+    place:cplace.value
+  });
+
+  cname.value=""; cmobile.value=""; cplace.value="";
+};
+
+// SAVE MILK
+window.saveMilk=()=>{
+  let id=customerSelect.value;
+  if(!id) return alert("Select customer");
+
+  let selectedDate=date.value;
+
+  push(ref(db,"milkData"),{
+    customerId:id,
+    milk:parseFloat(milk.value),
+    rate:parseFloat(rate.value),
+    total:milk.value*rate.value,
+    date:new Date(selectedDate).toISOString(),
+    status:"UNPAID"
+  });
+
+  alert("Saved");
+};
+
+// OPEN
+window.openCustomer=(id)=>{
+  let c=customers[id];
+
+  let data=Object.entries(milkData)
+    .filter(([k,v])=>v.customerId==id)
+    .sort((a,b)=>new Date(b[1].date)-new Date(a[1].date));
+
+  let total=0,paid=0,unpaid=0;
+
+  let html=`
+  <div class="box">
+    <h3>${c.name}</h3>
+    📱 ${c.mobile}<br>
+    📍 ${c.place}<br>
+
+    <button class="blue" onclick="sendWhatsApp('${id}')">WhatsApp</button>
+    <button class="blue" onclick="generateMonthlyPDF('${id}')">Monthly PDF</button>
+    <button class="red" onclick="deleteCustomer('${id}')">Delete</button>
+  </div>
+
+  <h3>History</h3>
+  `;
+
+  data.forEach(([key,r])=>{
+    total+=r.total;
+    if(r.status==="PAID") paid+=r.total;
+    else unpaid+=r.total;
+
+    html+=`
+    <div class="card">
+      📅 ${new Date(r.date).toLocaleDateString()}<br>
+      🥛 ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
+      Status: ${r.status}<br>
+
+      <button class="blue" onclick="togglePaid('${key}')">Toggle</button>
+      <button class="blue" onclick="editDate('${key}')">Edit Date</button>
+      <button class="red" onclick="deleteEntry('${key}')">Delete</button>
+    </div>`;
+  });
+
+  html+=`
+  <h3>Total ₹${total}</h3>
+  <p style="color:lightgreen">Paid ₹${paid}</p>
+  <p style="color:red">Unpaid ₹${unpaid}</p>
+  `;
+
+  output.innerHTML=html;
+};
+
+// TOGGLE
+window.togglePaid=(id)=>{
+  let r=milkData[id];
+  update(ref(db,"milkData/"+id),{
+    status:r.status==="PAID"?"UNPAID":"PAID"
+  });
+};
+
+// EDIT DATE
+window.editDate=(id)=>{
+  let d=prompt("Enter date YYYY-MM-DD");
+  if(!d) return;
+
+  update(ref(db,"milkData/"+id),{
+    date:new Date(d).toISOString()
+  });
+};
+
+// DELETE ENTRY
+window.deleteEntry=(id)=>{
+  remove(ref(db,"milkData/"+id));
+};
+
+// DELETE CUSTOMER
+window.deleteCustomer=(id)=>{
+  if(!confirm("Delete?")) return;
+  remove(ref(db,"customers/"+id));
+};
+
+// WHATSAPP
+window.sendWhatsApp=(id)=>{
+  let c=customers[id];
+  let data=Object.values(milkData).filter(x=>x.customerId==id);
+
+  let total=0;
+  let msg=`Milk Bill\n${c.name}\n\n`;
+
+  data.forEach(r=>{
+    total+=r.total;
+    msg+=`${new Date(r.date).toLocaleDateString()} ₹${r.total}\n`;
+  });
+
+  msg+=`\nTotal ₹${total}`;
+
+  window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
+};
+
+// MONTHLY PDF
+window.generateMonthlyPDF=(id)=>{
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+
+  let c=customers[id];
+  let data=Object.values(milkData).filter(x=>x.customerId==id);
+
+  let month=prompt("Enter month (1-12)");
+  let year=new Date().getFullYear();
+
+  let y=40,total=0;
+
+  doc.text("Milk Dairy",20,15);
+  doc.text("Monthly Bill",20,25);
+  doc.text("Customer: "+c.name,20,35);
+
+  data.forEach(r=>{
+    let d=new Date(r.date);
+
+    if((d.getMonth()+1)==month && d.getFullYear()==year){
+      doc.text(d.toLocaleDateString(),20,y);
+      doc.text("₹"+r.total,150,y);
+      total+=r.total;
+      y+=8;
+    }
+  });
+
+  doc.text("Total ₹"+total,20,y+10);
+  doc.save(c.name+"_Monthly.pdf");
+};
+
+// INSTALL APP
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  installBtn.style.display="block";
+});
+
+installBtn.onclick=async ()=>{
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+};
 
 </script>
 
 </body>
-</html>
+  </html>
