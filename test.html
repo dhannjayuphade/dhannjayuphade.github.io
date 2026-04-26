@@ -1,299 +1,193 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Milk Dairy Ultimate PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="manifest" href="manifest.json">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>Profile</title>
 
 <style>
-body{
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:white;
-  text-align:center;
-  font-family:Arial;
+body{margin:0;font-family:Arial;background:black;color:white;}
+.header{text-align:center;padding:15px;font-size:20px;border-bottom:1px solid #333;}
+.container{text-align:center;padding:20px;}
+
+img{
+width:100px;height:100px;border-radius:50%;
+object-fit:cover;border:2px solid #ff0066;
 }
 
-.box{background:#1e293b;margin:10px;padding:12px;border-radius:10px;}
-.card{background:#334155;margin:10px;padding:10px;border-radius:10px;}
-button{padding:8px;margin:5px;border:none;border-radius:6px;}
-input,select{padding:8px;margin:5px;border-radius:6px;border:none;width:90%;}
-.green{background:#22c55e;color:white;}
-.blue{background:#3b82f6;color:white;}
-.red{background:#ef4444;color:white;}
-</style>
+.name{font-size:18px;margin-top:10px;}
+.bio{opacity:0.7;font-size:14px;}
 
+input,textarea{
+width:90%;margin:8px;padding:10px;
+border:none;border-radius:10px;background:#111;color:white;
+}
+
+button{
+width:90%;padding:10px;border:none;
+border-radius:10px;background:#ff0066;color:white;
+margin-top:10px;font-size:16px;
+}
+</style>
 </head>
 
 <body>
 
-<h2>🥛 Milk Dairy Ultimate PRO</h2>
+<div class="header">🔥 My Profile</div>
 
-<button id="installBtn" class="blue" style="display:none;width:90%">📱 Install App</button>
+<div class="container">
 
-<div class="box">
-<h3>Customer</h3>
-<input id="cname" placeholder="Name">
-<input id="cmobile" placeholder="Mobile">
-<input id="cplace" placeholder="Place">
-<button class="green" onclick="addCustomer()">Add</button>
+<img id="photo" src="https://via.placeholder.com/100">
+
+<div class="name" id="showName">Loading...</div>
+<div id="email"></div>
+<div class="bio" id="showBio"></div>
+
+<input id="name" placeholder="Name">
+<textarea id="bio" placeholder="Bio"></textarea>
+<input id="phone" placeholder="Phone">
+
+<input type="file" id="file">
+
+<button onclick="uploadPhoto()">Upload Photo</button>
+<button onclick="saveProfile()">Save Profile</button>
+<button onclick="logout()">Logout</button>
+
 </div>
-
-<div class="box">
-<h3>Milk Entry</h3>
-<select id="customerSelect"></select>
-<input id="milk" placeholder="Milk (L)">
-<input id="rate" value="40">
-<input id="date" type="date">
-<button class="green" onclick="saveMilk()">Save</button>
-</div>
-
-<div id="output"></div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-// 🔥 PASTE YOUR CONFIG
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut,
+  updateProfile 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// 🔥 YOUR CONFIG
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_ID"
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-let customers = {};
-let milkData = {};
+let currentUser;
 
-// LOAD DATA
-onValue(ref(db,"customers"), snap=>{
-  customers = snap.val() || {};
-  loadCustomers();
-});
+// 🔥 LOAD USER
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    currentUser = user;
 
-onValue(ref(db,"milkData"), snap=>{
-  milkData = snap.val() || {};
-});
+    // Auth data
+    email.innerText = user.email;
+    showName.innerText = user.displayName || "No Name";
+    photo.src = user.photoURL || "https://via.placeholder.com/100";
 
-// INIT
-window.onload = () => {
-  loadCustomers();
-  let today = new Date().toISOString().split("T")[0];
-  date.value = today;
-};
+    // Firestore data
+    const refDoc = doc(db,"users",user.uid);
+    const snap = await getDoc(refDoc);
 
-// LOAD
-function loadCustomers(){
-  customerSelect.innerHTML="<option>Select Customer</option>";
+    if(snap.exists()){
+      const data = snap.data();
 
-  Object.keys(customers).forEach(id=>{
-    customerSelect.innerHTML+=`<option value="${id}">${customers[id].name}</option>`;
-  });
+      showBio.innerText = data.bio || "";
 
-  showCustomers();
-}
-
-// SHOW
-function showCustomers(){
-  let html="<h3>Customers</h3>";
-
-  Object.keys(customers).forEach(id=>{
-    let c=customers[id];
-
-    html+=`
-    <div class="card" onclick="openCustomer('${id}')">
-      <b>${c.name}</b><br>
-      📱 ${c.mobile}<br>
-      📍 ${c.place}
-    </div>`;
-  });
-
-  output.innerHTML=html;
-}
-
-// ADD
-window.addCustomer=()=>{
-  if(!cname.value||!cmobile.value) return alert("Fill all");
-
-  push(ref(db,"customers"),{
-    name:cname.value,
-    mobile:cmobile.value,
-    place:cplace.value
-  });
-
-  cname.value=""; cmobile.value=""; cplace.value="";
-};
-
-// SAVE MILK
-window.saveMilk=()=>{
-  let id=customerSelect.value;
-  if(!id) return alert("Select customer");
-
-  let selectedDate=date.value;
-
-  push(ref(db,"milkData"),{
-    customerId:id,
-    milk:parseFloat(milk.value),
-    rate:parseFloat(rate.value),
-    total:milk.value*rate.value,
-    date:new Date(selectedDate).toISOString(),
-    status:"UNPAID"
-  });
-
-  alert("Saved");
-};
-
-// OPEN
-window.openCustomer=(id)=>{
-  let c=customers[id];
-
-  let data=Object.entries(milkData)
-    .filter(([k,v])=>v.customerId==id)
-    .sort((a,b)=>new Date(b[1].date)-new Date(a[1].date));
-
-  let total=0,paid=0,unpaid=0;
-
-  let html=`
-  <div class="box">
-    <h3>${c.name}</h3>
-    📱 ${c.mobile}<br>
-    📍 ${c.place}<br>
-
-    <button class="blue" onclick="sendWhatsApp('${id}')">WhatsApp</button>
-    <button class="blue" onclick="generateMonthlyPDF('${id}')">Monthly PDF</button>
-    <button class="red" onclick="deleteCustomer('${id}')">Delete</button>
-  </div>
-
-  <h3>History</h3>
-  `;
-
-  data.forEach(([key,r])=>{
-    total+=r.total;
-    if(r.status==="PAID") paid+=r.total;
-    else unpaid+=r.total;
-
-    html+=`
-    <div class="card">
-      📅 ${new Date(r.date).toLocaleDateString()}<br>
-      🥛 ${r.milk}L × ₹${r.rate} = ₹${r.total}<br>
-      Status: ${r.status}<br>
-
-      <button class="blue" onclick="togglePaid('${key}')">Toggle</button>
-      <button class="blue" onclick="editDate('${key}')">Edit Date</button>
-      <button class="red" onclick="deleteEntry('${key}')">Delete</button>
-    </div>`;
-  });
-
-  html+=`
-  <h3>Total ₹${total}</h3>
-  <p style="color:lightgreen">Paid ₹${paid}</p>
-  <p style="color:red">Unpaid ₹${unpaid}</p>
-  `;
-
-  output.innerHTML=html;
-};
-
-// TOGGLE
-window.togglePaid=(id)=>{
-  let r=milkData[id];
-  update(ref(db,"milkData/"+id),{
-    status:r.status==="PAID"?"UNPAID":"PAID"
-  });
-};
-
-// EDIT DATE
-window.editDate=(id)=>{
-  let d=prompt("Enter date YYYY-MM-DD");
-  if(!d) return;
-
-  update(ref(db,"milkData/"+id),{
-    date:new Date(d).toISOString()
-  });
-};
-
-// DELETE ENTRY
-window.deleteEntry=(id)=>{
-  remove(ref(db,"milkData/"+id));
-};
-
-// DELETE CUSTOMER
-window.deleteCustomer=(id)=>{
-  if(!confirm("Delete?")) return;
-  remove(ref(db,"customers/"+id));
-};
-
-// WHATSAPP
-window.sendWhatsApp=(id)=>{
-  let c=customers[id];
-  let data=Object.values(milkData).filter(x=>x.customerId==id);
-
-  let total=0;
-  let msg=`Milk Bill\n${c.name}\n\n`;
-
-  data.forEach(r=>{
-    total+=r.total;
-    msg+=`${new Date(r.date).toLocaleDateString()} ₹${r.total}\n`;
-  });
-
-  msg+=`\nTotal ₹${total}`;
-
-  window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(msg)}`);
-};
-
-// MONTHLY PDF
-window.generateMonthlyPDF=(id)=>{
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF();
-
-  let c=customers[id];
-  let data=Object.values(milkData).filter(x=>x.customerId==id);
-
-  let month=prompt("Enter month (1-12)");
-  let year=new Date().getFullYear();
-
-  let y=40,total=0;
-
-  doc.text("Milk Dairy",20,15);
-  doc.text("Monthly Bill",20,25);
-  doc.text("Customer: "+c.name,20,35);
-
-  data.forEach(r=>{
-    let d=new Date(r.date);
-
-    if((d.getMonth()+1)==month && d.getFullYear()==year){
-      doc.text(d.toLocaleDateString(),20,y);
-      doc.text("₹"+r.total,150,y);
-      total+=r.total;
-      y+=8;
+      name.value = data.name || user.displayName || "";
+      bio.value = data.bio || "";
+      phone.value = data.phone || "";
     }
-  });
 
-  doc.text("Total ₹"+total,20,y+10);
-  doc.save(c.name+"_Monthly.pdf");
-};
-
-// INSTALL APP
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt",(e)=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  installBtn.style.display="block";
+  } else {
+    window.location.href="index.html";
+  }
 });
 
-installBtn.onclick=async ()=>{
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-};
+// 🔥 SAVE PROFILE
+window.saveProfile = async function(){
+
+  const nameVal = name.value;
+  const bioVal = bio.value;
+  const phoneVal = phone.value;
+
+  if(!nameVal){
+    alert("Name required ❌");
+    return;
+  }
+
+  // 🔥 Update Auth
+  await updateProfile(currentUser,{
+    displayName: nameVal,
+    photoURL: currentUser.photoURL || photo.src
+  });
+
+  // 🔥 Save Firestore
+  await setDoc(doc(db,"users",currentUser.uid),{
+    name:nameVal,
+    bio:bioVal,
+    phone:phoneVal
+  });
+
+  showName.innerText = nameVal;
+  showBio.innerText = bioVal;
+
+  alert("Profile updated ✅");
+}
+
+// 🔥 UPLOAD PHOTO
+window.uploadPhoto = async function(){
+
+  const file = document.getElementById("file").files[0];
+
+  if(!file){
+    alert("File select करा ❌");
+    return;
+  }
+
+  const storageRef = ref(storage,"profile/"+currentUser.uid);
+
+  await uploadBytes(storageRef,file);
+
+  const url = await getDownloadURL(storageRef);
+
+  // 🔥 Update Auth photo
+  await updateProfile(currentUser,{
+    photoURL: url
+  });
+
+  photo.src = url;
+
+  alert("Photo updated ✅");
+}
+
+// 🔥 LOGOUT
+window.logout = function(){
+  signOut(auth);
+  window.location.href="index.html";
+}
 
 </script>
 
 </body>
-  </html>
+</html>
