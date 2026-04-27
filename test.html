@@ -5,189 +5,224 @@
 <title>Profile</title>
 
 <style>
-body{margin:0;font-family:Arial;background:black;color:white;}
-.header{text-align:center;padding:15px;font-size:20px;border-bottom:1px solid #333;}
-.container{text-align:center;padding:20px;}
-
-img{
-width:100px;height:100px;border-radius:50%;
-object-fit:cover;border:2px solid #ff0066;
+body{
+margin:0;
+font-family:sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
-.name{font-size:18px;margin-top:10px;}
-.bio{opacity:0.7;font-size:14px;}
+.app{max-width:420px;margin:auto;padding:10px}
 
-input,textarea{
-width:90%;margin:8px;padding:10px;
-border:none;border-radius:10px;background:#111;color:white;
+.card{
+background:#1e293b;
+margin:10px;
+padding:15px;
+border-radius:12px;
+}
+
+img{
+border-radius:50%;
+border:3px solid #00ffcc;
 }
 
 button{
-width:90%;padding:10px;border:none;
-border-radius:10px;background:#ff0066;color:white;
-margin-top:10px;font-size:16px;
+padding:10px;
+margin:5px;
+border:none;
+border-radius:8px;
+background:#00ffcc;
 }
+
+h2{margin:5px}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
 
-<div class="header">🔥 My Profile</div>
+<div class="app">
 
-<div class="container">
+<!-- LOGIN -->
+<div class="card" id="loginBox">
+<h3>🔐 Login Required</h3>
+<button onclick="login()">Login with Google</button>
+</div>
 
-<img id="photo" src="https://via.placeholder.com/100">
+<!-- PROFILE -->
+<div id="profileBox" style="display:none;">
 
-<div class="name" id="showName">Loading...</div>
-<div id="email"></div>
-<div class="bio" id="showBio"></div>
+<div class="card">
+<img id="photo" width="90"><br><br>
+<h2 id="name"></h2>
+<p id="email"></p>
+<p id="verifyStatus"></p>
+</div>
 
-<input id="name" placeholder="Name">
-<textarea id="bio" placeholder="Bio"></textarea>
-<input id="phone" placeholder="Phone">
+<div class="card">
+<p>Total Score: <span id="total">0</span></p>
+<p>Quizzes Played: <span id="count">0</span></p>
+<p>🏆 Rank: <span id="rank">-</span></p>
+</div>
 
-<input type="file" id="file">
+<div class="card">
+<h3>🏅 Badges</h3>
+<div id="badges"></div>
+</div>
 
-<button onclick="uploadPhoto()">Upload Photo</button>
-<button onclick="saveProfile()">Save Profile</button>
-<button onclick="logout()">Logout</button>
+<div class="card">
+<h3>📈 Graph</h3>
+<canvas id="chart"></canvas>
+</div>
+
+<div class="card">
+<button onclick="location.href='aiquiz.html'">🎯 Play Quiz</button>
+<button onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
+<button onclick="logout()">🚪 Logout</button>
+<button onclick="switchAccount()">🔄 Switch Account</button>
+</div>
+
+</div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, onValue }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signOut,
-  updateProfile 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import { 
-  getStorage, 
-  ref, 
-  uploadBytes, 
-  getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-// 🔥 YOUR CONFIG
 const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  projectId: "dhannjay-website",
-  storageBucket: "dhannjay-website.firebasestorage.app",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
+apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+authDomain:"dhannjay-website.firebaseapp.com",
+databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
+projectId:"dhannjay-website"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const db = getDatabase(app);
 
-let currentUser;
+const provider = new GoogleAuthProvider();
 
-// 🔥 LOAD USER
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
-    currentUser = user;
+let chart;
 
-    // Auth data
-    email.innerText = user.email;
-    showName.innerText = user.displayName || "No Name";
-    photo.src = user.photoURL || "https://via.placeholder.com/100";
+/* LOGIN */
+window.login = function(){
+signInWithPopup(auth, provider).then(()=>{
+location.reload();
+});
+};
 
-    // Firestore data
-    const refDoc = doc(db,"users",user.uid);
-    const snap = await getDoc(refDoc);
+/* LOGOUT */
+window.logout = function(){
+signOut(auth).then(()=>location.reload());
+};
 
-    if(snap.exists()){
-      const data = snap.data();
+/* SWITCH ACCOUNT */
+window.switchAccount = function(){
+provider.setCustomParameters({ prompt:"select_account" });
+signInWithPopup(auth, provider).then(()=>location.reload());
+};
 
-      showBio.innerText = data.bio || "";
+/* AUTH STATE */
+onAuthStateChanged(auth, user => {
 
-      name.value = data.name || user.displayName || "";
-      bio.value = data.bio || "";
-      phone.value = data.phone || "";
-    }
+if(!user){
+document.getElementById("loginBox").style.display="block";
+document.getElementById("profileBox").style.display="none";
+return;
+}
 
-  } else {
-    window.location.href="index.html";
-  }
+// show profile
+document.getElementById("loginBox").style.display="none";
+document.getElementById("profileBox").style.display="block";
+
+document.getElementById("name").innerText = user.displayName;
+document.getElementById("email").innerText = user.email;
+document.getElementById("photo").src = user.photoURL;
+
+// verify status
+document.getElementById("verifyStatus").innerText =
+user.emailVerified ? "✅ Verified" : "❌ Not Verified";
+
+/* LOAD DATA */
+onValue(ref(db,"leaderboard"), snap => {
+
+let data = snap.val();
+if(!data) return;
+
+let total=0,count=0,best=0;
+let scores=[];
+let totals={};
+
+Object.values(data).forEach(d=>{
+
+if(!d.email || !d.score) return;
+
+if(!totals[d.email]) totals[d.email]=0;
+totals[d.email]+=Number(d.score);
+
+if(d.email===user.email){
+total+=Number(d.score);
+count++;
+scores.push(Number(d.score));
+if(d.score>best) best=d.score;
+}
+
 });
 
-// 🔥 SAVE PROFILE
-window.saveProfile = async function(){
+document.getElementById("total").innerText = total;
+document.getElementById("count").innerText = count;
 
-  const nameVal = name.value;
-  const bioVal = bio.value;
-  const phoneVal = phone.value;
+let sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+let index = sorted.findIndex(u=>u[0]===user.email);
+let rank = index === -1 ? "-" : index+1;
 
-  if(!nameVal){
-    alert("Name required ❌");
-    return;
-  }
+document.getElementById("rank").innerText = "#"+rank;
 
-  // 🔥 Update Auth
-  await updateProfile(currentUser,{
-    displayName: nameVal,
-    photoURL: currentUser.photoURL || photo.src
-  });
+drawGraph(scores);
+loadBadges(total,count,best,rank);
 
-  // 🔥 Save Firestore
-  await setDoc(doc(db,"users",currentUser.uid),{
-    name:nameVal,
-    bio:bioVal,
-    phone:phoneVal
-  });
+});
 
-  showName.innerText = nameVal;
-  showBio.innerText = bioVal;
+});
 
-  alert("Profile updated ✅");
+/* GRAPH */
+function drawGraph(scores){
+const ctx = document.getElementById("chart");
+if(chart) chart.destroy();
+
+chart = new Chart(ctx,{
+type:"line",
+data:{
+labels:scores.map((_,i)=>"Quiz "+(i+1)),
+datasets:[{
+label:"Score",
+data:scores
+}]
+}
+});
 }
 
-// 🔥 UPLOAD PHOTO
-window.uploadPhoto = async function(){
+/* BADGES */
+function loadBadges(total,count,best,rank){
+let b = document.getElementById("badges");
+b.innerHTML="";
 
-  const file = document.getElementById("file").files[0];
-
-  if(!file){
-    alert("File select करा ❌");
-    return;
-  }
-
-  const storageRef = ref(storage,"profile/"+currentUser.uid);
-
-  await uploadBytes(storageRef,file);
-
-  const url = await getDownloadURL(storageRef);
-
-  // 🔥 Update Auth photo
-  await updateProfile(currentUser,{
-    photoURL: url
-  });
-
-  photo.src = url;
-
-  alert("Photo updated ✅");
-}
-
-// 🔥 LOGOUT
-window.logout = function(){
-  signOut(auth);
-  window.location.href="index.html";
+if(count>=1) b.innerHTML+="🟢 Beginner ";
+if(count>=5) b.innerHTML+="🔵 Explorer ";
+if(count>=10) b.innerHTML+="🟣 Master ";
+if(best>=20) b.innerHTML+="🟡 Genius ";
+if(rank===1) b.innerHTML+="🔴 Champion ";
 }
 
 </script>
 
 </body>
-</html>
+  </html>
