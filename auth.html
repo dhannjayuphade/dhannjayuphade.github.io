@@ -1,53 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Auth System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Login</title>
 
 <style>
 body{background:#0f172a;color:white;text-align:center;font-family:sans-serif}
 input,button{padding:10px;margin:8px;border-radius:10px;border:none}
 button{background:#00ffcc}
+.box{background:#1e293b;margin:10px;padding:15px;border-radius:10px}
 </style>
-
 </head>
 
 <body>
 
-<h2>🔐 Login System</h2>
-
-<!-- GOOGLE -->
-<button onclick="googleLogin()">Google Login</button>
-
-<hr>
+<h2>🔐 Secure Login System</h2>
 
 <!-- EMAIL -->
+<div class="box">
+<h3>📧 Email Signup/Login</h3>
 <input id="email" placeholder="Email"><br>
 <input id="password" type="password" placeholder="Password"><br>
-<button onclick="emailSignup()">Signup</button>
-<button onclick="emailLogin()">Login</button>
+<button onclick="signup()">Signup</button>
+<button onclick="login()">Login</button>
+</div>
 
-<hr>
-
-<!-- PHONE -->
+<!-- OTP -->
+<div class="box" id="otpSection" style="display:none">
+<h3>📱 Phone OTP Verification</h3>
 <input id="phone" placeholder="+91XXXXXXXXXX"><br>
 <div id="recaptcha"></div>
 <button onclick="sendOTP()">Send OTP</button>
 
 <div id="otpBox" style="display:none">
 <input id="otp" placeholder="Enter OTP"><br>
-<button onclick="verifyOTP()">Verify</button>
+<button onclick="verifyOTP()">Verify OTP</button>
+</div>
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
 getAuth,
-GoogleAuthProvider,
-signInWithPopup,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
+sendEmailVerification,
 RecaptchaVerifier,
 signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -62,87 +60,105 @@ databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
 projectId:"dhannjay-website"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-const provider = new GoogleAuthProvider();
+let confirmation;
 
-/* GOOGLE LOGIN */
-window.googleLogin = function(){
-signInWithPopup(auth, provider).then(res=>{
-saveUser(res.user);
-location.href="profile.html";
-});
-};
-
-/* EMAIL SIGNUP */
-window.emailSignup = function(){
+/* ================= EMAIL SIGNUP ================= */
+window.signup = function(){
 
 let email = document.getElementById("email").value;
 let pass = document.getElementById("password").value;
 
 createUserWithEmailAndPassword(auth,email,pass)
 .then(res=>{
-saveUser(res.user);
-alert("Signup success");
-});
+
+sendEmailVerification(res.user);
+alert("📧 Verification email sent! Check inbox.");
+
+})
+.catch(err=>alert(err.message));
 };
 
-/* EMAIL LOGIN */
-window.emailLogin = function(){
+/* ================= EMAIL LOGIN ================= */
+window.login = function(){
 
 let email = document.getElementById("email").value;
 let pass = document.getElementById("password").value;
 
 signInWithEmailAndPassword(auth,email,pass)
 .then(res=>{
-location.href="profile.html";
-});
+
+if(!res.user.emailVerified){
+alert("❌ Please verify email first!");
+return;
+}
+
+// show OTP section
+document.getElementById("otpSection").style.display="block";
+
+})
+.catch(err=>alert(err.message));
 };
 
-/* OTP SETUP */
+/* ================= RECAPTCHA ================= */
 window.recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha',{size:'normal'});
-let confirmationResult;
 
-/* SEND OTP */
+/* ================= SEND OTP ================= */
 window.sendOTP = function(){
 
 let phone = document.getElementById("phone").value;
 
-// Fake number detection
-if(!phone.startsWith("+91") || phone.length < 13){
-alert("❌ Invalid number");
+// fake number detection
+if(!/^\+91[6-9]\d{9}$/.test(phone)){
+alert("❌ Invalid Indian number");
 return;
 }
 
-signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
+signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 .then(res=>{
-confirmationResult = res;
-alert("OTP Sent");
+confirmation = res;
+alert("✅ OTP Sent");
 document.getElementById("otpBox").style.display="block";
-});
+})
+.catch(err=>alert(err.message));
+
 };
 
-/* VERIFY OTP */
+/* ================= VERIFY OTP ================= */
 window.verifyOTP = function(){
 
 let code = document.getElementById("otp").value;
 
-confirmationResult.confirm(code)
+confirmation.confirm(code)
 .then(res=>{
+
+// SAVE USER
 saveUser(res.user);
+
+// mark verified
+localStorage.setItem("otpVerified","true");
+
+alert("🎉 Login Success");
+
 location.href="profile.html";
+
+})
+.catch(()=>{
+alert("❌ Wrong OTP");
 });
+
 };
 
-/* SAVE USER DATABASE */
+/* ================= SAVE USER ================= */
 function saveUser(user){
 
 set(ref(db,"users/"+user.uid),{
-name:user.displayName || "User",
 email:user.email || "",
 phone:user.phoneNumber || "",
+verified:true,
 time:Date.now()
 });
 
@@ -151,4 +167,4 @@ time:Date.now()
 </script>
 
 </body>
-  </html>
+</html>
