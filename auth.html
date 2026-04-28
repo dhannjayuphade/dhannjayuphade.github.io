@@ -1,170 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Login</title>
-
+<meta charset="UTF-8">
+<title>Full Auth System</title>
 <style>
-body{background:#0f172a;color:white;text-align:center;font-family:sans-serif}
-input,button{padding:10px;margin:8px;border-radius:10px;border:none}
-button{background:#00ffcc}
-.box{background:#1e293b;margin:10px;padding:15px;border-radius:10px}
+body{font-family:Arial;text-align:center;padding:20px}
+input,button{padding:10px;margin:5px;width:250px}
 </style>
 </head>
-
 <body>
 
-<h2>🔐 Secure Login System</h2>
-
-<!-- EMAIL -->
-<div class="box">
-<h3>📧 Email Signup/Login</h3>
+<h2>Signup</h2>
+<input id="name" placeholder="Name"><br>
 <input id="email" placeholder="Email"><br>
 <input id="password" type="password" placeholder="Password"><br>
 <button onclick="signup()">Signup</button>
-<button onclick="login()">Login</button>
-</div>
 
-<!-- OTP -->
-<div class="box" id="otpSection" style="display:none">
-<h3>📱 Phone OTP Verification</h3>
+<h2>Login</h2>
+<button onclick="login()">Login</button>
+
+<h2>Social Login</h2>
+<button onclick="googleLogin()">Google</button>
+<button onclick="githubLogin()">GitHub</button>
+
+<h2>Phone OTP</h2>
 <input id="phone" placeholder="+91XXXXXXXXXX"><br>
 <div id="recaptcha"></div>
-<button onclick="sendOTP()">Send OTP</button>
-
-<div id="otpBox" style="display:none">
+<button onclick="sendOTP()">Send OTP</button><br>
 <input id="otp" placeholder="Enter OTP"><br>
 <button onclick="verifyOTP()">Verify OTP</button>
-</div>
-</div>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-sendEmailVerification,
-RecaptchaVerifier,
-signInWithPhoneNumber
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  RecaptchaVerifier,
+  signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { getDatabase, ref, set }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// 🔑 YOUR CONFIG
 const firebaseConfig = {
-apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-authDomain:"dhannjay-website.firebaseapp.com",
-databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
-projectId:"dhannjay-website"
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
-let confirmation;
+// 🔐 Signup
+window.signup = async () => {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-/* ================= EMAIL SIGNUP ================= */
-window.signup = function(){
+  const userCred = await createUserWithEmailAndPassword(auth, email, pass);
 
-let email = document.getElementById("email").value;
-let pass = document.getElementById("password").value;
+  await sendEmailVerification(userCred.user);
 
-createUserWithEmailAndPassword(auth,email,pass)
-.then(res=>{
+  await setDoc(doc(db, "users", userCred.user.uid), {
+    name,
+    email,
+    created: new Date()
+  });
 
-sendEmailVerification(res.user);
-alert("📧 Verification email sent! Check inbox.");
-
-})
-.catch(err=>alert(err.message));
+  alert("Signup Done + Email Sent 📩");
 };
 
-/* ================= EMAIL LOGIN ================= */
-window.login = function(){
+// 🔓 Email Login
+window.login = async () => {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-let email = document.getElementById("email").value;
-let pass = document.getElementById("password").value;
+  const userCred = await signInWithEmailAndPassword(auth, email, pass);
 
-signInWithEmailAndPassword(auth,email,pass)
-.then(res=>{
-
-if(!res.user.emailVerified){
-alert("❌ Please verify email first!");
-return;
-}
-
-// show OTP section
-document.getElementById("otpSection").style.display="block";
-
-})
-.catch(err=>alert(err.message));
+  if(userCred.user.emailVerified){
+    alert("Login Success ✅");
+  } else {
+    alert("Verify Email First ❌");
+  }
 };
 
-/* ================= RECAPTCHA ================= */
-window.recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha',{size:'normal'});
+// 🌐 Google Login
+window.googleLogin = async () => {
+  const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(auth, provider);
 
-/* ================= SEND OTP ================= */
-window.sendOTP = function(){
+  await setDoc(doc(db, "users", result.user.uid), {
+    name: result.user.displayName,
+    email: result.user.email
+  });
 
-let phone = document.getElementById("phone").value;
-
-// fake number detection
-if(!/^\+91[6-9]\d{9}$/.test(phone)){
-alert("❌ Invalid Indian number");
-return;
-}
-
-signInWithPhoneNumber(auth, phone, recaptchaVerifier)
-.then(res=>{
-confirmation = res;
-alert("✅ OTP Sent");
-document.getElementById("otpBox").style.display="block";
-})
-.catch(err=>alert(err.message));
-
+  alert("Google Login ✅");
 };
 
-/* ================= VERIFY OTP ================= */
-window.verifyOTP = function(){
+// 🐙 GitHub Login
+window.githubLogin = async () => {
+  const provider = new GithubAuthProvider();
+  const result = await signInWithPopup(auth, provider);
 
-let code = document.getElementById("otp").value;
+  await setDoc(doc(db, "users", result.user.uid), {
+    name: result.user.displayName,
+    email: result.user.email
+  });
 
-confirmation.confirm(code)
-.then(res=>{
+  alert("GitHub Login ✅");
+};
 
-// SAVE USER
-saveUser(res.user);
-
-// mark verified
-localStorage.setItem("otpVerified","true");
-
-alert("🎉 Login Success");
-
-location.href="profile.html";
-
-})
-.catch(()=>{
-alert("❌ Wrong OTP");
+// 📲 reCAPTCHA
+window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha', {
+  size: 'normal'
 });
 
+// 📲 Send OTP
+window.sendOTP = async () => {
+  const phone = document.getElementById("phone").value;
+
+  window.confirmationResult = await signInWithPhoneNumber(
+    auth,
+    phone,
+    window.recaptchaVerifier
+  );
+
+  alert("OTP Sent 📩");
 };
 
-/* ================= SAVE USER ================= */
-function saveUser(user){
+// 🔑 Verify OTP
+window.verifyOTP = async () => {
+  const code = document.getElementById("otp").value;
 
-set(ref(db,"users/"+user.uid),{
-email:user.email || "",
-phone:user.phoneNumber || "",
-verified:true,
-time:Date.now()
-});
+  const result = await window.confirmationResult.confirm(code);
 
-}
+  await setDoc(doc(db, "users", result.user.uid), {
+    phone: result.user.phoneNumber
+  });
 
+  alert("OTP Login Success ✅");
+};
 </script>
 
 </body>
-</html>
+  </html>
