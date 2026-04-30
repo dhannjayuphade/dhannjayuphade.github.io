@@ -354,7 +354,18 @@ footer{
 </style>
 </style>
   
+  
 <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <title>Your Website</title>
+
+  <!-- Fun Mode CSS -->
+  <link rel="stylesheet" href="funmode.css">
+
+  <!-- Fun Mode JS -->
+  <script src="funmode.js" defer></script>
+</head>
 </head>
 
 <body>
@@ -452,10 +463,14 @@ onAuthStateChanged(auth,(user)=>{
   <button class="glow-suvichar-btn">⬇️Download app</button>
 </a>
 </div>
-  <button onclick="roll()">Do a Barrel Roll</button>
-
-  <button onclick="gravity()">Enable Gravity</button>
   
+  <!-- Floating Panel -->
+<div class="fun-panel">
+  <button onclick="FunMode.underwater()">🌊</button>
+  <button onclick="FunMode.roll()">🔁</button>
+  <button onclick="FunMode.gravity()">🧲</button>
+  <button onclick="FunMode.reset()">♻</button>
+</div>
   
 
   
