@@ -1,242 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Pro Profile</title>
+  <title>Profile</title>
 
-<style>
-body{
-text-align:center;
-background:#0f172a;
-color:white;
-font-family:Arial;
-}
+  <!-- Firebase v8 (Stable for GitHub Pages) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-.card{
-background:#1e293b;
-padding:15px;
-margin:10px;
-border-radius:10px;
-transition:0.3s;
-}
-
-button{
-padding:12px;
-border:none;
-border-radius:10px;
-background:#00ffcc;
-cursor:pointer;
-font-weight:bold;
-}
-
-.hidden{
-display:none;
-}
-
-/* leaderboard */
-.leader-item{
-display:flex;
-justify-content:space-between;
-padding:10px;
-margin:5px 0;
-background:#0f172a;
-border-radius:8px;
-}
-
-.top1{background:gold;color:black;}
-.top2{background:silver;color:black;}
-.top3{background:#cd7f32;color:black;}
-
-.me{
-border:2px solid #00ffcc;
-}
-</style>
-
+  <style>
+    body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
+    .box{background:#1e293b;padding:20px;border-radius:10px;margin-top:50px;}
+    img{border-radius:50%;width:100px;}
+    button{padding:10px;margin:10px;border:none;border-radius:5px;cursor:pointer;}
+  </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox" class="card">
-<h2>Login</h2>
-<button id="loginBtn" onclick="login()">Login with Google</button>
+<div class="box">
+  <h2>👤 Profile</h2>
+
+  <img id="photo" src="">
+  <h3 id="name">Loading...</h3>
+  <p id="email"></p>
+
+  <h3>🎮 Quiz Score: <span id="score">0</span></h3>
+
+  <button onclick="login()">Login with Google</button>
+  <button onclick="logout()">Logout</button>
 </div>
 
-<!-- PROFILE -->
-<div id="profileBox" class="hidden">
-
-<div class="card">
-<h2 id="name"></h2>
-<img id="photo" width="80"><br>
-<p id="email"></p>
-</div>
-
-<div class="card">
-<h3>Total Score: <span id="total">0</span></h3>
-</div>
-
-<div class="card">
-<h3>🏆 Leaderboard</h3>
-<div id="leaderboard"></div>
-</div>
-
-<div class="card">
-<button onclick="logout()">Logout</button>
-</div>
-
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set, update }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+<script>
 const firebaseConfig = {
-apiKey:"AIzaSyDz443...",
-authDomain:"dhannjay-website.firebaseapp.com",
-databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
-projectId:"dhannjay-website"
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
+  measurementId: "G-Y76NHS7ZV8"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+// Init
+firebase.initializeApp(firebaseConfig);
 
-// LOGIN (FIXED)
-window.login = function(){
+const auth = firebase.auth();
+const db = firebase.database();
 
-let btn = document.getElementById("loginBtn");
-
-btn.disabled = true;
-btn.innerText = "Logging in...";
-
-const provider = new GoogleAuthProvider();
-
-signInWithPopup(auth, provider).catch(err=>{
-btn.disabled = false;
-btn.innerText = "Login with Google";
-alert("Login failed");
-});
-
-};
-
-// AUTH STATE (NO FLICKER)
-onAuthStateChanged(auth, user => {
-
-// hide both first
-document.getElementById("loginBox").classList.add("hidden");
-document.getElementById("profileBox").classList.add("hidden");
-
-if(user){
-
-// save/update user
-update(ref(db,"users/"+user.uid),{
-name:user.displayName,
-email:user.email,
-photo:user.photoURL,
-lastLogin:Date.now()
-});
-
-// show profile
-document.getElementById("name").innerText = user.displayName;
-document.getElementById("email").innerText = user.email;
-document.getElementById("photo").src = user.photoURL;
-
-loadData(user.uid);
-loadLeaderboard(user.uid);
-
-document.getElementById("profileBox").classList.remove("hidden");
-
-}else{
-
-// show login
-document.getElementById("loginBox").classList.remove("hidden");
-
-let btn = document.getElementById("loginBtn");
-btn.disabled = false;
-btn.innerText = "Login with Google";
-
+// 🔐 LOGIN
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
 }
 
-});
-
-// LOAD SCORE
-function loadData(uid){
-
-onValue(ref(db,"leaderboard"), snap => {
-
-let data = snap.val();
-if(!data) return;
-
-let total = 0;
-
-Object.values(data).forEach(d=>{
-if(d.uid === uid){
-total += Number(d.score);
-}
-});
-
-document.getElementById("total").innerText = total;
-
-});
-
+// 🚪 LOGOUT
+function logout(){
+  auth.signOut();
 }
 
-// LEADERBOARD
-function loadLeaderboard(currentUid){
+// 🔁 SESSION CHECK (AUTO LOGIN)
+auth.onAuthStateChanged(user=>{
+  if(user){
+    // Show data
+    document.getElementById("name").innerText = user.displayName;
+    document.getElementById("email").innerText = user.email;
+    document.getElementById("photo").src = user.photoURL;
 
-onValue(ref(db,"leaderboard"), snap => {
+    // Save user in DB
+    db.ref("users/"+user.uid).update({
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL
+    });
 
-let data = snap.val();
-if(!data) return;
+    // Load score
+    db.ref("users/"+user.uid+"/score").on("value", snap=>{
+      document.getElementById("score").innerText = snap.val() || 0;
+    });
 
-let userTotals = {};
-
-Object.values(data).forEach(d => {
-if(!userTotals[d.uid]) userTotals[d.uid] = 0;
-userTotals[d.uid] += Number(d.score);
+  } else {
+    document.getElementById("name").innerText = "Please login";
+    document.getElementById("email").innerText = "";
+    document.getElementById("photo").src = "";
+    document.getElementById("score").innerText = "0";
+  }
 });
-
-let sorted = Object.entries(userTotals)
-.sort((a,b)=>b[1]-a[1]);
-
-let html = "";
-
-sorted.slice(0,10).forEach((u,i)=>{
-
-let uid = u[0];
-let score = u[1];
-
-let rankClass = "";
-if(i===0) rankClass="top1";
-if(i===1) rankClass="top2";
-if(i===2) rankClass="top3";
-
-let meClass = uid===currentUid ? "me" : "";
-
-html += `
-<div class="leader-item ${rankClass} ${meClass}">
-<span>#${i+1}</span>
-<span>${uid.substring(0,6)}</span>
-<span>${score}</span>
-</div>
-`;
-
-});
-
-document.getElementById("leaderboard").innerHTML = html;
-
-});
-
-}
-
-// LOGOUT
-window.logout = function(){
-signOut(auth);
-};
-
 </script>
 
 </body>
