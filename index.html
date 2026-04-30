@@ -440,6 +440,8 @@ onAuthStateChanged(auth,(user)=>{
   <button class="glow-suvichar-btn">⬇️Download app</button>
 </a>
 </div>
+  <button onclick="roll()">Do a Barrel Roll</button>
+  
 
   
   <!-- ===== YOUTUBE CHANNELS ===== -->
@@ -883,6 +885,16 @@ onSnapshot(q, (snapshot) => {
     `;
   });
 });
-</script></script>
+</script>
+  <script>
+function roll(){
+  document.body.style.transition = "transform 1s";
+  document.body.style.transform = "rotate(360deg)";
+  
+  setTimeout(() => {
+    document.body.style.transform = "rotate(0deg)";
+  }, 1000);
+}
+  </script>
 </body>
 </html>
