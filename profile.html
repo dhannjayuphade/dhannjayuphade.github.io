@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Profile</title>
+<title>Pro Profile</title>
 
 <style>
 body{
@@ -17,34 +17,52 @@ background:#1e293b;
 padding:15px;
 margin:10px;
 border-radius:10px;
+transition:0.3s;
 }
 
 button{
-padding:10px;
+padding:12px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 background:#00ffcc;
 cursor:pointer;
+font-weight:bold;
 }
 
-/* hide */
-.hidden{display:none;}
+.hidden{
+display:none;
+}
+
+/* leaderboard */
+.leader-item{
+display:flex;
+justify-content:space-between;
+padding:10px;
+margin:5px 0;
+background:#0f172a;
+border-radius:8px;
+}
+
+.top1{background:gold;color:black;}
+.top2{background:silver;color:black;}
+.top3{background:#cd7f32;color:black;}
+
+.me{
+border:2px solid #00ffcc;
+}
 </style>
 
 </head>
 
 <body>
 
-<!-- LOGIN UI -->
+<!-- LOGIN -->
 <div id="loginBox" class="card">
 <h2>Login</h2>
-<button onclick="login()">Login with Google</button>
+<button id="loginBtn" onclick="login()">Login with Google</button>
 </div>
 
-<!-- LOADER -->
-<div id="loader" class="hidden">Loading...</div>
-
-<!-- PROFILE UI -->
+<!-- PROFILE -->
 <div id="profileBox" class="hidden">
 
 <div class="card">
@@ -55,6 +73,11 @@ cursor:pointer;
 
 <div class="card">
 <h3>Total Score: <span id="total">0</span></h3>
+</div>
+
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+<div id="leaderboard"></div>
 </div>
 
 <div class="card">
@@ -81,36 +104,34 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// LOGIN
+// LOGIN (FIXED)
 window.login = function(){
+
+let btn = document.getElementById("loginBtn");
+
+btn.disabled = true;
+btn.innerText = "Logging in...";
 
 const provider = new GoogleAuthProvider();
 
-signInWithPopup(auth, provider).then(result => {
-
-const user = result.user;
-
-// save user
-set(ref(db,"users/"+user.uid),{
-name:user.displayName,
-email:user.email,
-photo:user.photoURL
-});
-
+signInWithPopup(auth, provider).catch(err=>{
+btn.disabled = false;
+btn.innerText = "Login with Google";
+alert("Login failed");
 });
 
 };
 
-// AUTH STATE
+// AUTH STATE (NO FLICKER)
 onAuthStateChanged(auth, user => {
 
-document.getElementById("loader").classList.remove("hidden");
+// hide both first
 document.getElementById("loginBox").classList.add("hidden");
 document.getElementById("profileBox").classList.add("hidden");
 
 if(user){
 
-// update DB
+// save/update user
 update(ref(db,"users/"+user.uid),{
 name:user.displayName,
 email:user.email,
@@ -123,8 +144,8 @@ document.getElementById("name").innerText = user.displayName;
 document.getElementById("email").innerText = user.email;
 document.getElementById("photo").src = user.photoURL;
 
-// load score
 loadData(user.uid);
+loadLeaderboard(user.uid);
 
 document.getElementById("profileBox").classList.remove("hidden");
 
@@ -133,9 +154,11 @@ document.getElementById("profileBox").classList.remove("hidden");
 // show login
 document.getElementById("loginBox").classList.remove("hidden");
 
-}
+let btn = document.getElementById("loginBtn");
+btn.disabled = false;
+btn.innerText = "Login with Google";
 
-document.getElementById("loader").classList.add("hidden");
+}
 
 });
 
@@ -156,6 +179,54 @@ total += Number(d.score);
 });
 
 document.getElementById("total").innerText = total;
+
+});
+
+}
+
+// LEADERBOARD
+function loadLeaderboard(currentUid){
+
+onValue(ref(db,"leaderboard"), snap => {
+
+let data = snap.val();
+if(!data) return;
+
+let userTotals = {};
+
+Object.values(data).forEach(d => {
+if(!userTotals[d.uid]) userTotals[d.uid] = 0;
+userTotals[d.uid] += Number(d.score);
+});
+
+let sorted = Object.entries(userTotals)
+.sort((a,b)=>b[1]-a[1]);
+
+let html = "";
+
+sorted.slice(0,10).forEach((u,i)=>{
+
+let uid = u[0];
+let score = u[1];
+
+let rankClass = "";
+if(i===0) rankClass="top1";
+if(i===1) rankClass="top2";
+if(i===2) rankClass="top3";
+
+let meClass = uid===currentUid ? "me" : "";
+
+html += `
+<div class="leader-item ${rankClass} ${meClass}">
+<span>#${i+1}</span>
+<span>${uid.substring(0,6)}</span>
+<span>${score}</span>
+</div>
+`;
+
+});
+
+document.getElementById("leaderboard").innerHTML = html;
 
 });
 
