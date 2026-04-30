@@ -1,0 +1,51 @@
+body.underwater {
+  animation: wave 3s infinite ease-in-out;
+  filter: hue-rotate(180deg) blur(1px);
+}
+
+@keyframes wave {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
+}
+
+body.roll {
+  transition: transform 1s;
+  transform: rotate(360deg);
+}
+
+.fall {
+  animation: fall 1s forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(500px);
+    opacity: 0.5;
+  }
+}
+
+/* Control Panel */
+.fun-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #000;
+  z-index: 9999;
+}
+
+.fun-panel button {
+  margin: 5px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #1e293b;
+  color: white;
+  cursor: pointer;
+}
+
+.fun-panel button:hover {
+  background: #334155;
+}
