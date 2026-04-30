@@ -97,8 +97,41 @@ box.innerHTML += `
 });
 
 // LEADERBOARD
-onValue(ref(db,"leaderboard"), snap=>{
+onValue(ref(db,"users"), snap=>{
 let data = snap.val();
+
+let list = document.getElementById("leaderList");
+let usersBox = document.getElementById("userList");
+
+list.innerHTML="";
+usersBox.innerHTML="";
+
+if(!data) return;
+
+let arr = Object.values(data);
+
+// users count
+document.getElementById("users").innerText = arr.length;
+
+// sort by score
+arr.sort((a,b)=>(b.score||0)-(a.score||0));
+
+// leaderboard (top 10)
+arr.slice(0,10).forEach((u,i)=>{
+list.innerHTML += `<li>#${i+1} ${u.name} - ${u.score||0}</li>`;
+});
+
+// full users list
+arr.forEach(u=>{
+usersBox.innerHTML += `
+<div class="card">
+<h3>${u.name}</h3>
+<p>${u.email}</p>
+<p>Score: ${u.score||0}</p>
+</div>`;
+});
+});
+
 let box = document.getElementById("leaderList");
 box.innerHTML="";
 
