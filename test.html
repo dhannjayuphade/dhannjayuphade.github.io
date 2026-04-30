@@ -1,227 +1,253 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile</title>
+  <title>Profile</title>
 
-<style>
-body{
-margin:0;
-font-family:sans-serif;
-background:#0f172a;
-color:white;
-text-align:center;
-}
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-.app{max-width:420px;margin:auto;padding:10px}
+  <style>
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#0a0f1c;
+      color:white;
+    }
 
-.card{
-background:#1e293b;
-margin:10px;
-padding:15px;
-border-radius:12px;
-}
+    .container{
+      max-width:400px;
+      margin:auto;
+      padding:15px;
+    }
 
-img{
-border-radius:50%;
-border:3px solid #00ffcc;
-}
+    /* PROFILE */
+    .profile{
+      text-align:center;
+      background:#111827;
+      padding:20px;
+      border-radius:15px;
+    }
 
-button{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:8px;
-background:#00ffcc;
-}
+    .profile img{
+      width:90px;
+      height:90px;
+      border-radius:50%;
+      border:3px solid #ff007f;
+    }
 
-h2{margin:5px}
-</style>
+    .name{font-size:20px;font-weight:bold;margin-top:10px;}
+    .email{font-size:13px;color:#aaa;}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    .stats{
+      display:flex;
+      justify-content:space-around;
+      margin-top:15px;
+    }
 
+    /* STORY */
+    .stories{
+      display:flex;
+      overflow-x:auto;
+      margin:15px 0;
+      gap:10px;
+    }
+
+    .story{
+      min-width:70px;
+      text-align:center;
+    }
+
+    .story img{
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      border:3px solid #ff007f;
+    }
+
+    /* QUIZ */
+    .quiz{
+      background:#111827;
+      padding:15px;
+      border-radius:10px;
+      margin-top:15px;
+    }
+
+    button{
+      margin:5px;
+      padding:10px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    .login{background:#3b82f6;color:white;}
+    .logout{background:#ef4444;color:white;}
+    .answer{background:#374151;color:white;}
+  </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="container">
 
-<!-- LOGIN -->
-<div class="card" id="loginBox">
-<h3>🔐 Login Required</h3>
-<button onclick="login()">Login with Google</button>
-</div>
+  <!-- PROFILE -->
+  <div class="profile">
+    <img id="photo">
+    <div class="name" id="name">Loading...</div>
+    <div class="email" id="email"></div>
 
-<!-- PROFILE -->
-<div id="profileBox" style="display:none;">
+    <div class="stats">
+      <div>
+        <h3 id="score">0</h3>
+        <p>Score</p>
+      </div>
+    </div>
 
-<div class="card">
-<img id="photo" width="90"><br><br>
-<h2 id="name"></h2>
-<p id="email"></p>
-<p id="verifyStatus"></p>
-</div>
+    <button class="login" onclick="login()">Login</button>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
 
-<div class="card">
-<p>Total Score: <span id="total">0</span></p>
-<p>Quizzes Played: <span id="count">0</span></p>
-<p>🏆 Rank: <span id="rank">-</span></p>
-</div>
+  <!-- STORIES -->
+  <div class="stories" id="stories"></div>
 
-<div class="card">
-<h3>🏅 Badges</h3>
-<div id="badges"></div>
-</div>
-
-<div class="card">
-<h3>📈 Graph</h3>
-<canvas id="chart"></canvas>
-</div>
-
-<div class="card">
-<button onclick="location.href='aiquiz.html'">🎯 Play Quiz</button>
-<button onclick="location.href='leaderboard.html'">🏆 Leaderboard</button>
-<button onclick="logout()">🚪 Logout</button>
-<button onclick="switchAccount()">🔄 Switch Account</button>
-</div>
+  <!-- QUIZ -->
+  <div class="quiz">
+    <h3 id="question"></h3>
+    <div id="answers"></div>
+    <button onclick="nextQ()">Next</button>
+  </div>
 
 </div>
 
-</div>
-
-<script type="module">
-
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, onValue }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+<script>
 const firebaseConfig = {
-apiKey:"AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-authDomain:"dhannjay-website.firebaseapp.com",
-databaseURL:"https://dhannjay-website-default-rtdb.firebaseio.com",
-projectId:"dhannjay-website"
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
+// 🔥 SESSION FIX
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-let chart;
+const auth = firebase.auth();
+const db = firebase.database();
 
-/* LOGIN */
-window.login = function(){
-signInWithPopup(auth, provider).then(()=>{
-location.reload();
-});
-};
-
-/* LOGOUT */
-window.logout = function(){
-signOut(auth).then(()=>location.reload());
-};
-
-/* SWITCH ACCOUNT */
-window.switchAccount = function(){
-provider.setCustomParameters({ prompt:"select_account" });
-signInWithPopup(auth, provider).then(()=>location.reload());
-};
-
-/* AUTH STATE */
-onAuthStateChanged(auth, user => {
-
-if(!user){
-document.getElementById("loginBox").style.display="block";
-document.getElementById("profileBox").style.display="none";
-return;
+// LOGIN
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
 }
 
-// show profile
-document.getElementById("loginBox").style.display="none";
-document.getElementById("profileBox").style.display="block";
-
-document.getElementById("name").innerText = user.displayName;
-document.getElementById("email").innerText = user.email;
-document.getElementById("photo").src = user.photoURL;
-
-// verify status
-document.getElementById("verifyStatus").innerText =
-user.emailVerified ? "✅ Verified" : "❌ Not Verified";
-
-/* LOAD DATA */
-onValue(ref(db,"leaderboard"), snap => {
-
-let data = snap.val();
-if(!data) return;
-
-let total=0,count=0,best=0;
-let scores=[];
-let totals={};
-
-Object.values(data).forEach(d=>{
-
-if(!d.email || !d.score) return;
-
-if(!totals[d.email]) totals[d.email]=0;
-totals[d.email]+=Number(d.score);
-
-if(d.email===user.email){
-total+=Number(d.score);
-count++;
-scores.push(Number(d.score));
-if(d.score>best) best=d.score;
+// LOGOUT
+function logout(){
+  auth.signOut();
 }
 
-});
+// STORY LOAD
+function loadStories(user){
+  const stories = document.getElementById("stories");
+  stories.innerHTML = "";
 
-document.getElementById("total").innerText = total;
-document.getElementById("count").innerText = count;
+  if(user){
+    stories.innerHTML += `
+      <div class="story">
+        <img src="${user.photoURL}">
+        <p>You</p>
+      </div>`;
+  }
 
-let sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-let index = sorted.findIndex(u=>u[0]===user.email);
-let rank = index === -1 ? "-" : index+1;
-
-document.getElementById("rank").innerText = "#"+rank;
-
-drawGraph(scores);
-loadBadges(total,count,best,rank);
-
-});
-
-});
-
-/* GRAPH */
-function drawGraph(scores){
-const ctx = document.getElementById("chart");
-if(chart) chart.destroy();
-
-chart = new Chart(ctx,{
-type:"line",
-data:{
-labels:scores.map((_,i)=>"Quiz "+(i+1)),
-datasets:[{
-label:"Score",
-data:scores
-}]
-}
-});
+  const demo = ["🔥","🎮","🏆","⚡"];
+  demo.forEach(d=>{
+    stories.innerHTML += `
+      <div class="story">
+        <img src="https://via.placeholder.com/60">
+        <p>${d}</p>
+      </div>`;
+  });
 }
 
-/* BADGES */
-function loadBadges(total,count,best,rank){
-let b = document.getElementById("badges");
-b.innerHTML="";
+// AUTH STATE
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById("name").innerText = user.displayName;
+    document.getElementById("email").innerText = user.email;
+    document.getElementById("photo").src = user.photoURL;
 
-if(count>=1) b.innerHTML+="🟢 Beginner ";
-if(count>=5) b.innerHTML+="🔵 Explorer ";
-if(count>=10) b.innerHTML+="🟣 Master ";
-if(best>=20) b.innerHTML+="🟡 Genius ";
-if(rank===1) b.innerHTML+="🔴 Champion ";
+    db.ref("users/"+user.uid).update({
+      name:user.displayName,
+      email:user.email,
+      photo:user.photoURL
+    });
+
+    db.ref("users/"+user.uid+"/score").on("value", snap=>{
+      document.getElementById("score").innerText = snap.val() || 0;
+    });
+
+    loadStories(user);
+
+  } else {
+    document.getElementById("name").innerText = "Not Logged In";
+  }
+});
+
+// QUIZ
+const questions = [
+  {q:"India capital?",a:["Delhi","Mumbai","Pune"],c:0},
+  {q:"2+2=?",a:["3","4","5"],c:1},
+  {q:"Sun rises from?",a:["West","East","North"],c:1}
+];
+
+let index=0,score=0;
+
+function loadQ(){
+  document.getElementById("question").innerText = questions[index].q;
+  let ans="";
+  questions[index].a.forEach((opt,i)=>{
+    ans += `<button class="answer" onclick="checkAns(${i})">${opt}</button>`;
+  });
+  document.getElementById("answers").innerHTML = ans;
 }
 
+function checkAns(i){
+  if(i===questions[index].c) score+=10;
+}
+
+function nextQ(){
+  index++;
+  if(index<questions.length){
+    loadQ();
+  }else{
+    finishQuiz();
+  }
+}
+
+function finishQuiz(){
+  alert("Score: "+score);
+  saveScore(score);
+  index=0;
+  score=0;
+  loadQ();
+}
+
+// SAVE SCORE
+function saveScore(score){
+  const user = firebase.auth().currentUser;
+  if(user){
+    firebase.database().ref("users/"+user.uid).update({
+      score:score
+    });
+  }
+}
+
+loadQ();
 </script>
 
 </body>
