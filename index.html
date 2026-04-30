@@ -340,6 +340,18 @@ footer{
   margin-top: 10px;
   color: white;
       }
+  <style>
+.fall {
+  animation: fall 1s forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(500px);
+    opacity: 0.5;
+  }
+}
+</style>
 </style>
   
 <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
@@ -441,6 +453,9 @@ onAuthStateChanged(auth,(user)=>{
 </a>
 </div>
   <button onclick="roll()">Do a Barrel Roll</button>
+
+  <button onclick="gravity()">Enable Gravity</button>
+  
   
 
   
@@ -895,6 +910,25 @@ function roll(){
     document.body.style.transform = "rotate(0deg)";
   }, 1000);
 }
+  </script>
+  <script>
+document.addEventListener("mousemove", (e) => {
+  let items = document.querySelectorAll(".gravity-item");
+
+  items.forEach(el => {
+    let rect = el.getBoundingClientRect();
+    let dx = e.clientX - (rect.left + rect.width/2);
+    let dy = e.clientY - (rect.top + rect.height/2);
+
+    let distance = Math.sqrt(dx*dx + dy*dy);
+
+    if(distance < 200){
+      el.style.transform = `translate(${dx*0.2}px, ${dy*0.2}px)`;
+    } else {
+      el.style.transform = "translate(0,0)";
+    }
+  });
+});
   </script>
 </body>
 </html>
