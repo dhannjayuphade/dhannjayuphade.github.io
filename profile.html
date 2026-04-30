@@ -3,32 +3,108 @@
 <head>
   <title>Profile</title>
 
-  <!-- Firebase v8 (Stable for GitHub Pages) -->
+  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <style>
-    body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
-    .box{background:#1e293b;padding:20px;border-radius:10px;margin-top:50px;}
-    img{border-radius:50%;width:100px;}
-    button{padding:10px;margin:10px;border:none;border-radius:5px;cursor:pointer;}
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#0a0f1c;
+      color:white;
+    }
+
+    .container{
+      max-width:400px;
+      margin:auto;
+      padding:15px;
+    }
+
+    .profile{
+      text-align:center;
+      background:#111827;
+      padding:20px;
+      border-radius:15px;
+    }
+
+    .profile img{
+      width:90px;
+      height:90px;
+      border-radius:50%;
+      border:3px solid #ff007f;
+    }
+
+    .name{
+      font-size:20px;
+      font-weight:bold;
+      margin-top:10px;
+    }
+
+    .email{
+      font-size:13px;
+      color:#aaa;
+    }
+
+    .score{
+      font-size:22px;
+      margin-top:10px;
+      color:#22c55e;
+    }
+
+    .btn{
+      margin:8px;
+      padding:10px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+
+    .login{background:#3b82f6;color:white;}
+    .logout{background:#ef4444;color:white;}
+    .play{background:#22c55e;color:black;}
+
+    .stories{
+      display:flex;
+      overflow-x:auto;
+      margin-top:15px;
+      gap:10px;
+    }
+
+    .story{
+      text-align:center;
+    }
+
+    .story img{
+      width:60px;
+      height:60px;
+      border-radius:50%;
+      border:3px solid #ff007f;
+    }
   </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>👤 Profile</h2>
+<div class="container">
 
-  <img id="photo" src="">
-  <h3 id="name">Loading...</h3>
-  <p id="email"></p>
+  <!-- PROFILE -->
+  <div class="profile">
+    <img id="photo">
+    <div class="name" id="name">Loading...</div>
+    <div class="email" id="email"></div>
 
-  <h3>🎮 Quiz Score: <span id="score">0</span></h3>
+    <div class="score">🎮 Score: <span id="score">0</span></div>
 
-  <button onclick="login()">Login with Google</button>
-  <button onclick="logout()">Logout</button>
+    <button class="btn login" onclick="login()">Login</button>
+    <button class="btn logout" onclick="logout()">Logout</button>
+    <button class="btn play" onclick="playGame()">Play Quiz</button>
+  </div>
+
+  <!-- STORIES -->
+  <div class="stories" id="stories"></div>
+
 </div>
 
 <script>
@@ -39,49 +115,78 @@ const firebaseConfig = {
   projectId: "dhannjay-website",
   storageBucket: "dhannjay-website.firebasestorage.app",
   messagingSenderId: "73314948186",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
-  measurementId: "G-Y76NHS7ZV8"
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
 };
 
-// Init
 firebase.initializeApp(firebaseConfig);
+
+// 🔥 SESSION FIX
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 const auth = firebase.auth();
 const db = firebase.database();
 
-// 🔐 LOGIN
+// LOGIN
 function login(){
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider);
 }
 
-// 🚪 LOGOUT
+// LOGOUT
 function logout(){
   auth.signOut();
 }
 
-// 🔁 SESSION CHECK (AUTO LOGIN)
+// PLAY QUIZ PAGE
+function playGame(){
+  window.location = "quiz.html"; // तुझा quiz page
+}
+
+// STORIES UI
+function loadStories(user){
+  const s = document.getElementById("stories");
+  s.innerHTML = "";
+
+  if(user){
+    s.innerHTML += `
+      <div class="story">
+        <img src="${user.photoURL}">
+        <p>You</p>
+      </div>`;
+  }
+
+  ["🔥","🎮","🏆","⚡"].forEach(e=>{
+    s.innerHTML += `
+      <div class="story">
+        <img src="https://via.placeholder.com/60">
+        <p>${e}</p>
+      </div>`;
+  });
+}
+
+// AUTH STATE
 auth.onAuthStateChanged(user=>{
   if(user){
-    // Show data
     document.getElementById("name").innerText = user.displayName;
     document.getElementById("email").innerText = user.email;
     document.getElementById("photo").src = user.photoURL;
 
-    // Save user in DB
+    // SAVE USER
     db.ref("users/"+user.uid).update({
-      name: user.displayName,
-      email: user.email,
-      photo: user.photoURL
+      name:user.displayName,
+      email:user.email,
+      photo:user.photoURL
     });
 
-    // Load score
+    // LOAD SCORE
     db.ref("users/"+user.uid+"/score").on("value", snap=>{
       document.getElementById("score").innerText = snap.val() || 0;
     });
 
+    loadStories(user);
+
   } else {
-    document.getElementById("name").innerText = "Please login";
+    document.getElementById("name").innerText = "Please Login";
     document.getElementById("email").innerText = "";
     document.getElementById("photo").src = "";
     document.getElementById("score").innerText = "0";
@@ -90,4 +195,4 @@ auth.onAuthStateChanged(user=>{
 </script>
 
 </body>
-</html>
+  </html>
