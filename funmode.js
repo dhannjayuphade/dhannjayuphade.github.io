@@ -80,7 +80,7 @@ body.horror{
 /* 🎛 Panel */
 .fun-panel{
   position:fixed;
-  bottom:20px;
+  bottom:70px;
   right:20px;
   background:#111;
   padding:10px;
