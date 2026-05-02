@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ultimate Car Racing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin:0;
+      font-family: Arial;
+      background: linear-gradient(135deg,#0f172a,#1e293b);
+      color:white;
+      text-align:center;
+    }
+
+    h1 { margin:10px; }
+
+    #scoreBox { font-size:18px; }
+
+    canvas {
+      background:#111;
+      display:block;
+      margin:auto;
+      border-radius:15px;
+    }
+
+    .controls {
+      margin-top:10px;
+    }
+
+    .btn {
+      padding:12px 20px;
+      margin:5px;
+      border:none;
+      border-radius:10px;
+      font-size:18px;
+      background:#22c55e;
+      color:white;
+    }
+
+    .nitroBtn {
+      background:#ef4444;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🏎️ Ultimate Racing</h1>
+<div id="scoreBox">Score: 0</div>
+
+<canvas id="game" width="400" height="600"></canvas>
+
+<div class="controls">
+  <button class="btn" onclick="moveLeft()">⬅️</button>
+  <button class="btn" onclick="moveRight()">➡️</button>
+  <button class="btn nitroBtn" onclick="activateNitro()">🔥 Nitro</button>
+</div>
+
+<!-- Sounds -->
+<audio id="engineSound" src="engine.mp3" loop></audio>
+<audio id="crashSound" src="crash.mp3"></audio>
+
+<script>
+let canvas = document.getElementById("game");
+let ctx = canvas.getContext("2d");
+
+// images
+let carImg = new Image();
+carImg.src = "car.png";
+
+let enemyImg = new Image();
+enemyImg.src = "enemy.png";
+
+// game vars
+let car, obstacles, score, gameOver;
+let baseSpeed = 4;
+let nitroSpeed = 10;
+let nitro = false;
+
+function init(){
+  car = { x:180, y:500 };
+  obstacles = [];
+  score = 0;
+  gameOver = false;
+}
+init();
+
+// controls
+function moveLeft(){ if(car.x > 0) car.x -= 20; }
+function moveRight(){ if(car.x < 360) car.x += 20; }
+
+document.addEventListener("keydown", e => {
+  if(e.key==="ArrowLeft") moveLeft();
+  if(e.key==="ArrowRight") moveRight();
+});
+
+// swipe mobile
+let startX=0;
+canvas.addEventListener("touchstart",e=>{
+  startX = e.touches[0].clientX;
+});
+canvas.addEventListener("touchmove",e=>{
+  let x = e.touches[0].clientX;
+  if(x < startX) moveLeft();
+  else moveRight();
+  startX = x;
+});
+
+// nitro
+function activateNitro(){
+  nitro = true;
+  setTimeout(()=> nitro=false, 2000);
+}
+
+// obstacles
+function createObstacle(){
+  let x = Math.floor(Math.random()*360);
+  obstacles.push({x:x,y:0});
+}
+setInterval(createObstacle,1200);
+
+// update
+function update(){
+  if(gameOver) return;
+
+  let speed = nitro ? nitroSpeed : baseSpeed + score*0.1;
+
+  for(let i=0;i<obstacles.length;i++){
+    obstacles[i].y += speed;
+
+    // collision
+    if(
+      car.x < obstacles[i].x + 40 &&
+      car.x + 40 > obstacles[i].x &&
+      car.y < obstacles[i].y + 70 &&
+      car.y + 70 > obstacles[i].y
+    ){
+      gameOver = true;
+      document.getElementById("crashSound").play();
+    }
+
+    if(obstacles[i].y > 600){
+      obstacles.splice(i,1);
+      score++;
+    }
+  }
+
+  document.getElementById("scoreBox").innerText = "Score: " + score;
+}
+
+// draw
+function draw(){
+  ctx.clearRect(0,0,400,600);
+
+  // road lines
+  ctx.fillStyle="white";
+  for(let i=0;i<600;i+=40){
+    ctx.fillRect(195,i+(Date.now()/10%40),10,20);
+  }
+
+  // wait image
+  if(!carImg.complete || !enemyImg.complete) return;
+
+  // player
+  ctx.shadowColor="red";
+  ctx.shadowBlur=10;
+  ctx.drawImage(carImg, car.x, car.y, 45, 80);
+  ctx.shadowBlur=0;
+
+  // nitro flame
+  if(nitro){
+    ctx.fillStyle="orange";
+    ctx.fillRect(car.x+15, car.y+80, 15, 10);
+  }
+
+  // enemies
+  obstacles.forEach(o=>{
+    ctx.drawImage(enemyImg, o.x, o.y, 45, 80);
+  });
+
+  // game over
+  if(gameOver){
+    ctx.fillStyle="white";
+    ctx.font="30px Arial";
+    ctx.fillText("GAME OVER",100,300);
+  }
+}
+
+// loop
+function gameLoop(){
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+// engine sound start on click
+document.body.addEventListener("click", ()=>{
+  document.getElementById("engineSound").play();
+},{once:true});
+</script>
+
+</body>
+  </html>
