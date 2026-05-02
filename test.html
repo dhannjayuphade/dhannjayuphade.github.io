@@ -1,254 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Profile</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhananjay Website</title>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(120deg,#0f172a,#1e293b);
+    color:white;
+    text-align:center;
+}
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      background:#0a0f1c;
-      color:white;
-    }
+header{
+    padding:40px;
+    background:#111827;
+}
 
-    .container{
-      max-width:400px;
-      margin:auto;
-      padding:15px;
-    }
+h1{
+    font-size:35px;
+    color:#38bdf8;
+}
 
-    /* PROFILE */
-    .profile{
-      text-align:center;
-      background:#111827;
-      padding:20px;
-      border-radius:15px;
-    }
+p{
+    color:#cbd5e1;
+}
 
-    .profile img{
-      width:90px;
-      height:90px;
-      border-radius:50%;
-      border:3px solid #ff007f;
-    }
+.container{
+    margin-top:40px;
+}
 
-    .name{font-size:20px;font-weight:bold;margin-top:10px;}
-    .email{font-size:13px;color:#aaa;}
+.card{
+    background:#1f2937;
+    padding:20px;
+    margin:15px auto;
+    width:80%;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
 
-    .stats{
-      display:flex;
-      justify-content:space-around;
-      margin-top:15px;
-    }
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    background:#38bdf8;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+}
 
-    /* STORY */
-    .stories{
-      display:flex;
-      overflow-x:auto;
-      margin:15px 0;
-      gap:10px;
-    }
+button:hover{
+    background:#0ea5e9;
+}
 
-    .story{
-      min-width:70px;
-      text-align:center;
-    }
+footer{
+    margin-top:40px;
+    padding:20px;
+    background:#111827;
+}
+</style>
 
-    .story img{
-      width:60px;
-      height:60px;
-      border-radius:50%;
-      border:3px solid #ff007f;
-    }
-
-    /* QUIZ */
-    .quiz{
-      background:#111827;
-      padding:15px;
-      border-radius:10px;
-      margin-top:15px;
-    }
-
-    button{
-      margin:5px;
-      padding:10px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-    }
-
-    .login{background:#3b82f6;color:white;}
-    .logout{background:#ef4444;color:white;}
-    .answer{background:#374151;color:white;}
-  </style>
 </head>
 
 <body>
 
+<header>
+    <h1>🚀 My Website</h1>
+    <p>Welcome to my personal website</p>
+</header>
+
 <div class="container">
 
-  <!-- PROFILE -->
-  <div class="profile">
-    <img id="photo">
-    <div class="name" id="name">Loading...</div>
-    <div class="email" id="email"></div>
-
-    <div class="stats">
-      <div>
-        <h3 id="score">0</h3>
-        <p>Score</p>
-      </div>
+    <div class="card">
+        <h2>👤 About Me</h2>
+        <p>मी एक student / creator आहे आणि मला websites, YouTube आणि technology आवडते.</p>
     </div>
 
-    <button class="login" onclick="login()">Login</button>
-    <button class="logout" onclick="logout()">Logout</button>
-  </div>
+    <div class="card">
+        <h2>🎥 YouTube Channel</h2>
+        <p>Dhananjay Gaming 2.0</p>
+        <button onclick="window.open('https://youtube.com')">Visit Channel</button>
+    </div>
 
-  <!-- STORIES -->
-  <div class="stories" id="stories"></div>
-
-  <!-- QUIZ -->
-  <div class="quiz">
-    <h3 id="question"></h3>
-    <div id="answers"></div>
-    <button onclick="nextQ()">Next</button>
-  </div>
+    <div class="card">
+        <h2>💡 Projects</h2>
+        <p>Science models, coding projects, AI experiments</p>
+    </div>
 
 </div>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
-  projectId: "dhannjay-website",
-  storageBucket: "dhannjay-website.firebasestorage.app",
-  messagingSenderId: "73314948186",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-// 🔥 SESSION FIX
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-const auth = firebase.auth();
-const db = firebase.database();
-
-// LOGIN
-function login(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-}
-
-// LOGOUT
-function logout(){
-  auth.signOut();
-}
-
-// STORY LOAD
-function loadStories(user){
-  const stories = document.getElementById("stories");
-  stories.innerHTML = "";
-
-  if(user){
-    stories.innerHTML += `
-      <div class="story">
-        <img src="${user.photoURL}">
-        <p>You</p>
-      </div>`;
-  }
-
-  const demo = ["🔥","🎮","🏆","⚡"];
-  demo.forEach(d=>{
-    stories.innerHTML += `
-      <div class="story">
-        <img src="https://via.placeholder.com/60">
-        <p>${d}</p>
-      </div>`;
-  });
-}
-
-// AUTH STATE
-auth.onAuthStateChanged(user=>{
-  if(user){
-    document.getElementById("name").innerText = user.displayName;
-    document.getElementById("email").innerText = user.email;
-    document.getElementById("photo").src = user.photoURL;
-
-    db.ref("users/"+user.uid).update({
-      name:user.displayName,
-      email:user.email,
-      photo:user.photoURL
-    });
-
-    db.ref("users/"+user.uid+"/score").on("value", snap=>{
-      document.getElementById("score").innerText = snap.val() || 0;
-    });
-
-    loadStories(user);
-
-  } else {
-    document.getElementById("name").innerText = "Not Logged In";
-  }
-});
-
-// QUIZ
-const questions = [
-  {q:"India capital?",a:["Delhi","Mumbai","Pune"],c:0},
-  {q:"2+2=?",a:["3","4","5"],c:1},
-  {q:"Sun rises from?",a:["West","East","North"],c:1}
-];
-
-let index=0,score=0;
-
-function loadQ(){
-  document.getElementById("question").innerText = questions[index].q;
-  let ans="";
-  questions[index].a.forEach((opt,i)=>{
-    ans += `<button class="answer" onclick="checkAns(${i})">${opt}</button>`;
-  });
-  document.getElementById("answers").innerHTML = ans;
-}
-
-function checkAns(i){
-  if(i===questions[index].c) score+=10;
-}
-
-function nextQ(){
-  index++;
-  if(index<questions.length){
-    loadQ();
-  }else{
-    finishQuiz();
-  }
-}
-
-function finishQuiz(){
-  alert("Score: "+score);
-  saveScore(score);
-  index=0;
-  score=0;
-  loadQ();
-}
-
-// SAVE SCORE
-function saveScore(score){
-  const user = firebase.auth().currentUser;
-  if(user){
-    firebase.database().ref("users/"+user.uid).update({
-      score:score
-    });
-  }
-}
-
-loadQ();
-</script>
+<footer>
+    <p>© 2026 My Website | Made by Me</p>
+</footer>
 
 </body>
-  </html>
+</html>
