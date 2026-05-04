@@ -1,205 +1,292 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultimate Car Racing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Racing Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin:0;
-      font-family: Arial;
-      background: linear-gradient(135deg,#0f172a,#1e293b);
-      color:white;
-      text-align:center;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:white;
+  text-align:center;
+}
 
-    h1 { margin:10px; }
+canvas{
+  display:block;
+  margin:auto;
+  border-radius:15px;
+  background:#111;
+}
 
-    #scoreBox { font-size:18px; }
+.btn{
+  padding:10px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  background:#22c55e;
+  color:white;
+}
 
-    canvas {
-      background:#111;
-      display:block;
-      margin:auto;
-      border-radius:15px;
-    }
-
-    .controls {
-      margin-top:10px;
-    }
-
-    .btn {
-      padding:12px 20px;
-      margin:5px;
-      border:none;
-      border-radius:10px;
-      font-size:18px;
-      background:#22c55e;
-      color:white;
-    }
-
-    .nitroBtn {
-      background:#ef4444;
-    }
-  </style>
+#shop,#garage{
+  display:none;
+  background:#000a;
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🏎️ Ultimate Racing</h1>
-<div id="scoreBox">Score: 0</div>
+<h2>🏎️ Ultimate Racing</h2>
+
+<div id="score">Score:0</div>
+<div id="coinsBox">💰 0</div>
+<div id="best">🏆 Best:0</div>
+<div id="missionBox">🎯 Mission: Loading...</div>
 
 <canvas id="game" width="400" height="600"></canvas>
 
-<div class="controls">
-  <button class="btn" onclick="moveLeft()">⬅️</button>
-  <button class="btn" onclick="moveRight()">➡️</button>
-  <button class="btn nitroBtn" onclick="activateNitro()">🔥 Nitro</button>
+<div>
+<button class="btn" onclick="left()">⬅️</button>
+<button class="btn" onclick="right()">➡️</button>
+<button class="btn" onclick="nitroOn()">🔥</button>
+<button class="btn" onclick="toggleShop()">🛒</button>
+<button class="btn" onclick="toggleGarage()">🚗</button>
 </div>
 
-<!-- Sounds -->
-<audio id="engineSound" src="engine.mp3" loop></audio>
-<audio id="crashSound" src="crash.mp3"></audio>
+<!-- SHOP -->
+<div id="shop">
+<h3>Shop</h3>
+<button onclick="buy('red',0)">Red</button>
+<button onclick="buy('blue',50)">Blue</button>
+<button onclick="buy('gold',100)">Gold</button>
+</div>
+
+<!-- GARAGE -->
+<div id="garage">
+<h3>Garage</h3>
+<img id="preview" src="car.png" width="120"><br>
+<button onclick="prevCar()">⬅️</button>
+<button onclick="nextCar()">➡️</button>
+<button onclick="selectCar()">Select</button>
+</div>
+
+<audio id="engine" src="engine.mp3" loop></audio>
+<audio id="crash" src="crash.mp3"></audio>
 
 <script>
-let canvas = document.getElementById("game");
-let ctx = canvas.getContext("2d");
+let c=document.getElementById("game");
+let ctx=c.getContext("2d");
 
-// images
-let carImg = new Image();
-carImg.src = "car.png";
+// cars
+let cars={red:"car.png",blue:"car2.png",gold:"car3.png"};
+let img=new Image();
+let enemy=new Image();
+enemy.src="enemy.png";
 
-let enemyImg = new Image();
-enemyImg.src = "enemy.png";
+// storage
+let coins=parseInt(localStorage.getItem("coins"))||0;
+let best=parseInt(localStorage.getItem("best"))||0;
+let owned=JSON.parse(localStorage.getItem("owned"))||["red"];
+let selected=localStorage.getItem("selected")||"red";
 
-// game vars
-let car, obstacles, score, gameOver;
-let baseSpeed = 4;
-let nitroSpeed = 10;
-let nitro = false;
+img.src=cars[selected];
 
-function init(){
-  car = { x:180, y:500 };
-  obstacles = [];
-  score = 0;
-  gameOver = false;
+// mission
+let missions=[
+ {text:"Score 10",target:10,reward:20},
+ {text:"Score 30",target:30,reward:50},
+ {text:"Coins 200",coinTarget:200,reward:100}
+];
+let mIndex=parseInt(localStorage.getItem("mIndex"))||0;
+let currentMission=missions[mIndex];
+
+// game
+let lanes=[40,175,310];
+let carX=lanes[1],carY=500;
+let obs=[];
+let score=0;
+let nitro=false;
+let day=true;
+
+// rain
+let rain=[];
+for(let i=0;i<80;i++){
+ rain.push({x:Math.random()*400,y:Math.random()*600});
 }
-init();
 
 // controls
-function moveLeft(){ if(car.x > 0) car.x -= 20; }
-function moveRight(){ if(car.x < 360) car.x += 20; }
+function left(){
+ let i=lanes.indexOf(carX);
+ if(i>0) carX=lanes[i-1];
+}
+function right(){
+ let i=lanes.indexOf(carX);
+ if(i<lanes.length-1) carX=lanes[i+1];
+}
 
-document.addEventListener("keydown", e => {
-  if(e.key==="ArrowLeft") moveLeft();
-  if(e.key==="ArrowRight") moveRight();
-});
-
-// swipe mobile
-let startX=0;
-canvas.addEventListener("touchstart",e=>{
-  startX = e.touches[0].clientX;
-});
-canvas.addEventListener("touchmove",e=>{
-  let x = e.touches[0].clientX;
-  if(x < startX) moveLeft();
-  else moveRight();
-  startX = x;
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft") left();
+ if(e.key==="ArrowRight") right();
 });
 
 // nitro
-function activateNitro(){
-  nitro = true;
-  setTimeout(()=> nitro=false, 2000);
+function nitroOn(){
+ nitro=true;
+ setTimeout(()=>nitro=false,2000);
 }
 
-// obstacles
-function createObstacle(){
-  let x = Math.floor(Math.random()*360);
-  obstacles.push({x:x,y:0});
+// shop
+function toggleShop(){
+ shop.style.display=shop.style.display==="none"?"block":"none";
 }
-setInterval(createObstacle,1200);
+function buy(name,price){
+ if(owned.includes(name)){
+   selected=name;
+ }else if(coins>=price){
+   coins-=price;
+   owned.push(name);
+   selected=name;
+ }
+ localStorage.setItem("owned",JSON.stringify(owned));
+ localStorage.setItem("coins",coins);
+ localStorage.setItem("selected",selected);
+ img.src=cars[selected];
+}
+
+// garage
+let gCars=["car.png","car2.png","car3.png"];
+let gIndex=0;
+
+function toggleGarage(){
+ garage.style.display=garage.style.display==="none"?"block":"none";
+}
+function prevCar(){gIndex=(gIndex-1+gCars.length)%gCars.length;updatePreview();}
+function nextCar(){gIndex=(gIndex+1)%gCars.length;updatePreview();}
+function updatePreview(){preview.src=gCars[gIndex];}
+function selectCar(){
+ img.src=gCars[gIndex];
+}
+
+// spawn
+setInterval(()=>{
+ let x=lanes[Math.floor(Math.random()*3)];
+ obs.push({x:x,y:-100});
+},1200);
+
+// mission check
+function checkMission(){
+ if(currentMission.target && score>=currentMission.target) completeMission();
+ if(currentMission.coinTarget && coins>=currentMission.coinTarget) completeMission();
+}
+
+function completeMission(){
+ coins+=currentMission.reward;
+ alert("Mission Done! +" + currentMission.reward);
+
+ mIndex++;
+ if(mIndex>=missions.length) mIndex=0;
+
+ localStorage.setItem("mIndex",mIndex);
+ localStorage.setItem("coins",coins);
+
+ currentMission=missions[mIndex];
+}
 
 // update
 function update(){
-  if(gameOver) return;
+ let speed=nitro?10:4+score*0.1;
 
-  let speed = nitro ? nitroSpeed : baseSpeed + score*0.1;
+ if(score%20==0) day=!day;
 
-  for(let i=0;i<obstacles.length;i++){
-    obstacles[i].y += speed;
+ rain.forEach(r=>{
+  r.y+=5;
+  if(r.y>600){r.y=0;r.x=Math.random()*400;}
+ });
 
-    // collision
-    if(
-      car.x < obstacles[i].x + 40 &&
-      car.x + 40 > obstacles[i].x &&
-      car.y < obstacles[i].y + 70 &&
-      car.y + 70 > obstacles[i].y
-    ){
-      gameOver = true;
-      document.getElementById("crashSound").play();
-    }
+ for(let i=0;i<obs.length;i++){
+  obs[i].y+=speed;
 
-    if(obstacles[i].y > 600){
-      obstacles.splice(i,1);
-      score++;
-    }
+  if(
+   carX<obs[i].x+45 &&
+   carX+45>obs[i].x &&
+   carY<obs[i].y+80 &&
+   carY+80>obs[i].y
+  ){
+   document.getElementById("crash").play();
+   if(score>best){best=score;localStorage.setItem("best",best);}
+   location.reload();
   }
 
-  document.getElementById("scoreBox").innerText = "Score: " + score;
+  if(obs[i].y>600){
+   obs.splice(i,1);
+   score++;
+   coins+=5;
+  }
+ }
+
+ checkMission();
+
+ document.getElementById("score").innerText="Score:"+score;
+ document.getElementById("coinsBox").innerText="💰 "+coins;
+ document.getElementById("best").innerText="🏆 "+best;
+
+ if(currentMission.target){
+   missionBox.innerText="🎯 "+currentMission.text+" ("+score+"/"+currentMission.target+")";
+ }else{
+   missionBox.innerText="🎯 "+currentMission.text+" ("+coins+"/"+currentMission.coinTarget+")";
+ }
 }
 
 // draw
 function draw(){
-  ctx.clearRect(0,0,400,600);
+ ctx.clearRect(0,0,400,600);
 
-  // road lines
-  ctx.fillStyle="white";
-  for(let i=0;i<600;i+=40){
-    ctx.fillRect(195,i+(Date.now()/10%40),10,20);
-  }
+ ctx.fillStyle=day?"#111":"#000022";
+ ctx.fillRect(0,0,400,600);
 
-  // wait image
-  if(!carImg.complete || !enemyImg.complete) return;
+ ctx.fillStyle="white";
+ for(let i=0;i<600;i+=40){
+  ctx.fillRect(195,i+(Date.now()/10%40),10,20);
+ }
 
-  // player
-  ctx.shadowColor="red";
-  ctx.shadowBlur=10;
-  ctx.drawImage(carImg, car.x, car.y, 45, 80);
-  ctx.shadowBlur=0;
+ ctx.strokeStyle="rgba(173,216,230,0.5)";
+ rain.forEach(r=>{
+  ctx.beginPath();
+  ctx.moveTo(r.x,r.y);
+  ctx.lineTo(r.x,r.y+10);
+  ctx.stroke();
+ });
 
-  // nitro flame
-  if(nitro){
-    ctx.fillStyle="orange";
-    ctx.fillRect(car.x+15, car.y+80, 15, 10);
-  }
+ ctx.drawImage(img,carX,carY,45,80);
 
-  // enemies
-  obstacles.forEach(o=>{
-    ctx.drawImage(enemyImg, o.x, o.y, 45, 80);
-  });
+ obs.forEach(o=>{
+  ctx.drawImage(enemy,o.x,o.y,45,80);
+ });
 
-  // game over
-  if(gameOver){
-    ctx.fillStyle="white";
-    ctx.font="30px Arial";
-    ctx.fillText("GAME OVER",100,300);
-  }
+ if(nitro){
+  ctx.fillStyle="orange";
+  ctx.fillRect(carX+15,carY+80,15,10);
+ }
 }
 
 // loop
-function gameLoop(){
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
+function loop(){
+ update();
+ draw();
+ requestAnimationFrame(loop);
 }
-gameLoop();
+loop();
 
-// engine sound start on click
-document.body.addEventListener("click", ()=>{
-  document.getElementById("engineSound").play();
+// sound
+document.body.addEventListener("click",()=>{
+ document.getElementById("engine").play();
 },{once:true});
 </script>
-
+<footer>make in Dhannjay uphade 🇮🇳 </footer>
 </body>
   </html>
