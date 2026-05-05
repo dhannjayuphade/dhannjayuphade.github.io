@@ -235,7 +235,48 @@ btn.innerHTML="🌙";
 }
 
 }
+<canvas id="canvas"></canvas>
 
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+let angle = 0;
+
+function draw() {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(angle);
+
+    for (let i = 0; i < 250; i++) {
+        ctx.beginPath();
+        ctx.strokeStyle = `hsl(${i * 2}, 100%, 60%)`;
+        ctx.lineWidth = i / 100;
+
+        ctx.arc(0, 0, i, 0, Math.PI / 2);
+        ctx.rotate(0.05);
+
+        ctx.stroke();
+    }
+
+    ctx.restore();
+
+    angle += 0.01; // rotation speed
+    requestAnimationFrame(draw);
+}
+
+draw();
+</script>
 </script>
   <div id="loginBox">
   <input type="text" id="username" placeholder="Enter Name">
