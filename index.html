@@ -575,12 +575,7 @@ onAuthStateChanged(auth,(user)=>{
 <h1>Thank you 💕 </h1>
 <footer>© 2026 Dhannjay Uphade</footer>
 
-<script>
-/* ===== COMMENT ===== */
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 
  <script>
@@ -645,6 +640,14 @@ function whatsappShare(){
     <div style="text-align:center; margin-top:20px;">
   <h3>👀 Total Visitors: <span id="visitor-count">Loading...</span></h3>
 </div>
+
+<script>
+fetch('https://api.countapi.xyz/hit/dhannjayuphade.github.io/visits')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('visitor-count').innerText = data.value;
+  });
+</script>
 
 <script>
 fetch('https://api.countapi.xyz/hit/dhannjayuphade.github.io/visits')
@@ -912,7 +915,7 @@ window.addComment = async function(){
 
   document.getElementById("comment").value = "";
 };
-  </script>
-  </script>
+  
+</script>
 </body>
 </html>
