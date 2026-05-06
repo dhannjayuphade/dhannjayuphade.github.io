@@ -311,40 +311,51 @@ footer{
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
-.comment {
-  background: #1e1e1e;
-  color: white;
-  padding: 12px;
+
+</style>
+  <style> 
+    .comment-box textarea {
+  width: 90%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
   margin-top: 10px;
+}
+
+.comment-box button {
+  margin-top: 10px;
+}
+
+.comment {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #1e293b;
+  padding: 10px;
   border-radius: 10px;
-  position: relative;
+  margin-top: 10px;
+  color: white;
 }
 
-.comment small {
-  color: #aaa;
+.comment img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
 }
 
-.comment span {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  cursor: pointer;
-  color: red;
-  }
-.fall {
-  animation: fall 1s forwards;
-}
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+    }
+    </style>
 
-@keyframes fall {
-  to {
-    transform: translateY(500px);
-    opacity: 0.5;
-  }
-}
-</style>
-</style>
-  
-  
 <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 <head>
   <meta charset="UTF-8">
@@ -555,15 +566,11 @@ onAuthStateChanged(auth,(user)=>{
   </a>
 
 <div class="comment-box">
-    <h2>Comments</h2>
-
-    <input type="text" id="name" placeholder="तुमचं नाव">
-    <textarea id="comment" placeholder="तुमचा comment लिहा..."></textarea>
-    <button onclick="addComment()">Post</button>
-
-    <div id="commentList"></div>
+  <textarea id="comment" placeholder="Write a comment..."></textarea>
+  <button onclick="addComment()">Post</button>
 </div>
 
+<div id="commentList"></div>
   
 <h1>Thank you 💕 </h1>
 <footer>© 2026 Dhannjay Uphade</footer>
@@ -806,159 +813,109 @@ body {
   padding-bottom: 60px;
 }
 </style>
-  <script> <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-// CONFIG
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  query, 
+  orderBy 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🔴 तुझा config
 const firebaseConfig = {
   apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
   authDomain: "dhannjay-website.firebaseapp.com",
-  projectId: "dhannjay-website",
+  projectId: "dhannjay-website"
 };
 
-// INIT
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ADD COMMENT
-window.addComment = async function () {
-  const input = document.getElementById("commentInput");
-  const text = input.value;
+const provider = new GoogleAuthProvider();
 
-  if (text.trim() === "") {
+let currentUser = null;
+
+// 🔐 Login
+window.login = function(){
+  signInWithPopup(auth, provider);
+}
+
+// 🔐 Logout
+window.logout = function(){
+  signOut(auth);
+}
+
+// 👤 Track user
+onAuthStateChanged(auth, (user)=>{
+  currentUser = user;
+});
+
+// 📥 Load comments (real-time)
+const q = query(collection(db, "comments"), orderBy("time","desc"));
+
+onSnapshot(q, (snapshot)=>{
+  let html = "";
+
+  snapshot.forEach((doc)=>{
+    const c = doc.data();
+
+    html += `
+      <div class="comment">
+        ${c.photo ? `<img src="${c.photo}">` : `<div class="avatar">U</div>`}
+        <div>
+          <strong>${c.name}</strong>
+          <p>${c.text}</p>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("commentList").innerHTML = html;
+});
+
+// ➕ Add comment
+window.addComment = async function(){
+  let text = document.getElementById("comment").value.trim();
+
+  if(!text){
     alert("Comment टाका");
     return;
   }
 
+  // 👤 Name logic
+  let name = "User";
+  let photo = "";
+
+  if(currentUser){
+    name = currentUser.displayName || "User";
+    photo = currentUser.photoURL || "";
+  }
+
   await addDoc(collection(db, "comments"), {
     text: text,
-    user: "Anonymous",
-    time: new Date()
+    name: name,
+    photo: photo,
+    time: Date.now()
   });
 
-  input.value = "";
-};
-
-// SHOW COMMENTS (REAL-TIME)
-const q = query(collection(db, "comments"), orderBy("time", "desc"));
-
-onSnapshot(q, (snapshot) => {
-  const container = document.getElementById("comments");
-  container.innerHTML = "";
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-
-    container.innerHTML += `
-      <div class="comment">
-        <strong>${data.user}</strong>
-        <p>${data.text}</p>
-      </div>
-    `;
-  });
-});
-</script>
-  <script>
-function roll(){
-  document.body.style.transition = "transform 1s";
-  document.body.style.transform = "rotate(360deg)";
-  
-  setTimeout(() => {
-    document.body.style.transform = "rotate(0deg)";
-  }, 1000);
-}
-  </script>
-  <script>
-document.addEventListener("mousemove", (e) => {
-  let items = document.querySelectorAll(".gravity-item");
-
-  items.forEach(el => {
-    let rect = el.getBoundingClientRect();
-    let dx = e.clientX - (rect.left + rect.width/2);
-    let dy = e.clientY - (rect.top + rect.height/2);
-
-    let distance = Math.sqrt(dx*dx + dy*dy);
-
-    if(distance < 200){
-      el.style.transform = `translate(${dx*0.2}px, ${dy*0.2}px)`;
-    } else {
-      el.style.transform = "translate(0,0)";
-    }
-  });
-});
-  </script>
-  <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getDatabase, 
-  ref, 
-  push, 
-  onValue, 
-  remove 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-// ✅ तुझा config
-const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
-  projectId: "dhannjay-website",
-  storageBucket: "dhannjay-website.firebasestorage.app",
-  messagingSenderId: "73314948186",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
-  measurementId: "G-Y76NHS7ZV8"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// 📥 Real-time load
-const commentsRef = ref(db, "comments");
-
-onValue(commentsRef, (snapshot) => {
-  const data = snapshot.val();
-  const list = document.getElementById("commentList");
-  list.innerHTML = "";
-
-  for (let id in data) {
-    const c = data[id];
-
-    list.innerHTML += `
-      <div class="comment">
-        <strong>${c.name}</strong>
-        <small> • ${c.time}</small>
-        <p>${c.text}</p>
-        <span onclick="deleteComment('${id}')">❌</span>
-      </div>
-    `;
-  }
-});
-
-// ➕ Add comment
-window.addComment = function () {
-  let name = document.getElementById("name").value.trim();
-  let text = document.getElementById("comment").value.trim();
-
-  if (!name || !text) {
-    alert("सगळी माहिती भरा!");
-    return;
-  }
-
-  push(commentsRef, {
-    name,
-    text,
-    time: new Date().toLocaleString()
-  });
-
-  document.getElementById("name").value = "";
   document.getElementById("comment").value = "";
 };
+  </script>
 
-// ❌ Delete comment
-window.deleteComment = function (id) {
-  remove(ref(db, "comments/" + id));
-};
+
   </script>
 </body>
 </html>
