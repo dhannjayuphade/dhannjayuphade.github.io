@@ -15,7 +15,9 @@
 
   <meta property="og:image" content="https://dhannjayuphade.github.io/share.jpg">
    
-
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ffcc">
+  
   <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
   window.OneSignal = window.OneSignal || [];
@@ -27,6 +29,7 @@
       }
     });
   });
+
 </script>
   <style>
   .logo {
@@ -917,5 +920,11 @@ window.addComment = async function(){
 };
   
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js")
+    .then(() => console.log("Service Worker Registered"));
+}
+  </script>
 </body>
 </html>
