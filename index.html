@@ -926,5 +926,79 @@ if ("serviceWorker" in navigator) {
     .then(() => console.log("Service Worker Registered"));
 }
   </script>
+  <script>
+async function requestNotificationPermission() {
+
+  if (!("Notification" in window)) {
+    alert("Browser does not support notifications");
+    return;
+  }
+
+  let permission = await Notification.requestPermission();
+
+  if (permission === "granted") {
+
+    function showNotification(title, body) {
+
+      let notification = new Notification(title, {
+        body: body,
+        icon: "https://dhannjayuphade.github.io/icon.png"
+      });
+
+      notification.onclick = () => {
+        window.open("https://dhannjayuphade.github.io/");
+      };
+    }
+
+    function checkTime() {
+
+      let now = new Date();
+      let hour = now.getHours();
+      let minute = now.getMinutes();
+
+      // Good Morning
+      if (hour === 7 && minute === 0) {
+        showNotification(
+          "🌞 Good Morning",
+          "Have a great day 🚀"
+        );
+      }
+      // Good afternoon 
+      if (hour === 1 && minute === 0) {
+        showNotification(
+          "🌞 Good afternoon",
+          "Have a great day 🚀"
+        );
+    }
+      // Good evening 
+      if (hour === 5 && minute === 0) {
+        showNotification(
+          "🌞 Good evening",
+          "Have a great day 🚀"
+        );
+        / Good evening 
+      if (hour === 3 && minute === 0) {
+        showNotification(
+          "🌞 Good boy",
+          "Have a great day 🚀"
+        );
+        
+      // Good Night
+      if (hour === 22 && minute === 0) {
+        showNotification(
+          "🌙 Good Night",
+          "Visit your website 😄"
+        );
+      }
+    }
+
+    // Check every minute
+    setInterval(checkTime, 60000);
+
+  }
+}
+
+requestNotificationPermission();
+  </script>
 </body>
 </html>
