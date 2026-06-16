@@ -41,7 +41,34 @@
   box-shadow: 0 0 20px cyan, 0 0 40px blue;
 }
 </style>
-  
+  <style>.welcome-text{
+  font-size: 60px;
+  font-weight: bold;
+
+  background: linear-gradient(
+    90deg,
+    #ff0000,
+    #ff9900,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #ff00ff
+  );
+
+  background-size: 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: rainbow 4s linear infinite;
+}
+
+@keyframes rainbow{
+  0%{background-position:0%;}
+  100%{background-position:300%;}
+}
+    </style>
+    
   <style>
     /* ===== Announcement Bar ===== */
 .announcement {
