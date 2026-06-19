@@ -1,54 +1,76 @@
-<!DOCTYPE html> 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ABC School</title>
+<title>B. K. Kawle Madhyamik Vidyalaya</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
+--primary:#1E3A8A;
+--secondary:#3B82F6;
 --bg:#ffffff;
 --text:#222;
---primary:#1E3A8A;
+--card:#ffffff;
 }
 
 .dark{
 --bg:#0f172a;
 --text:#ffffff;
+--card:#1e293b;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
 }
 
 body{
-margin:0;
-font-family:Poppins,sans-serif;
 background:var(--bg);
 color:var(--text);
 transition:.4s;
 }
 
 header{
-background:#1E3A8A;
-color:white;
-padding:15px;
+position:fixed;
+top:0;
+width:100%;
+background:rgba(30,58,138,.95);
+backdrop-filter:blur(10px);
+padding:15px 5%;
 display:flex;
 justify-content:space-between;
 align-items:center;
+z-index:1000;
 }
 
 .logo{
-font-size:25px;
-font-weight:bold;
+color:white;
+font-size:24px;
+font-weight:700;
 }
 
-button{
-padding:10px;
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+}
+
+.dark-btn{
+padding:8px 15px;
 border:none;
 border-radius:10px;
 cursor:pointer;
 }
 
 .notice{
+margin-top:75px;
 background:#ef4444;
 color:white;
 padding:10px;
@@ -56,12 +78,14 @@ font-weight:bold;
 }
 
 .hero{
-height:90vh;
-background:linear-gradient(
+height:100vh;
+background:
+linear-gradient(
 rgba(0,0,0,.5),
 rgba(0,0,0,.5)
 ),
-url('https://picsum.photos/1400/900');
+url('school1.jpg');
+
 background-size:cover;
 background-position:center;
 
@@ -69,53 +93,74 @@ display:flex;
 justify-content:center;
 align-items:center;
 text-align:center;
+
 color:white;
 }
 
 .hero h1{
 font-size:60px;
-margin:0;
 }
 
 .hero p{
 font-size:22px;
-}
-
-.btn{
-background:#3B82F6;
-color:white;
-padding:15px 30px;
-text-decoration:none;
-border-radius:10px;
-display:inline-block;
 margin-top:15px;
 }
 
-.ai-btn{
-position:fixed;
-right:20px;
-bottom:20px;
-width:70px;
-height:70px;
-border-radius:50%;
-background:#3B82F6;
+.btn{
+display:inline-block;
+margin-top:20px;
+padding:14px 30px;
+background:var(--secondary);
 color:white;
-font-size:30px;
+text-decoration:none;
+border-radius:10px;
 }
 
-.fade{
-animation:fade 1s ease;
+section{
+padding:80px 8%;
 }
 
-@keyframes fade{
-from{
-opacity:0;
-transform:translateY(50px);
+.title{
+text-align:center;
+font-size:35px;
+margin-bottom:40px;
+color:var(--primary);
 }
-to{
-opacity:1;
-transform:translateY(0);
+
+.about{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:30px;
+align-items:center;
 }
+
+.about img{
+width:100%;
+border-radius:20px;
+box-shadow:0 10px 20px rgba(0,0,0,.2);
+}
+
+.card{
+background:var(--card);
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+
+@media(max-width:768px){
+
+.hero h1{
+font-size:35px;
+}
+
+.about{
+grid-template-columns:1fr;
+}
+
+nav{
+display:none;
+}
+
 }
 
 </style>
@@ -126,34 +171,49 @@ transform:translateY(0);
 <header>
 
 <div class="logo">
-🏫 ABC SCHOOL
+🏫 B.K. Kawle School
 </div>
 
-<button onclick="darkMode()">
-🌙 Dark Mode
+<nav>
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<a href="#gallery">Gallery</a>
+<a href="#contact">Contact</a>
+</nav>
+
+<button class="dark-btn"
+onclick="darkMode()">
+🌙
 </button>
 
 </header>
 
 <div class="notice">
+
 <marquee>
-📢 Admissions Open 2026-27 |
-📢 Annual Function 25 July |
-📢 Science Exhibition Coming Soon
+
+📢 Admissions Open |
+📢 Welcome to B.K. Kawle Madhyamik Vidyalaya |
+📢 Rajaram Nagar, Tal. Dindori, Dist. Nashik
+
 </marquee>
+
 </div>
 
-<section class="hero">
+<section class="hero" id="home">
 
-<div class="fade">
+<div>
 
-<h1>Welcome To ABC School</h1>
+<h1>
+B. K. Kawle Madhyamik Vidyalaya
+</h1>
 
 <p>
-Knowledge • Discipline • Success
+Rajaram Nagar, Tal. Dindori, Dist. Nashik
 </p>
 
-<a href="#" class="btn">
+<a href="#about"
+class="btn">
 Explore School
 </a>
 
@@ -161,10 +221,40 @@ Explore School
 
 </section>
 
-<button class="ai-btn"
-onclick="alert('School AI Assistant')">
-🤖
-</button>
+<section id="about">
+
+<h2 class="title">
+About School
+</h2>
+
+<div class="about">
+
+<img src="school2.jpg">
+
+<div class="card">
+
+<h3>
+Welcome to Our School
+</h3>
+
+<br>
+
+<p>
+
+B. K. Kawle Madhyamik Vidyalaya is a leading educational
+institution located at Rajaram Nagar, Taluka Dindori,
+District Nashik.
+
+The school is committed to academic excellence,
+discipline, innovation, and holistic student development.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
 
 <script>
 
@@ -173,6 +263,7 @@ document.body.classList.toggle("dark");
 }
 
 </script>
+    
 
 </body>
     </html>
