@@ -1,27 +1,178 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
-    <head>
-        <titel>program</titel>
-        <style>=background colour"orange"</style>
-        <style>
-            display: flex;
-justify-content: center;
-align-items: center;
-        </style>
-    </head>
-    <body>
-        
-    <div class="box">       
-   <h1>hello</h1>
-    <p>Hi hello </p>
-    </div>
-    <botton
-        onclick="sayHi()">click Me</botton>
-    
-    <script>
-        function sayHi(){
-            alert("Hi Dhannjay uphade 🇮🇳")
-        }
-    </script>
-    </body>
-</html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ABC School</title>
+
+<style>
+
+:root{
+--bg:#ffffff;
+--text:#222;
+--primary:#1E3A8A;
+}
+
+.dark{
+--bg:#0f172a;
+--text:#ffffff;
+}
+
+body{
+margin:0;
+font-family:Poppins,sans-serif;
+background:var(--bg);
+color:var(--text);
+transition:.4s;
+}
+
+header{
+background:#1E3A8A;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:25px;
+font-weight:bold;
+}
+
+button{
+padding:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.notice{
+background:#ef4444;
+color:white;
+padding:10px;
+font-weight:bold;
+}
+
+.hero{
+height:90vh;
+background:linear-gradient(
+rgba(0,0,0,.5),
+rgba(0,0,0,.5)
+),
+url('https://picsum.photos/1400/900');
+background-size:cover;
+background-position:center;
+
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+color:white;
+}
+
+.hero h1{
+font-size:60px;
+margin:0;
+}
+
+.hero p{
+font-size:22px;
+}
+
+.btn{
+background:#3B82F6;
+color:white;
+padding:15px 30px;
+text-decoration:none;
+border-radius:10px;
+display:inline-block;
+margin-top:15px;
+}
+
+.ai-btn{
+position:fixed;
+right:20px;
+bottom:20px;
+width:70px;
+height:70px;
+border-radius:50%;
+background:#3B82F6;
+color:white;
+font-size:30px;
+}
+
+.fade{
+animation:fade 1s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(50px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🏫 ABC SCHOOL
+</div>
+
+<button onclick="darkMode()">
+🌙 Dark Mode
+</button>
+
+</header>
+
+<div class="notice">
+<marquee>
+📢 Admissions Open 2026-27 |
+📢 Annual Function 25 July |
+📢 Science Exhibition Coming Soon
+</marquee>
+</div>
+
+<section class="hero">
+
+<div class="fade">
+
+<h1>Welcome To ABC School</h1>
+
+<p>
+Knowledge • Discipline • Success
+</p>
+
+<a href="#" class="btn">
+Explore School
+</a>
+
+</div>
+
+</section>
+
+<button class="ai-btn"
+onclick="alert('School AI Assistant')">
+🤖
+</button>
+
+<script>
+
+function darkMode(){
+document.body.classList.toggle("dark");
+}
+
+</script>
+
+</body>
+    </html>
