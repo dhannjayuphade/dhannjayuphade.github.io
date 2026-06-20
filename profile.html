@@ -1,197 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Profile</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Page</title>
 
-  <!-- Firebase v8 -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial;
-      background:#0a0f1c;
-      color:white;
-    }
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+transition:.4s;
+overflow-x:hidden;
+}
 
-    .container{
-      max-width:400px;
-      margin:auto;
-      padding:15px;
-    }
+body.light{
+background:linear-gradient(135deg,#f8fafc,#e2e8f0);
+}
 
-    .profile{
-      text-align:center;
-      background:#111827;
-      padding:20px;
-      border-radius:15px;
-    }
+.container{
+width:95%;
+max-width:450px;
+padding:25px;
+border-radius:25px;
+backdrop-filter:blur(15px);
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.2);
+box-shadow:0 0 30px rgba(0,255,255,.2);
+text-align:center;
+animation:fadeIn 1s ease;
+}
 
-    .profile img{
-      width:90px;
-      height:90px;
-      border-radius:50%;
-      border:3px solid #ff007f;
-    }
+.profile-pic{
+width:130px;
+height:130px;
+border-radius:50%;
+border:4px solid cyan;
+object-fit:cover;
+box-shadow:0 0 25px cyan;
+animation:glow 2s infinite alternate;
+}
 
-    .name{
-      font-size:20px;
-      font-weight:bold;
-      margin-top:10px;
-    }
+@keyframes glow{
+from{box-shadow:0 0 10px cyan;}
+to{box-shadow:0 0 40px cyan;}
+}
 
-    .email{
-      font-size:13px;
-      color:#aaa;
-    }
+h2{
+color:white;
+margin-top:15px;
+}
 
-    .score{
-      font-size:22px;
-      margin-top:10px;
-      color:#22c55e;
-    }
+.light h2{
+color:black;
+}
 
-    .btn{
-      margin:8px;
-      padding:10px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-    }
+.bio{
+margin-top:10px;
+color:#ddd;
+}
 
-    .login{background:#3b82f6;color:white;}
-    .logout{background:#ef4444;color:white;}
-    .play{background:#22c55e;color:black;}
+.light .bio{
+color:#444;
+}
 
-    .stories{
-      display:flex;
-      overflow-x:auto;
-      margin-top:15px;
-      gap:10px;
-    }
+.stats{
+display:flex;
+justify-content:space-around;
+margin-top:20px;
+color:white;
+}
 
-    .story{
-      text-align:center;
-    }
+.light .stats{
+color:black;
+}
 
-    .story img{
-      width:60px;
-      height:60px;
-      border-radius:50%;
-      border:3px solid #ff007f;
-    }
-  </style>
+.stat{
+cursor:pointer;
+}
+
+.follow-btn{
+margin-top:20px;
+padding:12px 25px;
+border:none;
+border-radius:30px;
+background:linear-gradient(45deg,#00e5ff,#0077ff);
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+
+.follow-btn:hover{
+transform:scale(1.08);
+}
+
+.top-buttons{
+display:flex;
+justify-content:space-between;
+margin-bottom:15px;
+}
+
+.icon-btn{
+border:none;
+padding:10px;
+border-radius:50%;
+cursor:pointer;
+font-size:18px;
+}
+
+.search{
+margin-top:20px;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border:none;
+outline:none;
+border-radius:15px;
+}
+
+.results{
+margin-top:10px;
+max-height:120px;
+overflow:auto;
+}
+
+.results div{
+padding:10px;
+margin-top:5px;
+background:rgba(255,255,255,.1);
+border-radius:10px;
+color:white;
+}
+
+.light .results div{
+color:black;
+}
+
+.socials{
+margin-top:20px;
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.socials a{
+text-decoration:none;
+padding:10px 15px;
+border-radius:12px;
+background:#1e293b;
+color:white;
+transition:.3s;
+}
+
+.socials a:hover{
+transform:translateY(-4px);
+}
+
+.light .socials a{
+background:#dbeafe;
+color:black;
+}
+
+#toast{
+position:fixed;
+top:20px;
+right:20px;
+background:#22c55e;
+color:white;
+padding:12px 18px;
+border-radius:12px;
+display:none;
+z-index:1000;
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+</style>
 </head>
 
 <body>
 
+<div id="toast"></div>
+
 <div class="container">
 
-  <!-- PROFILE -->
-  <div class="profile">
-    <img id="photo">
-    <div class="name" id="name">Loading...</div>
-    <div class="email" id="email"></div>
+<div class="top-buttons">
+<button class="icon-btn" id="themeBtn">🌙</button>
+<button class="icon-btn">⚙️</button>
+</div>
 
-    <div class="score">🎮 Score: <span id="score">0</span></div>
+<img
+class="profile-pic"
+src="https://via.placeholder.com/150"
+alt="Profile">
 
-    <button class="btn login" onclick="login()">Login</button>
-    <button class="btn logout" onclick="logout()">Logout</button>
-    <button class="btn play" onclick="playGame()">Play Quiz</button>
-  </div>
+<h2>Dhananjay Uphade ✔️</h2>
 
-  <!-- STORIES -->
-  <div class="stories" id="stories"></div>
+<p class="bio">
+Developer • Editor • YouTuber
+</p>
+
+<div class="stats">
+<div class="stat">
+<h3 id="followers">125</h3>
+<p>Followers</p>
+</div>
+
+<div class="stat">
+<h3 id="following">87</h3>
+<p>Following</p>
+</div>
+
+<div class="stat">
+<h3>14</h3>
+<p>Posts</p>
+</div>
+</div>
+
+<button
+class="follow-btn"
+id="followBtn">
+Follow
+</button>
+
+<div class="search">
+<input
+type="text"
+id="searchBox"
+placeholder="Search Users...">
+
+<div
+class="results"
+id="results">
+</div>
+</div>
+
+<div class="socials">
+<a href="#">YouTube</a>
+<a href="#">GitHub</a>
+<a href="#">Instagram</a>
+<a href="#">Facebook</a>
+</div>
 
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
-  authDomain: "dhannjay-website.firebaseapp.com",
-  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
-  projectId: "dhannjay-website",
-  storageBucket: "dhannjay-website.firebasestorage.app",
-  messagingSenderId: "73314948186",
-  appId: "1:73314948186:web:e7d64f04ba3221a21df463"
+
+let following=false;
+
+const btn=document.getElementById("followBtn");
+const followers=document.getElementById("followers");
+
+btn.onclick=()=>{
+
+let count=parseInt(followers.innerText);
+
+if(!following){
+count++;
+btn.innerText="Following";
+showToast("You followed this user");
+}else{
+count--;
+btn.innerText="Follow";
+showToast("You unfollowed this user");
+}
+
+followers.innerText=count;
+following=!following;
 };
 
-firebase.initializeApp(firebaseConfig);
+const themeBtn=
+document.getElementById("themeBtn");
 
-// 🔥 SESSION FIX
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+themeBtn.onclick=()=>{
 
-const auth = firebase.auth();
-const db = firebase.database();
+document.body.classList.toggle("light");
 
-// LOGIN
-function login(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+if(document.body.classList.contains("light")){
+themeBtn.innerHTML="☀️";
+}else{
+themeBtn.innerHTML="🌙";
 }
 
-// LOGOUT
-function logout(){
-  auth.signOut();
-}
+};
 
-// PLAY QUIZ PAGE
-function playGame(){
-  window.location = "quiz.html"; // तुझा quiz page
-}
+const users=[
+"Dhananjay",
+"Sai",
+"Gaming",
+"Editor",
+"Developer",
+"Arduino",
+"Python",
+"Firebase",
+"GitHub"
+];
 
-// STORIES UI
-function loadStories(user){
-  const s = document.getElementById("stories");
-  s.innerHTML = "";
+const searchBox=
+document.getElementById("searchBox");
 
-  if(user){
-    s.innerHTML += `
-      <div class="story">
-        <img src="${user.photoURL}">
-        <p>You</p>
-      </div>`;
-  }
+const results=
+document.getElementById("results");
 
-  ["🔥","🎮","🏆","⚡"].forEach(e=>{
-    s.innerHTML += `
-      <div class="story">
-        <img src="https://via.placeholder.com/60">
-        <p>${e}</p>
-      </div>`;
-  });
-}
+searchBox.oninput=()=>{
 
-// AUTH STATE
-auth.onAuthStateChanged(user=>{
-  if(user){
-    document.getElementById("name").innerText = user.displayName;
-    document.getElementById("email").innerText = user.email;
-    document.getElementById("photo").src = user.photoURL;
+let val=
+searchBox.value.toLowerCase();
 
-    // SAVE USER
-    db.ref("users/"+user.uid).update({
-      name:user.displayName,
-      email:user.email,
-      photo:user.photoURL
-    });
+results.innerHTML="";
 
-    // LOAD SCORE
-    db.ref("users/"+user.uid+"/score").on("value", snap=>{
-      document.getElementById("score").innerText = snap.val() || 0;
-    });
+users
+.filter(x=>
+x.toLowerCase().includes(val)
+)
+.forEach(user=>{
 
-    loadStories(user);
+let div=
+document.createElement("div");
 
-  } else {
-    document.getElementById("name").innerText = "Please Login";
-    document.getElementById("email").innerText = "";
-    document.getElementById("photo").src = "";
-    document.getElementById("score").innerText = "0";
-  }
+div.innerText=user;
+
+results.appendChild(div);
+
 });
+
+};
+
+function showToast(msg){
+
+const toast=
+document.getElementById("toast");
+
+toast.innerText=msg;
+toast.style.display="block";
+
+setTimeout(()=>{
+toast.style.display="none";
+},3000);
+
+}
+
+setTimeout(()=>{
+showToast("Welcome to Profile Page");
+},1000);
+
 </script>
 
 </body>
