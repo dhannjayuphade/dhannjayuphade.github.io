@@ -197,7 +197,55 @@ background:#444;
 }
 
 </style>
+    
+<style> 
+  .qr-btn{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 35px;
+    margin:15px;
+    text-decoration:none;
+    color:white;
+    font-size:18px;
+    font-weight:600;
+    border-radius:50px;
+    overflow:hidden;
+    background:linear-gradient(45deg,#00c9ff,#92fe9d,#667eea,#764ba2);
+    background-size:300% 300%;
+    animation:gradientMove 5s ease infinite;
+    box-shadow:0 0 25px rgba(0,201,255,.5);
+    transition:.3s;
+}
 
+.qr-btn:hover{
+    transform:translateY(-5px) scale(1.05);
+    box-shadow:0 0 40px rgba(255,255,255,.7);
+}
+
+.qr-btn::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,.25);
+    transform:skewX(-30deg);
+    transition:.7s;
+}
+
+.qr-btn:hover::before{
+    left:120%;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  </style>
 <script>
 
 function toggleMenu(){
@@ -392,6 +440,10 @@ font-size:16px;
     }
 }
 </style>
+
+  <a href="qr.html" class="qr-btn">
+    <span>📱 QR Studio Pro</span>
+  </a>
   
     <!-- =====Download app===== -->
 <div>
