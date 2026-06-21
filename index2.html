@@ -341,14 +341,55 @@ font-size:16px;
 <style>
 .creator-studio{
     text-align:center;
-    margin:20px 0;
+    margin:20px auto;
+    width:95%;
+    max-width:900px;
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+    animation:float 4s ease-in-out infinite;
+    box-shadow:0 0 20px rgba(0,255,255,0.5);
 }
 
 .creator-studio img{
     width:100%;
-    max-width:900px;
-    border-radius:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.3);
+    display:block;
+    border-radius:20px;
+}
+
+/* Shine Effect */
+.creator-studio::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-120%;
+    width:50%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.6),
+        transparent
+    );
+    transform:skewX(-25deg);
+    animation:shine 3s infinite;
+}
+
+/* Floating Animation */
+@keyframes float{
+    0%,100%{
+        transform:translateY(0px);
+    }
+    50%{
+        transform:translateY(-10px);
+    }
+}
+
+/* Moving Light */
+@keyframes shine{
+    100%{
+        left:150%;
+    }
 }
 </style>
   
