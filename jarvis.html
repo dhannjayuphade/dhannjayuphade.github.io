@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jarvis Voice Assistant</title>
+<style>
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh}
+.card{background:#141b34;padding:30px;border-radius:18px;max-width:420px;text-align:center;box-shadow:0 0 30px rgba(0,255,255,.2)}
+button{padding:12px 24px;border:none;border-radius:999px;background:#00c2ff;color:#001;font-weight:bold;cursor:pointer}
+#status{margin:16px 0}
+.orb{width:120px;height:120px;border-radius:50%;margin:20px auto;background:radial-gradient(circle,#4cf,#08f);animation:pulse 2s infinite}
+@keyframes pulse{50%{transform:scale(1.08);filter:brightness(1.2)}}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>JARVIS</h1>
+<div class="orb"></div>
+<p id="status">Press Start and speak.</p>
+<button onclick="start()">Start Listening</button>
+</div>
+<script>
+const statusEl=document.getElementById('status');
+function speak(t){
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t);
+ u.rate=1;
+ speechSynthesis.speak(u);
+ statusEl.textContent=t;
+}
+function handle(cmd){
+ cmd=cmd.toLowerCase();
+ if(cmd.includes("time")){
+   speak("The time is "+new Date().toLocaleTimeString());
+ }else if(cmd.includes("date")){
+   speak("Today is "+new Date().toDateString());
+ }else if(cmd.includes("open youtube")){
+   window.open("https://youtube.com","_blank"); speak("Opening YouTube");
+ }else if(cmd.includes("open google")){
+   window.open("https://google.com","_blank"); speak("Opening Google");
+ }else{
+   speak("You said: "+cmd);
+ }
+}
+function start(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){alert("Speech Recognition is not supported in this browser.");return;}
+ const r=new SR();
+ r.lang="en-US";
+ r.onstart=()=>statusEl.textContent="Listening...";
+ r.onresult=e=>handle(e.results[0][0].transcript);
+ r.onerror=e=>statusEl.textContent="Error: "+e.error;
+ r.onend=()=>statusEl.textContent+=" (finished)";
+ r.start();
+}
+</script>
+</body>
+</html>
