@@ -1054,12 +1054,12 @@ requestNotificationPermission();
 
 <script>
 // TYPING EFFECT (4)
-const text="> Welcome to Dhannjay's World... > Loading Terminal Tools...";
+const text="> Welcome to Dhannjay's World... > Loading website...";
 let i=0;
 function typing(){
  if(i<text.length){
   document.getElementById('type').innerHTML+=text.charAt(i);
-  i++; setTimeout(typing,40);
+  i++; setTimeout(typing,50);
  } else {
   setTimeout(()=>{document.getElementById('loader').style.display='none'},800);
  }
