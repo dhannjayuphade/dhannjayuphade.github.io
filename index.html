@@ -612,6 +612,24 @@ onAuthStateChanged(auth,(user)=>{
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
+  <!-- VISITOR COUNTER - Before Footer -->
+<div style="text-align:center;padding:25px 15px;background:#151515;border-radius:15px;margin:30px 15px;border:1px solid #222">
+  <p style="color:#888;font-size:13px;letter-spacing:2px;margin:0 0 8px 0">TOTAL VISITORS</p>
+  <h2 style="color:#00ff88;font-family:monospace;font-size:32px;margin:0" id="visits">0000</h2>
+</div>
+
+<script>
+fetch('https://api.countapi.xyz/hit/dhannjayuphade.github.io/visits')
+.then(r=>r.json())
+.then(d=>{
+  document.getElementById('visits').innerText = String(d.value).padStart(4,'0');
+})
+.catch(()=>{
+  let c = localStorage.getItem('vcount') || 1240;
+  c++; localStorage.setItem('vcount',c);
+  document.getElementById('visits').innerText = c;
+});
+                            </script>
 <h1>Thank you 💕 </h1>
 <footer>© 2026 Dhannjay Uphade</footer>
 
