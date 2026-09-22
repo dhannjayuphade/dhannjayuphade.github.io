@@ -1037,5 +1037,52 @@ async function requestNotificationPermission() {
 
 requestNotificationPermission();
   </script>
+  <!-- 1. LOADER + TYPING EFFECT -->
+<div id="loader" style="position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column">
+  <h2 id="type" style="color:#00ff88;font-family:monospace"></h2>
+</div>
+
+<style>
+/* 2. SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:0.8s}
+.reveal.active{opacity:1;transform:none}
+
+/* 3. SHAKE MODE */
+@keyframes shake{0%,100%{transform:translate(0,0)}10%{transform:translate(-5px,-5px)}20%{transform:translate(5px,5px)}30%{transform:translate(-5px,5px)}40%{transform:translate(5px,-5px)}50%{transform:translate(-3px,0)}}
+.shake-mode{animation:shake 0.2s infinite}
+</style>
+
+<script>
+// TYPING EFFECT (4)
+const text="> Welcome to Dhannjay's World... > Loading Terminal Tools...";
+let i=0;
+function typing(){
+ if(i<text.length){
+  document.getElementById('type').innerHTML+=text.charAt(i);
+  i++; setTimeout(typing,40);
+ } else {
+  setTimeout(()=>{document.getElementById('loader').style.display='none'},800);
+ }
+}
+typing();
+
+// SCROLL REVEAL (3)
+window.addEventListener('scroll',()=>{
+ document.querySelectorAll('.card, .tool, section').forEach(el=>{
+  el.classList.add('reveal');
+  if(el.getBoundingClientRect().top < window.innerHeight-80) el.classList.add('active');
+ });
+});
+
+// SHAKE MODE (Press S)
+document.addEventListener('keydown',(e)=>{
+ if(e.key.toLowerCase()==='s'){
+   document.body.classList.add('shake-mode');
+   setTimeout(()=>document.body.classList.remove('shake-mode'),2000);
+   // optional sound
+   console.log("SHAKE MODE ON");
+ }
+});
+</script>
 </body>
 </html>
