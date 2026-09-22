@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IP Finder - By Dhannjay</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#0a0a0a;color:#00ff88;font-family:monospace;display:flex;justify-content:center;padding:20px}
+.box{background:#151515;border:1px solid #222;border-radius:15px;padding:25px;max-width:450px;width:100%;text-align:center}
+h2{color:#fff}
+.info{text-align:left;background:#000;padding:15px;border-radius:10px;margin-top:15px;line-height:28px;border:1px solid #222}
+button{background:#00ff88;color:#000;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🌍 IP & Location Finder</h2>
+<p style="color:#888;font-size:13px">Your Real IP Details</p>
+<div class="info" id="data">Loading...</div>
+<button onclick="location.reload()">Refresh IP</button>
+<br><br>
+<a href="/" style="color:#555;text-decoration:none;font-size:12px"><- Back to Home</a>
+</div>
+
+<script>
+fetch('https://ipapi.co/json/')
+.then(r=>r.json())
+.then(d=>{
+ document.getElementById('data').innerHTML=`
+ <b>IP:</b> ${d.ip}<br>
+ <b>City:</b> ${d.city}<br>
+ <b>Region:</b> ${d.region}<br>
+ <b>Country:</b> ${d.country_name} ${d.country}<br>
+ <b>ISP:</b> ${d.org}<br>
+ <b>Timezone:</b> ${d.timezone}<br>
+ <b>Lat/Lon:</b> ${d.latitude}, ${d.longitude}<br>
+ `;
+})
+.catch(()=>{document.getElementById('data').innerHTML='Failed to fetch. Try VPN off karun.'})
+</script>
+</body>
+  </html>
