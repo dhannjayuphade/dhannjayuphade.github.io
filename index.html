@@ -21,20 +21,25 @@
   <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ffcc">
   
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
 <script>
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
-    OneSignal.init({
-      appId: "8b3c9ee5-fa61-4f72-9587-188e1fde0e2c",
-      notifyButton: {
-        enable: true,
-      }
-    });
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({
+    appId: "8b3c9ee5-fa61-4f72-9587-188e1fde0e2c",
+
+    notifyButton: {
+      enable: true
+    }
   });
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7835288041144720"
-     crossorigin="anonymous"></script>
+
+  console.log("✅ OneSignal initialized");
+});
 </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7835288041144720"
+     crossorigin="anonymous"></script>
   <style>
   .logo {
   width: 150px;
@@ -657,26 +662,33 @@ function shareSuvichar(){
   window.open("https://wa.me/?text="+encodeURIComponent("🌟 सुविचार:\n"+text+"\n\nhttps://dhannjayuphade.github.io/suvichar/"),"_blank");
 }
 </script>
-  <script>
-function subscribeSite(){
-  if(!("Notification" in window)){
-    alert("तुमचा browser notifications support करत नाही");
-    return;
+
+<script>
+async function subscribeSite() {
+  try {
+    OneSignalDeferred.push(async function(OneSignal) {
+
+      const permission =
+        await OneSignal.Notifications.requestPermission();
+
+      if (permission) {
+        document.getElementById("subStatus").innerText =
+          "✅ Notifications enabled!";
+      } else {
+        document.getElementById("subStatus").innerText =
+          "❌ Notification permission denied.";
+      }
+
+    });
+
+  } catch (error) {
+    console.error("OneSignal error:", error);
+
+    document.getElementById("subStatus").innerText =
+      "⚠️ Notification setup failed.";
   }
-
-  Notification.requestPermission().then(permission=>{
-    if(permission==="granted"){
-      localStorage.setItem("site_subscribed","yes");
-      document.getElementById("subStatus").innerText="✅ Subscribed Successfully!";
-      new Notification("🎉 Dhannjay Uphade Website",{
-        body:"तुम्ही website ला subscribe केलं आहे. Updates लवकरच येतील!"
-      });
-    }else{
-      alert("❌ Notification permission deny केली");
-    }
-  });
 }
-
+          </script>
 window.onload=function(){
   if(localStorage.getItem("site_subscribed")==="yes"){
     document.getElementById("subStatus").innerText="🔔 You are already subscribed";
