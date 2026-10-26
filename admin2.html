@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin – Dhannjay Hub</title>
+<meta name="theme-color" content="#00ffcc">
+<style>
+:root{--bg:#050a0f;--card:rgba(12,22,30,.78);--line:rgba(0,255,204,.22);--neon:#00ffcc;--neon2:#7a5cff;
+  --text:#e6fff9;--muted:#8fb5ad;--err:#ff4d6d;--ok:#00e68a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,-apple-system,'Noto Sans Devanagari',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::before{content:"";position:absolute;inset:-50%;
+  background-image:linear-gradient(rgba(0,255,204,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,204,.05) 1px,transparent 1px);
+  background-size:44px 44px;transform:perspective(500px) rotateX(60deg) translateY(-10%);animation:grid 14s linear infinite}
+@keyframes grid{to{background-position:0 44px}}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35}
+.o1{width:280px;height:280px;background:var(--neon);top:-90px;left:-90px}
+.o2{width:300px;height:300px;background:var(--neon2);bottom:-100px;right:-100px}
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:16px 16px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.top a{color:var(--neon);text-decoration:none;font-size:14px}
+h1{font-size:20px;font-family:monospace;color:var(--neon);text-shadow:0 0 12px var(--neon)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center}
+.stat b{display:block;font-size:22px;color:var(--neon);font-family:monospace}
+.stat small{font-size:11px;color:var(--muted)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tools input,.tools select{flex:1;min-width:140px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(0,0,0,.35);color:var(--text);font-size:14px;outline:none}
+.tools input:focus,.tools select:focus{border-color:var(--neon)}
+.tools option{background:#0a141c}
+.btn{padding:11px 16px;border-radius:12px;border:1px solid var(--neon);background:transparent;color:var(--neon);
+  font-weight:600;font-size:14px;cursor:pointer;transition:.2s}
+.btn:hover{box-shadow:0 0 18px rgba(0,255,204,.4)}
+.btn.fill{background:linear-gradient(135deg,var(--neon),var(--neon2));color:#021;border:0}
+.u{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden;animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+.uh{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.av{width:46px;height:46px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));color:#021;font-weight:700;font-size:18px}
+.av img{width:100%;height:100%;object-fit:cover}
+.who{flex:1;min-width:0}
+.who b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who small{color:var(--muted);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{color:var(--muted);transition:transform .25s}
+.u.open .chev{transform:rotate(90deg)}
+.det{display:none;padding:2px 14px 14px;border-top:1px solid rgba(255,255,255,.06);font-size:13px}
+.u.open .det{display:block}
+.r{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.r span:first-child{color:var(--muted);flex:none}
+.r span:last-child{text-align:right;word-break:break-word}
+.dl{margin-top:8px;color:var(--muted);font-size:12px}
+.dl div{padding:3px 0}
+.empty,#denied{text-align:center;color:var(--muted);padding:40px 10px;line-height:1.7}
+#denied{background:var(--card);border:1px solid var(--err);border-radius:16px;margin-top:20px}
+#denied code{display:block;background:rgba(0,0,0,.4);padding:10px;border-radius:10px;margin:10px 0;color:var(--neon);word-break:break-all;font-size:12px}
+.ring{width:54px;height:54px;border-radius:50%;border:3px solid transparent;border-top-color:var(--neon);border-right-color:var(--neon2);
+  animation:sp 1s linear infinite;margin:80px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-80px);z-index:30;padding:11px 18px;border-radius:12px;
+  background:var(--neon);color:#021;font-weight:600;font-size:14px;transition:transform .4s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#proto{display:none;position:fixed;bottom:12px;left:12px;right:12px;z-index:40;padding:12px 14px;border-radius:12px;background:var(--err);color:#fff;font-size:13px;text-align:center}
+[hidden]{display:none!important}
+@media(max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="proto">⚠️ Local file detected. Open this page on the website: https://dhannjayuphade.github.io/admin2.html</div>
+
+<main>
+  <div class="top"><h1>🛡️ ADMIN PANEL</h1><a href="profile.html">My profile →</a></div>
+  <div id="loading"><div class="ring"></div></div>
+
+  <div id="denied" hidden>
+    <b style="color:var(--err)">⛔ Access denied</b><br>
+    This account is not an admin (or the database rules are not published yet).
+    <div style="margin-top:10px;font-size:13px">To make this account an admin, open Firebase Console → Realtime Database → Data, add a node
+    <b>admins</b> with this key and value <b>true</b>:</div>
+    <code id="myUid"></code>
+    <a class="btn" href="login.html" style="display:inline-block;text-decoration:none;margin-top:6px">Login with another account</a>
+  </div>
+
+  <div id="panel" hidden>
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><small>Total users</small></div>
+      <div class="stat"><b id="sDay">0</b><small>Active 24h</small></div>
+      <div class="stat"><b id="sWeek">0</b><small>Active 7 days</small></div>
+      <div class="stat"><b id="sVer">0</b><small>Verified</small></div>
+    </div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="🔍 Search name, email, phone, city">
+      <select id="sort">
+        <option value="login">Last login</option>
+        <option value="new">Newest members</option>
+        <option value="name">Name A–Z</option>
+      </select>
+      <button class="btn" id="csv">⬇ CSV</button>
+    </div>
+    <div id="list"></div>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
+  measurementId: "G-Y76NHS7ZV8"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = s => document.querySelector(s);
+if(!/^https?:$/.test(location.protocol)) $('#proto').style.display='block';
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+const fmt = ts => ts ? new Date(ts).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : '–';
+function ago(ts){
+  if(!ts) return '';
+  const m = Math.floor((Date.now()-ts)/6e4);
+  if(m<1) return 'just now'; if(m<60) return m+' min ago';
+  const h = Math.floor(m/60); if(h<24) return h+' hr ago';
+  return Math.floor(h/24)+' days ago';
+}
+const safeImg = u => typeof u==='string' && (/^data:image\/(jpeg|png|webp);base64,/.test(u) || /^https:\/\//.test(u)) ? u : '';
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e; }
+
+let users = [];
+
+/* ---- gate: only accounts listed under /admins/<uid> = true may continue.
+   The real protection is in the database rules; this check only decides what to show. ---- */
+onAuthStateChanged(auth, async user=>{
+  if(!user){ location.replace('login.html'); return; }
+  let ok = false;
+  try{ ok = (await get(ref(db,'admins/'+user.uid))).val() === true; }catch(e){ ok = false; }
+  $('#loading').hidden = true;
+  if(!ok){ $('#myUid').textContent = user.uid; $('#denied').hidden = false; return; }
+  $('#panel').hidden = false;
+  onValue(ref(db,'users'), snap=>{
+    users = Object.entries(snap.val()||{}).map(([id,v])=>({id,...v}));
+    render();
+  }, e=>toast('Cannot read users: '+(e.code||e.message)));
+});
+
+/* ---- render ---- */
+function render(){
+  const now = Date.now();
+  $('#sTotal').textContent = users.length;
+  $('#sDay').textContent   = users.filter(u=>now-(u.lastLogin||0) < 864e5).length;
+  $('#sWeek').textContent  = users.filter(u=>now-(u.lastLogin||0) < 6048e5).length;
+  $('#sVer').textContent   = users.filter(u=>u.emailVerified).length;
+
+  const q = $('#q').value.trim().toLowerCase();
+  let rows = users.filter(u=>!q || [u.name,u.email,u.phone,u.city].some(x=>String(x||'').toLowerCase().includes(q)));
+  const s = $('#sort').value;
+  rows.sort((a,b)=> s==='name' ? String(a.name||'').localeCompare(String(b.name||''))
+                  : s==='new'  ? (b.createdAt||0)-(a.createdAt||0)
+                  : (b.lastLogin||0)-(a.lastLogin||0));
+
+  const list = $('#list'); list.replaceChildren();
+  if(!rows.length){ list.append(el('div','empty', users.length ? 'No users match your search.' : 'No users yet. They appear here after they log in.')); return; }
+
+  rows.forEach(u=>{
+    const card = el('div','u');
+    const head = el('div','uh');
+    const av = el('div','av');
+    const img = safeImg(u.photo);
+    if(img){ const i=document.createElement('img'); i.src=img; i.alt=''; av.append(i); }
+    else av.textContent = (u.name||'?').trim().charAt(0).toUpperCase() || '?';
+    const who = el('div','who'); who.append(el('b','',u.name||'(no name)'), el('small','',u.email||''), el('small','','Last login: '+fmt(u.lastLogin)+(u.lastLogin?' · '+ago(u.lastLogin):'')));
+    head.append(av, who, el('span','chev','›'));
+    head.onclick = ()=>card.classList.toggle('open');
+
+    const det = el('div','det');
+    const row = (k,v)=>{ const r=el('div','r'); r.append(el('span','',k), el('span','',v||'–')); det.append(r); };
+    row('Phone', u.phone); row('City', u.city); row('About', u.bio);
+    row('Login method', (u.provider||'').replace('.com',''));
+    row('Email verified', u.emailVerified ? 'Yes' : 'No');
+    row('Member since', fmt(u.createdAt));
+    row('Total logins', u.loginCount ? String(u.loginCount) : '–');
+    row('User ID', u.id);
+    const devs = Object.values(u.devices||{});
+    const dl = el('div','dl'); dl.append(el('div','','📱 Devices ('+devs.length+')'));
+    devs.sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0)).forEach(d=>dl.append(el('div','','• '+(d.label||'Device')+' — '+fmt(d.lastSeen))));
+    det.append(dl);
+    const rec = (Array.isArray(u.recent) ? u.recent : Object.values(u.recent||{})).filter(n=>typeof n==='number');
+    const rl = el('div','dl'); rl.append(el('div','','🕒 Recent logins'));
+    if(rec.length) rec.forEach(t=>rl.append(el('div','','• '+fmt(t)))); else rl.append(el('div','','• –'));
+    det.append(rl);
+    const cp = el('button','btn','📋 Copy email'); cp.style.marginTop='10px';
+    cp.onclick = async e=>{ e.stopPropagation(); try{ await navigator.clipboard.writeText(u.email||''); toast('Copied ✅'); }catch(_){ toast('Copy not supported'); } };
+    det.append(cp);
+
+    card.append(head, det); list.append(card);
+  });
+}
+$('#q').oninput = render;
+$('#sort').onchange = render;
+
+/* ---- CSV export (cells starting with = + - @ are neutralised) ---- */
+$('#csv').onclick = ()=>{
+  const cell = v => { let s=String(v==null?'':v).replace(/"/g,'""'); if(/^[=+\-@\t\r]/.test(s)) s="'"+s; return '"'+s+'"'; };
+  const head = ['Name','Email','Phone','City','Verified','Provider','Member since','Last login','Devices','UID'];
+  const lines = [head.map(cell).join(',')].concat(users.map(u=>[
+    u.name,u.email,u.phone,u.city,u.emailVerified?'yes':'no',u.provider,fmt(u.createdAt),fmt(u.lastLogin),Object.keys(u.devices||{}).length,u.id
+  ].map(cell).join(',')));
+  const blob = new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'users.csv';
+  document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+</script>
+</body>
+</html>
