@@ -43,6 +43,7 @@ h2::before{content:"> ";opacity:.6}
 .cam{position:absolute;right:-2px;bottom:-2px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
   background:linear-gradient(135deg,var(--neon),var(--neon2));font-size:16px;border:3px solid var(--bg)}
 .hero h1{font-size:22px;word-break:break-word}
+.vt{display:inline-block;width:24px;height:24px;vertical-align:-4px;margin-left:6px}
 .hero p{color:var(--muted);font-size:14px;margin-top:4px;word-break:break-all}
 .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .badge{font-size:12px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
@@ -90,6 +91,7 @@ ul{list-style:none}
 <main id="app" hidden>
   <div class="top">
     <a href="index.html">← Home</a>
+    <a href="people.html">🔍 Find people</a>
     <a href="admin2.html" id="adminLink" hidden>🛡️ Admin panel</a>
   </div>
 
@@ -99,7 +101,7 @@ ul{list-style:none}
       <span class="cam">📷</span>
     </label>
     <input type="file" id="photoIn" accept="image/*" hidden>
-    <h1 id="dName">…</h1>
+    <h1><span id="dName">…</span><svg id="tick" class="vt" viewBox="0 0 24 24" hidden aria-label="Verified"><title>Verified</title><path fill="#1d9bf0" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.7 1.8-.9 3.1.9 3.1-2.7 1.8-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1L2.5 15.9l.9-3.1-.9-3.1 2.7-1.8 1-3.1 3.2.2z"/><path d="M8 12.3l2.7 2.7L16.2 9.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>
     <p id="dEmail"></p>
     <div class="badges"><span class="badge" id="vBadge"></span><span class="badge" id="pBadge"></span></div>
     <button class="btn ghost small" id="verifyBtn" hidden>📧 Send verification email</button>
@@ -184,7 +186,8 @@ function deviceLabel(){
 async function ensureProfile(user){
   const pRef = ref(db,'users/'+user.uid);
   const snap = await get(pRef);
-  const base = { email:user.email||'', emailVerified:!!user.emailVerified, lastLogin:serverTimestamp() };
+  const social = !!(user.providerData[0] && user.providerData[0].providerId !== 'password');
+  const base = { email:user.email||'', emailVerified:!!user.emailVerified || social, lastLogin:serverTimestamp() };
   const sKey = 'lg_'+user.uid;
   let counted = false;
   try{ counted = !!sessionStorage.getItem(sKey); sessionStorage.setItem(sKey,'1'); }catch(e){}
@@ -204,6 +207,31 @@ async function ensureProfile(user){
     await update(pRef, upd);
   }
   await update(ref(db,'users/'+user.uid+'/devices/'+deviceId()), { label:deviceLabel(), lastSeen:serverTimestamp() });
+  await syncPublic(user.uid);
+}
+
+/* ---- public profile: only name, small photo and bio (never email or phone) ---- */
+function thumbOf(dataUrl){
+  return new Promise(res=>{
+    if(!/^data:image\/(jpeg|png|webp);base64,/.test(dataUrl||'')) return res('');
+    const img=new Image();
+    img.onload=()=>{ const c=document.createElement('canvas'); c.width=c.height=96;
+      c.getContext('2d').drawImage(img,0,0,96,96); res(c.toDataURL('image/jpeg',.7)); };
+    img.onerror=()=>res('');
+    img.src=dataUrl;
+  });
+}
+async function syncPublic(id){
+  const d = (await get(ref(db,'users/'+id))).val() || {};
+  const pub = ref(db,'publicProfiles/'+id);
+  const cur = (await get(pub)).val();
+  const name = String(d.name||'User').slice(0,80), bio = String(d.bio||'').slice(0,300);
+  const needThumb = !cur || (d.photo && !cur.thumb);
+  if(!cur || cur.name!==name || (cur.bio||'')!==bio || needThumb){
+    await update(pub, { name, nameLower:name.toLowerCase(), bio,
+      createdAt:(cur && cur.createdAt) || d.createdAt || Date.now(),
+      thumb: needThumb ? await thumbOf(d.photo) : (cur.thumb||'') });
+  }
 }
 
 /* ---- render ---- */
@@ -216,7 +244,8 @@ function render(user, d){
   if(img){ $('#avImg').src = img; $('#avImg').hidden=false; $('#avLetter').hidden=true; }
   else { $('#avImg').hidden=true; $('#avLetter').hidden=false; $('#avLetter').textContent = name.trim().charAt(0).toUpperCase() || '?'; }
 
-  const v = !!user.emailVerified;
+  const prov0 = (d.provider||'password').replace('.com','');
+  const v = !!user.emailVerified || prov0!=='password';   // Google etc. already verify the email
   const vb = $('#vBadge'); vb.textContent = v ? '✔ Email verified' : '⚠ Email not verified'; vb.className = 'badge '+(v?'ok':'warn');
   const prov = (d.provider||'password').replace('.com','');
   $('#pBadge').textContent = prov==='password' ? '🔑 Email login' : '🌐 '+prov;
@@ -249,12 +278,14 @@ let unsub = null;
 onAuthStateChanged(auth, async user=>{
   if(!user){ location.replace('login.html'); return; }
   uid = user.uid;
+  try{ await user.reload(); }catch(e){}   // refresh verified status after clicking the email link
   try{ await ensureProfile(user); }
   catch(e){ toast('Database error: '+(e.code||e.message)+'. Check Firebase rules.'); }
   if(unsub) unsub();
   unsub = onValue(ref(db,'users/'+user.uid), snap=>{ const d=snap.val(); if(d) render(auth.currentUser||user, d); },
                   e=>toast('Cannot read profile: '+(e.code||e.message)));
   try{ const a = await get(ref(db,'admins/'+user.uid)); if(a.val()===true) $('#adminLink').hidden=false; }catch(e){}
+  onValue(ref(db,'badges/'+user.uid), s=>{ $('#tick').hidden = s.val()!==true; }, ()=>{});   // blue tick
   $('#loading').hidden = true; $('#app').hidden = false;
 });
 
@@ -267,6 +298,7 @@ $('#form').onsubmit = async e=>{
   const b=$('#saveBtn'); b.disabled=true;
   try{
     await update(ref(db,'users/'+uid), {name,phone,city,bio});
+    await update(ref(db,'publicProfiles/'+uid), {name, nameLower:name.toLowerCase(), bio});
     await updateProfile(auth.currentUser, {displayName:name});
     toast('Saved ✅');
   }catch(err){ toast('Could not save: '+(err.code||err.message)); }
@@ -298,6 +330,7 @@ $('#photoIn').onchange = async e=>{
     toast('Uploading…');
     const url = await toSquareDataURL(f,256);
     await update(ref(db,'users/'+uid), {photo:url});
+    await update(ref(db,'publicProfiles/'+uid), {thumb: await thumbOf(url)});
     toast('Photo updated ✅');
   }catch(err){ toast('Photo failed: '+(err.message||err.code)); }
 };
@@ -305,7 +338,7 @@ $('#photoIn').onchange = async e=>{
 /* ---- verify email / logout ---- */
 $('#verifyBtn').onclick = async ()=>{
   try{ await sendEmailVerification(auth.currentUser); toast('Verification email sent 📧'); }
-  catch(err){ toast(err.code==='auth/too-many-requests' ? 'Please wait a bit and try again' : 'Could not send email'); }
+  catch(err){ toast(err.code==='auth/too-many-requests' ? 'Please wait a bit and try again' : 'Could not send email ('+(err.code||err.message)+')'); }
 };
 $('#logout').onclick = async ()=>{
   try{ await remove(ref(db,'users/'+uid+'/devices/'+deviceId())); }catch(e){}
@@ -313,6 +346,5 @@ $('#logout').onclick = async ()=>{
   await signOut(auth);
 };
 </script>
-  <script src="navbar.js"></script>
 </body>
 </html>
