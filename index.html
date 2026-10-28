@@ -1115,5 +1115,82 @@ document.addEventListener('keydown',(e)=>{
  }
 });
 </script>
+  <style>
+  #adBox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:99999}
+  #adBox .card{background:#fff;color:#000;border-radius:14px;width:92%;max-width:360px;padding:14px;position:relative;text-align:center}
+  #adBox .prev{width:100%;height:200px;border:1px solid #ddd;border-radius:10px;overflow:hidden;position:relative}
+  #adBox iframe{width:200%;height:400px;border:0;transform:scale(.5);transform-origin:0 0;pointer-events:none}
+  #adBox .go{display:block;margin-top:10px;padding:12px;background:#00ffcc;color:#000;font-weight:bold;border-radius:10px;text-decoration:none}
+  #adSkip{position:absolute;top:-12px;right:-6px;padding:6px 12px;border:none;border-radius:20px;background:#333;color:#fff;cursor:pointer}
+  #adSkip:disabled{background:#999;cursor:not-allowed}
+  #miniAd{display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:90%;max-width:340px;background:#111;color:#fff;border-radius:14px;padding:14px;z-index:99998;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+  #miniAd a{display:inline-block;margin-top:8px;padding:8px 16px;background:#00ffcc;color:#000;border-radius:8px;text-decoration:none;font-weight:bold}
+</style>
+
+<div id="adBox">
+  <div class="card">
+    <button id="adSkip" disabled>Skip in 10</button>
+    <h3 style="margin:4px 0 10px">🧑‍💼 login now</h3>
+    <div class="prev"><iframe id="adFrame" loading="lazy"></iframe></div>
+    <a class="go" href="login.html">Go to sing up or login➜</a>
+  </div>
+</div>
+
+<div id="miniAd"><div id="miniText"></div><a id="miniLink" href="#">Open ➜</a></div>
+
+<script>
+/* ===== SETTINGS ===== */
+const QUIZ_AD_DELAY = 15;  // quiz ad kiti sec nantar yeil
+const SKIP_AFTER    = 10;  // skip button kiti sec nantar (10 kiva 20)
+const RANDOM_AD_SHOW= 5;   // random ad kiti sec disel (5 kiva 10)
+const MIN_GAP       = 10;  // random ad kamit kami kiti minute nantar
+const MAX_GAP       = 20;  // random ad jast jast kiti minute nantar
+
+const RANDOM_PAGES = [
+  {t:"🎮 Game Hub madhe game khela!", u:"gamehub.html"},
+  {t:"🤖 AI page try kara!",          u:"ai.html"},
+  {t:"📜 Aajcha Suvichar vacha",      u:"suvichar/"},
+  {t:"📱 Explore this website",       u:"shivjayanti-quiz.html"},
+  {t:"🏠 Second Home bagha",          u:"index2.html"},
+  {t:"🧑‍💼 complete your profile",      u:"profile.html"},
+  {t:"🚀solve quiz and achieve cirtificate",      u:"profile.html"}
+];
+
+/* ===== AD 1: Quiz Hub preview + skip ===== */
+const adBox=document.getElementById('adBox'), adSkip=document.getElementById('adSkip');
+setTimeout(()=>{
+  document.getElementById('adFrame').src='quizhub.html';
+  adBox.style.display='flex';
+  let s=SKIP_AFTER;
+  adSkip.disabled=true; adSkip.textContent='Skip in '+s;
+  const t=setInterval(()=>{
+    s--;
+    if(s>0){adSkip.textContent='Skip in '+s;}
+    else{clearInterval(t);adSkip.disabled=false;adSkip.textContent='Skip ✖';}
+  },1000);
+}, QUIZ_AD_DELAY*1000);
+adSkip.onclick=()=>{ if(!adSkip.disabled) adBox.style.display='none'; };
+
+/* ===== AD 2: random time, pahila Login ===== */
+const mini=document.getElementById('miniAd');
+let firstAd=true;
+
+function showMiniAd(){
+  if(adBox.style.display==='flex'){ scheduleNext(); return; }
+  let p;
+  if(firstAd){ p={t:"🔐 Login Now!", u:"login.html"}; firstAd=false; }
+  else { p=RANDOM_PAGES[Math.floor(Math.random()*RANDOM_PAGES.length)]; }
+  document.getElementById('miniText').textContent=p.t;
+  document.getElementById('miniLink').href=p.u;
+  mini.style.display='block';
+  setTimeout(()=>mini.style.display='none', RANDOM_AD_SHOW*1000);
+  scheduleNext();
+}
+function scheduleNext(){
+  const mins = MIN_GAP + Math.random()*(MAX_GAP-MIN_GAP);
+  setTimeout(showMiniAd, mins*60*1000);
+}
+scheduleNext();
+</script>
 </body>
 </html>
