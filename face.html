@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Face Attendance</title>
+<style>
+  :root{
+    --bg:#eef1f4; --panel:#ffffff; --ink:#14202b; --muted:#5d6b78; --line:#d9e0e6;
+    --accent:#0f766e; --accent-ink:#ffffff; --ok:#15803d; --okbg:#dcfce7; --warn:#b45309; --warnbg:#fef3c7;
+    --bad:#b91c1c; --badbg:#fee2e2; --cam:#0b1218;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e141a; --panel:#17202a; --ink:#e6edf3; --muted:#93a1ae; --line:#2a3744;
+      --accent:#2dd4bf; --accent-ink:#06201d; --ok:#4ade80; --okbg:#10321d; --warn:#fbbf24; --warnbg:#3a2a07;
+      --bad:#f87171; --badbg:#3b1414; --cam:#05090d;
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 40px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  h1{font-size:22px;margin:0;letter-spacing:-.01em}
+  h2{font-size:16px;margin:0 0 10px}
+  .status{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--warnbg);color:var(--warn)}
+  .status.ready{background:var(--okbg);color:var(--ok)}
+  .status.error{background:var(--badbg);color:var(--bad)}
+  .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+  @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+  .cam{position:relative;background:var(--cam);border-radius:8px;overflow:hidden;aspect-ratio:4/3}
+  .cam video,.cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .cam .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9fb0bf;text-align:center;padding:20px;font-size:14px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+  button:hover{border-color:var(--accent)}
+  button:focus-visible,input:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  button.danger{color:var(--bad)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.small{padding:4px 10px;font-size:13px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 14px}
+  .tab{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;padding:8px 12px;color:var(--muted);font-weight:600}
+  .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  input[type=text],input[type=date]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:480px){.fields{grid-template-columns:1fr}}
+  .muted{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .tablewrap{overflow-x:auto}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+  .pill.p{background:var(--okbg);color:var(--ok)} .pill.a{background:var(--badbg);color:var(--bad)}
+  .samples{display:flex;gap:6px;margin-top:10px}
+  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line)}
+  .dot.on{background:var(--accent);border-color:var(--accent)}
+  .feed{list-style:none;margin:0;padding:0;max-height:280px;overflow:auto}
+  .feed li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .stats{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+  .stat b{display:block;font-size:24px;line-height:1.1}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s}
+  .toast.show{opacity:1}
+  .range{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .range input{flex:1}
+  @media (prefers-reduced-motion: reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Face Attendance</h1>
+    <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="status" class="status">Loading face models…</span><button id="retryBtn" class="small" hidden>Retry</button></span>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-label="Camera">
+      <div class="cam">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay"></canvas>
+        <div id="camHint" class="hint">Camera is off. Press “Start camera”.</div>
+      </div>
+      <div class="row">
+        <button id="camBtn" class="primary">Start camera</button>
+        <span id="camMsg" class="muted"></span>
+      </div>
+      <div class="range">
+        <label for="strict" style="margin:0;white-space:nowrap">Match strictness</label>
+        <input id="strict" type="range" min="0.35" max="0.65" step="0.01" value="0.5">
+        <span id="strictVal" class="muted">0.50</span>
+      </div>
+      <p class="muted" style="margin:8px 0 0">Lower number = stricter match. Use 0.45 to 0.55 in normal light.</p>
+    </section>
+
+    <section class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="t-att" aria-selected="true" data-tab="att">Attendance</button>
+        <button class="tab" role="tab" id="t-reg" aria-selected="false" data-tab="reg">Register</button>
+        <button class="tab" role="tab" id="t-rec" aria-selected="false" data-tab="rec">Records</button>
+      </div>
+
+      <!-- Attendance -->
+      <div id="p-att">
+        <div class="stats">
+          <div class="stat"><b id="sPresent">0</b><span class="muted">present today</span></div>
+          <div class="stat"><b id="sTotal">0</b><span class="muted">registered</span></div>
+        </div>
+        <p class="muted" style="margin-top:0">Start the camera and face it. Each person is marked once per day.</p>
+        <h2>Marked today</h2>
+        <ul id="feed" class="feed"></ul>
+      </div>
+
+      <!-- Register -->
+      <div id="p-reg" hidden>
+        <div class="fields">
+          <div><label for="pName">Full name</label><input id="pName" type="text" autocomplete="off"></div>
+          <div><label for="pRoll">Roll / Employee ID</label><input id="pRoll" type="text" autocomplete="off"></div>
+        </div>
+        <div class="samples" id="samples" aria-label="Face samples"></div>
+        <p class="muted" id="sampleMsg" style="margin:6px 0 0">Capture 5 samples. Turn your head slightly between captures.</p>
+        <div class="row">
+          <button id="capBtn">Capture sample</button>
+          <button id="saveBtn" class="primary" disabled>Save person</button>
+          <button id="resetBtn" class="small">Reset</button>
+        </div>
+        <h2 style="margin-top:20px">Registered people</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Name</th><th>ID</th><th></th></tr></thead>
+          <tbody id="people"></tbody>
+        </table></div>
+        <p id="noPeople" class="muted" hidden>No one registered yet.</p>
+      </div>
+
+      <!-- Records -->
+      <div id="p-rec" hidden>
+        <div class="row" style="margin-top:0">
+          <div style="flex:1;min-width:150px"><label for="recDate">Date</label><input id="recDate" type="date"></div>
+          <button id="expDay">Export this date (CSV)</button>
+          <button id="expAll">Export all (CSV)</button>
+        </div>
+        <div class="row"><button id="bkBtn" class="small">Backup (JSON)</button><label for="rsFile" class="small" style="margin:0;padding:4px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--ink)">Restore backup</label><input id="rsFile" type="file" accept=".json,application/json" hidden><span class="muted">Backup keeps faces and records safe if browser data is cleared.</span></div>
+        <div class="tablewrap" style="margin-top:12px"><table>
+          <thead><tr><th>Name</th><th>ID</th><th>Status</th><th>Time</th><th></th></tr></thead>
+          <tbody id="recRows"></tbody>
+        </table></div>
+        <p id="noRec" class="muted" hidden>Register people first.</p>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var SCRIPT_URLS = [
+    'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js',
+    'https://unpkg.com/@vladmandic/face-api@1.7.13/dist/face-api.js',
+    'https://cdn.jsdelivr.net/gh/vladmandic/face-api@master/dist/face-api.js'
+  ];
+  var MODEL_URLS = [
+    'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model/',
+    'https://unpkg.com/@vladmandic/face-api@1.7.13/model/',
+    'https://cdn.jsdelivr.net/gh/vladmandic/face-api@master/model/',
+    'https://raw.githubusercontent.com/vladmandic/face-api/master/model/'
+  ];
+  var NEED_SAMPLES = 5;
+  var CONFIRM_FRAMES = 2;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var video = $('video'), overlay = $('overlay');
+  var state = { ready:false, running:false, tab:'att', people:[], records:[], samples:[], matcher:null, seen:{}, busy:false };
+  var threshold = 0.5;
+
+  // ---------- storage ----------
+  function load(key){ try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e){ return []; } }
+  function save(key, val){
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch(e){ toast('Could not save data. Browser storage is blocked or full.'); return false; }
+  }
+  state.people = load('fa_people');
+  state.records = load('fa_records');
+
+  // ---------- helpers ----------
+  function pad(n){ return (n<10?'0':'')+n; }
+  function today(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function nowTime(){ var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function el(tag, text, cls){ var e=document.createElement(tag); if(text!=null) e.textContent=text; if(cls) e.className=cls; return e; }
+  var toastTimer;
+  function toast(msg){ var t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove('show'); }, 2600); }
+  function setStatus(text, kind){ var s=$('status'); s.textContent=text; s.className='status'+(kind?' '+kind:''); }
+  function personById(id){ for(var i=0;i<state.people.length;i++) if(state.people[i].id===id) return state.people[i]; return null; }
+  function recordFor(pid, date){ for(var i=0;i<state.records.length;i++){ var r=state.records[i]; if(r.pid===pid && r.date===date) return r; } return null; }
+
+  // ---------- models ----------
+  function loadScript(url){
+    return new Promise(function(resolve, reject){
+      var t = document.createElement('script'); t.src = url;
+      t.onload = resolve; t.onerror = function(){ t.remove(); reject(new Error('script '+url)); };
+      document.head.appendChild(t);
+    });
+  }
+  function loadLibrary(){
+    if(window.faceapi) return Promise.resolve();
+    var i = 0;
+    function next(){
+      if(i>=SCRIPT_URLS.length) return Promise.reject(new Error('Face library could not be downloaded.'));
+      return loadScript(SCRIPT_URLS[i++]).then(function(){ if(!window.faceapi) return next(); }, next);
+    }
+    return next();
+  }
+  function loadNets(base){
+    return faceapi.nets.tinyFaceDetector.loadFromUri(base)
+      .then(function(){ return faceapi.nets.faceLandmark68Net.loadFromUri(base); })
+      .then(function(){ return faceapi.nets.faceRecognitionNet.loadFromUri(base); });
+  }
+  function loadModels(){
+    state.ready = false; $('retryBtn').hidden = true;
+    setStatus('Loading face models…');
+    loadLibrary().then(function(){
+      var i = 0;
+      function next(){
+        if(i>=MODEL_URLS.length) return Promise.reject(new Error('Face models could not be downloaded.'));
+        return loadNets(MODEL_URLS[i++]).catch(function(e){ console.warn('model source failed', e); return next(); });
+      }
+      return next();
+    }).then(function(){
+      var tf = faceapi.tf;
+      if(!tf) return;
+      return tf.setBackend('webgl').then(function(ok){ if(ok===false) return tf.setBackend('cpu'); }).catch(function(){ return tf.setBackend('cpu'); }).then(function(){ return tf.ready(); });
+    }).then(function(){
+      state.ready = true; rebuildMatcher(); setStatus('Models ready', 'ready'); updateButtons();
+    }).catch(function(err){
+      console.error(err);
+      setStatus((err && err.message ? err.message : 'Could not load models.')+' Check your internet connection.', 'error');
+      $('retryBtn').hidden = false;
+    });
+  }
+  $('retryBtn').addEventListener('click', loadModels);
+
+  function rebuildMatcher(){
+    if(!state.ready) return;
+    var labeled = state.people.filter(function(p){ return p.descriptors && p.descriptors.length; }).map(function(p){
+      return new faceapi.LabeledFaceDescriptors(p.id, p.descriptors.map(function(d){ return new Float32Array(d); }));
+    });
+    state.matcher = labeled.length ? new faceapi.FaceMatcher(labeled, threshold) : null;
+  }
+
+  // ---------- camera ----------
+  var starting = false;
+  function startCamera(){
+    if(starting || state.running) return;
+    $('camMsg').textContent = '';
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      $('camMsg').textContent = 'This browser cannot use the camera here. Open the file in Chrome or Edge.'; return;
+    }
+    starting = true; $('camBtn').disabled = true;
+    navigator.mediaDevices.getUserMedia({ video:{ width:{ideal:640}, height:{ideal:480}, facingMode:'user' }, audio:false })
+      .then(function(stream){
+        video.srcObject = stream;
+        return video.play();
+      }).then(function(){
+        starting = false; $('camBtn').disabled = false;
+        state.running = true; $('camHint').hidden = true; $('camBtn').textContent = 'Stop camera'; updateButtons();
+        overlay.width = video.videoWidth || 640; overlay.height = video.videoHeight || 480;
+        tick();
+      }).catch(function(err){
+        starting = false; $('camBtn').disabled = false;
+        var s = video.srcObject; if(s){ s.getTracks().forEach(function(t){ t.stop(); }); video.srcObject = null; }
+        var n = err && err.name, m = 'Could not start the camera.';
+        if(n==='NotAllowedError' || n==='SecurityError') m = 'Camera permission is blocked. Allow the camera in the address bar and press Start again.';
+        else if(n==='NotFoundError' || n==='OverconstrainedError') m = 'No camera found on this device.';
+        else if(n==='NotReadableError' || n==='AbortError') m = 'The camera is in use by another app. Close it and try again.';
+        $('camMsg').textContent = m; console.error(err);
+      });
+  }
+  function stopCamera(){
+    state.running = false;
+    var s = video.srcObject; if(s) s.getTracks().forEach(function(t){ t.stop(); });
+    video.srcObject = null; $('camHint').hidden = false; $('camBtn').textContent = 'Start camera'; updateButtons();
+    var c = overlay.getContext('2d'); c.clearRect(0,0,overlay.width,overlay.height);
+  }
+  $('camBtn').addEventListener('click', function(){ state.running ? stopCamera() : startCamera(); });
+
+  // ---------- detection loop ----------
+  function detectOptions(){ return new faceapi.TinyFaceDetectorOptions({ inputSize:416, scoreThreshold:0.5 }); }
+
+  function tick(){
+    if(!state.running) return;
+    if(!state.ready || state.tab==='rec' || video.readyState<2){ setTimeout(tick, 300); return; }
+    state.busy = true;
+    faceapi.detectAllFaces(video, detectOptions()).withFaceLandmarks().withFaceDescriptors().then(function(results){
+      state.busy = false;
+      if(!state.running) return;
+      draw(results);
+      setTimeout(tick, 150);
+    }).catch(function(err){ state.busy=false; console.error(err); setTimeout(tick, 600); });
+  }
+
+  function draw(results){
+    var w = video.videoWidth, h = video.videoHeight;
+    if(overlay.width!==w || overlay.height!==h){ overlay.width=w; overlay.height=h; }
+    var ctx = overlay.getContext('2d'); ctx.clearRect(0,0,w,h);
+    ctx.lineWidth = Math.max(2, w/320); ctx.font = Math.max(14, Math.round(w/32))+'px system-ui,sans-serif'; ctx.textBaseline='top';
+    var seenNow = {};
+    results.forEach(function(r){
+      var b = r.detection.box, label = '', color = '#f59e0b';
+      if(state.tab==='att'){
+        if(state.matcher){
+          var m = state.matcher.findBestMatch(r.descriptor);
+          if(m.label!=='unknown'){
+            var p = personById(m.label);
+            if(p){
+              color = '#22c55e'; label = p.name;
+              seenNow[p.id] = true;
+              state.seen[p.id] = (state.seen[p.id]||0)+1;
+              if(state.seen[p.id]>=CONFIRM_FRAMES) markPresent(p, 'face');
+            }
+          } else { label = 'Unknown'; color = '#ef4444'; }
+        } else { label = 'No one registered'; }
+      } else { label = 'Face detected'; }
+      ctx.strokeStyle = color; ctx.strokeRect(b.x, b.y, b.width, b.height);
+      if(label){
+        var tw = ctx.measureText(label).width + 10, th = parseInt(ctx.font,10)+8;
+        var ty = b.y - th >= 0 ? b.y - th : b.y + b.height;
+        ctx.fillStyle = color; ctx.fillRect(b.x, ty, tw, th);
+        ctx.fillStyle = '#06130d'; ctx.fillText(label, b.x+5, ty+4);
+      }
+    });
+    Object.keys(state.seen).forEach(function(k){ if(!seenNow[k]) delete state.seen[k]; });
+    state.lastResults = results;
+  }
+
+  // ---------- attendance ----------
+  function markPresent(p, how){
+    var d = today();
+    if(recordFor(p.id, d)) return false;
+    state.records.push({ pid:p.id, name:p.name, roll:p.roll, date:d, time:nowTime(), how:how });
+    if(save('fa_records', state.records)){ toast(p.name+' marked present'); }
+    renderAll();
+    return true;
+  }
+
+  function renderAttendance(){
+    var d = today();
+    var todays = state.records.filter(function(r){ return r.date===d; }).sort(function(a,b){ return a.time<b.time?1:-1; });
+    $('sPresent').textContent = todays.length; $('sTotal').textContent = state.people.length;
+    var feed = $('feed'); feed.textContent = '';
+    if(!todays.length){ var li = el('li','Nobody marked yet today.','muted'); feed.appendChild(li); return; }
+    todays.forEach(function(r){
+      var li = el('li'); li.appendChild(el('span', r.name+(r.roll?' ('+r.roll+')':'')));
+      li.appendChild(el('span', r.time, 'muted')); feed.appendChild(li);
+    });
+  }
+
+  // ---------- register ----------
+  function renderSamples(){
+    var box = $('samples'); box.textContent = '';
+    for(var i=0;i<NEED_SAMPLES;i++){ box.appendChild(el('span', null, 'dot'+(i<state.samples.length?' on':''))); }
+    $('sampleMsg').textContent = state.samples.length>=NEED_SAMPLES ? 'Enough samples. Enter the name and save.' : 'Capture '+NEED_SAMPLES+' samples. Turn your head slightly between captures. ('+state.samples.length+'/'+NEED_SAMPLES+')';
+    updateButtons();
+  }
+  function updateButtons(){
+    $('capBtn').disabled = !(state.ready && state.running) || state.samples.length>=NEED_SAMPLES;
+    $('saveBtn').disabled = !(state.samples.length>=NEED_SAMPLES && $('pName').value.trim());
+  }
+  $('pName').addEventListener('input', updateButtons);
+
+  $('capBtn').addEventListener('click', function(){
+    if(state.tab!=='reg') return;
+    var res = state.lastResults || [];
+    if(res.length===0){ toast('No face found. Face the camera in good light.'); return; }
+    if(res.length>1){ toast('More than one face. Only one person should be in view.'); return; }
+    var desc = Array.prototype.slice.call(res[0].descriptor);
+    if(state.matcher && state.samples.length===0){
+      var m = state.matcher.findBestMatch(res[0].descriptor);
+      if(m.label!=='unknown'){ var p = personById(m.label); if(p) toast('This face looks like '+p.name+', who is already registered.'); }
+    }
+    state.samples.push(desc); renderSamples();
+  });
+  $('resetBtn').addEventListener('click', function(){ state.samples=[]; renderSamples(); });
+
+  $('saveBtn').addEventListener('click', function(){
+    var name = $('pName').value.trim(), roll = $('pRoll').value.trim();
+    if(!name) return;
+    if(roll && state.people.some(function(p){ return p.roll===roll; })){ toast('That ID is already used.'); return; }
+    state.people.push({ id:uid(), name:name, roll:roll, descriptors:state.samples.slice(), created:today() });
+    if(save('fa_people', state.people)){
+      toast(name+' registered');
+      state.samples=[]; $('pName').value=''; $('pRoll').value='';
+      rebuildMatcher(); renderAll();
+    } else { state.people.pop(); }
+  });
+
+  function renderPeople(){
+    var tb = $('people'); tb.textContent='';
+    $('noPeople').hidden = state.people.length>0;
+    state.people.forEach(function(p){
+      var tr = el('tr'); tr.appendChild(el('td', p.name)); tr.appendChild(el('td', p.roll||'-'));
+      var td = el('td'); var b = el('button','Delete','small danger'); b.type='button';
+      b.addEventListener('click', function(){
+        if(b.dataset.armed!=='1'){ b.dataset.armed='1'; b.textContent='Tap again to confirm'; setTimeout(function(){ b.dataset.armed=''; b.textContent='Delete'; }, 3000); return; }
+        state.people = state.people.filter(function(x){ return x.id!==p.id; });
+        state.records = state.records.filter(function(r){ return r.pid!==p.id; });
+        save('fa_people', state.people); save('fa_records', state.records); rebuildMatcher(); renderAll();
+      });
+      td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+    });
+  }
+
+  // ---------- records ----------
+  function renderRecords(){
+    var d = $('recDate').value || today();
+    var tb = $('recRows'); tb.textContent='';
+    $('noRec').hidden = state.people.length>0;
+    state.people.forEach(function(p){
+      var r = recordFor(p.id, d), tr = el('tr');
+      tr.appendChild(el('td', p.name)); tr.appendChild(el('td', p.roll||'-'));
+      var s = el('td'); s.appendChild(el('span', r?'Present':'Absent', 'pill '+(r?'p':'a'))); tr.appendChild(s);
+      tr.appendChild(el('td', r?r.time:'-'));
+      var a = el('td'); var b = el('button', r?'Remove':'Mark present', 'small'); b.type='button';
+      b.addEventListener('click', function(){
+        if(r){ state.records = state.records.filter(function(x){ return x!==r; }); }
+        else { state.records.push({ pid:p.id, name:p.name, roll:p.roll, date:d, time:nowTime(), how:'manual' }); }
+        save('fa_records', state.records); renderAll();
+      });
+      a.appendChild(b); tr.appendChild(a); tb.appendChild(tr);
+    });
+  }
+
+  function csvCell(v){ v = String(v==null?'':v); if(/^[=+\-@]/.test(v)) v = "'"+v; return '"'+v.replace(/"/g,'""')+'"'; }
+  function exportCsv(rows, filename){
+    if(!rows.length){ toast('No records to export.'); return; }
+    var lines = ['Date,Time,ID,Name,Method'].concat(rows.map(function(r){
+      return [r.date,r.time,r.roll,r.name,r.how||''].map(csvCell).join(',');
+    }));
+    var blob = new Blob(['﻿'+lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  function sorted(rows){ return rows.slice().sort(function(a,b){ return (a.date+a.time)<(b.date+b.time)?-1:1; }); }
+  $('expDay').addEventListener('click', function(){
+    var d = $('recDate').value || today();
+    exportCsv(sorted(state.records.filter(function(r){ return r.date===d; })), 'attendance-'+d+'.csv');
+  });
+  $('expAll').addEventListener('click', function(){ exportCsv(sorted(state.records), 'attendance-all.csv'); });
+  $('recDate').addEventListener('change', renderRecords);
+
+  $('bkBtn').addEventListener('click', function(){
+    var blob = new Blob([JSON.stringify({ version:1, people:state.people, records:state.records })], { type:'application/json' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'face-attendance-backup-'+today()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+  $('rsFile').addEventListener('change', function(){
+    var f = this.files && this.files[0]; var input = this; if(!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try {
+        var d = JSON.parse(rd.result);
+        if(!d || !Array.isArray(d.people) || !Array.isArray(d.records)) throw new Error('bad');
+        var okP = d.people.every(function(p){ return p && typeof p.id==='string' && typeof p.name==='string' && Array.isArray(p.descriptors) && p.descriptors.every(function(x){ return Array.isArray(x) && x.length===128; }); });
+        if(!okP) throw new Error('bad');
+        state.people = d.people; state.records = d.records.filter(function(r){ return r && r.pid && r.date && r.time; });
+        save('fa_people', state.people); save('fa_records', state.records); rebuildMatcher(); renderAll(); toast('Backup restored');
+      } catch(e){ toast('That file is not a valid backup.'); }
+      input.value = '';
+    };
+    rd.readAsText(f);
+  });
+
+  // ---------- tabs & misc ----------
+  function showTab(name){
+    state.tab = name; state.seen = {};
+    ['att','reg','rec'].forEach(function(t){
+      $('p-'+t).hidden = t!==name; $('t-'+t).setAttribute('aria-selected', t===name?'true':'false');
+    });
+    var c = overlay.getContext('2d'); c.clearRect(0,0,overlay.width,overlay.height);
+    renderAll();
+  }
+  document.querySelectorAll('.tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
+
+  $('strict').addEventListener('input', function(){
+    threshold = parseFloat(this.value); $('strictVal').textContent = threshold.toFixed(2); rebuildMatcher();
+  });
+
+  function renderAll(){ renderAttendance(); renderPeople(); renderRecords(); renderSamples(); }
+
+  $('recDate').value = today();
+  renderAll();
+  loadModels();
+  window.addEventListener('pagehide', stopCamera);
+})();
+</script>
+</body>
+</html>
