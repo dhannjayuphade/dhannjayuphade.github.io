@@ -365,5 +365,83 @@ $('#delBtn').onclick = async ()=>{
 };
 </script>
   <p style="text-align:center;font-size:13px;margin:0 0 30px;color:#8fb5ad"><a href="privacy.html" style="color:#00ffcc">Privacy Policy</a> · <a href="terms.html" style="color:#00ffcc">Terms of Use</a></p>
+  <style>
+#consent{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:16px;background:rgba(3,8,12,.92)}
+#consent[hidden]{display:none}
+#consent .cbox{width:100%;max-width:420px;background:#0c161e;border:1px solid rgba(0,255,204,.22);border-radius:20px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(0,255,204,.12);color:#e6fff9;font-family:inherit}
+#consent h2{font-size:18px;margin-bottom:10px;color:#e6fff9;font-family:inherit;letter-spacing:0}
+#consent h2::before{content:none}
+#consent p{font-size:14px;color:#8fb5ad;margin-bottom:12px;line-height:1.5}
+#consent .clinks{display:flex;gap:10px;flex-wrap:wrap}
+#consent .clinks a{flex:1;min-width:150px;text-align:center;padding:11px;border:1px solid rgba(0,255,204,.22);border-radius:12px;color:#00ffcc;text-decoration:none;font-size:14px}
+#consent .cchk{display:flex;gap:10px;align-items:flex-start;margin:6px 0 14px;font-size:14px;cursor:pointer}
+#consent .cchk input{width:20px;height:20px;margin-top:2px;accent-color:#00ffcc;flex:none}
+#consent button{width:100%;padding:14px;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;border:0}
+#cBtn{color:#021;background:linear-gradient(135deg,#00ffcc,#7a5cff)}
+#cBtn:disabled{opacity:.5;cursor:not-allowed}
+#cNo{margin-top:8px;background:transparent;color:#ff4d6d;border:1px solid #ff4d6d}
+</style>
+
+<div id="consent" hidden role="dialog" aria-modal="true">
+  <div class="cbox">
+    <h2>Before you continue</h2>
+    <p>Please read our Terms of Use and Privacy Policy. You need to accept them to use your account.</p>
+    <p class="clinks"><a href="terms.html" target="_blank" rel="noopener">📄 Terms of Use</a><a href="privacy.html" target="_blank" rel="noopener">🔒 Privacy Policy</a></p>
+    <label class="cchk"><input type="checkbox" id="cChk"><span>I have read and I accept the Terms of Use and the Privacy Policy.</span></label>
+    <button id="cBtn" disabled>Continue →</button>
+    <button id="cNo" type="button">I do not accept — Logout</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getDatabase, ref, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
+  measurementId: "G-Y76NHS7ZV8"
+});
+const auth = getAuth(app), db = getDatabase(app);
+const box = document.getElementById('consent'), chk = document.getElementById('cChk'), btn = document.getElementById('cBtn');
+const VERSION = '2026-11-02';
+let uid = null, off = null;
+
+const signupFlag = ()=>{ try{ return sessionStorage.getItem('consentOnSignup')==='1'; }catch(e){ return false; } };
+const saveConsent = ()=>update(ref(db,'users/'+uid), { consentAt:serverTimestamp(), consentVersion:VERSION });
+
+onAuthStateChanged(auth, u=>{
+  if(off){ off(); off=null; }
+  box.hidden = true;
+  if(!u) return;
+  uid = u.uid;
+  off = onValue(ref(db,'users/'+uid), s=>{
+    const d = s.val();
+    if(!d) return;                                   // profile is not created yet
+    if(d.consentAt){ box.hidden = true; return; }    // already accepted once, never ask again
+    if(signupFlag()){                                // accepted on the signup form
+      try{ sessionStorage.removeItem('consentOnSignup'); }catch(e){}
+      saveConsent().catch(()=>{ box.hidden = false; });
+      return;
+    }
+    box.hidden = false;
+  });
+});
+
+chk.onchange = ()=>{ btn.disabled = !chk.checked; };
+btn.onclick = async ()=>{
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try{ await saveConsent(); box.hidden = true; }
+  catch(e){ btn.disabled = false; btn.textContent = 'Could not save, tap to retry (' + (e.code||'error') + ')'; }
+};
+document.getElementById('cNo').onclick = ()=>signOut(auth);
+</script>
+  <script>navbar.js</script>
 </body>
 </html>
