@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Use – Dhannjay Hub</title>
+<meta name="theme-color" content="#00ffcc">
+<style>
+:root{--bg:#050a0f;--card:rgba(12,22,30,.72);--line:rgba(0,255,204,.22);--neon:#00ffcc;--text:#e6fff9;--muted:#9bbfb7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,'Noto Sans Devanagari',sans-serif;background:var(--bg);color:var(--text);line-height:1.65;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(600px 300px at 10% -5%,rgba(0,255,204,.18),transparent),radial-gradient(500px 300px at 100% 100%,rgba(122,92,255,.2),transparent)}
+main{position:relative;max-width:760px;margin:0 auto;padding:18px 16px 50px}
+nav{display:flex;justify-content:space-between;font-size:14px;margin-bottom:16px}
+a{color:var(--neon)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 20px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+h1{font-size:26px;margin-bottom:4px}
+.upd{color:var(--muted);font-size:13px;margin-bottom:18px}
+h2{font-size:17px;color:var(--neon);margin:22px 0 8px}
+p,li{font-size:15px;color:#d6ece7}
+p{margin-bottom:10px}
+ul{padding-left:20px;margin-bottom:10px}
+li{margin-bottom:5px}
+.box{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(0,0,0,.25);font-size:14px;margin:12px 0}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="index.html">← Home</a><a href="privacy.html">Privacy Policy →</a></nav>
+<div class="card">
+<h1>Terms of Use</h1>
+<p class="upd">Last updated: 2 November 2026</p>
+
+<p>These terms apply when you use <strong>Dhannjay Hub</strong> (<a href="https://dhannjayuphade.github.io/">dhannjayuphade.github.io</a>) and create an account on it. By creating an account or using the site you agree to them. If you do not agree, please do not use the site.</p>
+
+<h2>1. Who can use it</h2>
+<ul>
+<li>You must be <strong>18 years or older</strong>.</li>
+<li>You must give correct information and keep your password safe. You are responsible for activity on your account.</li>
+<li>One person, one account. Do not share or sell your account.</li>
+</ul>
+
+<h2>2. Your account and profile</h2>
+<ul>
+<li>You can log in with email and password or with Google, and stay logged in on many devices.</li>
+<li>Your name, photo and bio must not be offensive, misleading or copied from someone else. Do not pretend to be another person or brand.</li>
+<li>Only upload a photo that you have the right to use.</li>
+</ul>
+
+<h2>3. Verified blue tick</h2>
+<p>The blue tick is given and removed <strong>only by the site owner</strong>, at his own discretion. It is not automatic and cannot be bought. A verified email address alone does not earn a blue tick. We may remove it at any time, for example if the account is misused.</p>
+
+<h2>4. What you must not do</h2>
+<ul>
+<li>Break the law or help anyone else to do so.</li>
+<li>Try to hack, overload or reverse-engineer the site, or access other users’ data.</li>
+<li>Create fake or automated accounts, or spam other people.</li>
+<li>Upload malware, or harassing, hateful or adult content.</li>
+</ul>
+<p>We may suspend or delete an account that breaks these rules, without notice where needed to protect the site or other users.</p>
+
+<h2>5. Content and ownership</h2>
+<p>You keep ownership of what you add to your profile. You allow us to store and display it on the site so the service can work. The site’s design, code, logo and original content belong to Dhannjay Uphade and may not be copied without permission.</p>
+
+<h2>6. Your data</h2>
+<p>How we handle your personal data is explained in our <a href="privacy.html">Privacy Policy</a>. You can delete your account and data at any time from your <a href="profile.html">profile page</a>.</p>
+
+<h2>7. No guarantee</h2>
+<p>The site is a personal creator project provided “as is”. We try to keep it running but do not promise that it will always be available or error-free. Features may change or be removed.</p>
+
+<h2>8. Limit of responsibility</h2>
+<p>To the extent allowed by law, we are not liable for any indirect loss or for losses caused by events outside our control, such as downtime of third-party services (Google Firebase, GitHub) or misuse of your password by someone else.</p>
+
+<h2>9. Changes</h2>
+<p>We may update these terms. The date above shows the latest version. If you keep using the site after a change, you accept the new terms.</p>
+
+<h2>10. Law and contact</h2>
+<p>These terms are governed by the laws of India. Courts in India have jurisdiction. Questions or complaints: <strong>dhannjayuphade5@gmail.com</strong>.</p>
+
+<div class="box">By ticking “I agree to the Terms &amp; Privacy Policy” while signing up, you confirm that you have read and accepted both documents.</div>
+
+<div class="box" id="acc">
+  <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+    <input type="checkbox" id="accChk" style="width:20px;height:20px;margin-top:3px;accent-color:#00ffcc">
+    <span>I have read and I accept the Terms of Use.</span>
+  </label>
+  <button id="accBtn" disabled style="margin-top:12px;width:100%;padding:13px;border:0;border-radius:12px;font-size:15px;font-weight:700;color:#021;background:linear-gradient(135deg,#00ffcc,#7a5cff);opacity:.5">✔ I Accept</button>
+  <p id="accMsg" style="margin:10px 0 0;font-size:13px;color:#00e68a"></p>
+</div>
+<script>
+(function(){var K='accepted_terms',c=document.getElementById('accChk'),b=document.getElementById('accBtn'),m=document.getElementById('accMsg');
+function done(t){m.textContent='✔ Accepted'+(t?' on '+t:'');c.checked=true;c.disabled=true;b.hidden=true}
+try{var s=localStorage.getItem(K);if(s)done(s)}catch(e){}
+c.onchange=function(){b.disabled=!c.checked;b.style.opacity=c.checked?1:.5};
+b.onclick=function(){var t=new Date().toLocaleDateString('en-IN',{dateStyle:'medium'});try{localStorage.setItem(K,t)}catch(e){}done(t)}})();
+</script>
+</div>
+</main>
+</body>
+</html>
