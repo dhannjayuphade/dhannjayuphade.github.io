@@ -1,0 +1,731 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Laddoo Dash</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&family=Tiro+Devanagari+Marathi&display=swap">
+<style>
+/* Layout: header, a HUD row, the 3D stage with chips, toast and menu overlay, then touch controls. Deliberately single dark UI around a stage that changes world. */
+:root {
+  --ink: #14110c;
+  --ink-2: #211c13;
+  --paper: #f6efe0;
+  --muted: #b3a88f;
+  --saffron: #ff9a2e;
+  --gold: #ffd54a;
+  --chili: #e5412d;
+  --leaf: #6fcf64;
+  --line: #3a3224;
+  --display: "Tiro Devanagari Marathi", Georgia, serif;
+  --body: "Mukta", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--ink); color: var(--paper); font-family: var(--body); font-size: 17px; line-height: 1.5; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 32px; }
+.wrap { max-width: 720px; margin: 0 auto; display: grid; gap: 12px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0; color: var(--saffron); }
+.hud { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; font-variant-numeric: tabular-nums; }
+.hud div { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; min-width: 0; }
+.hud small { display: block; color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.hud b { font-size: 20px; }
+#lv { color: var(--chili); letter-spacing: 2px; }
+#cb.hot { color: var(--gold); }
+.stage { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--ink-2); touch-action: none; }
+@media (max-width: 520px) { .stage { aspect-ratio: 1 / 1.1; } }
+#gl { width: 100%; height: 100%; display: block; }
+.chips { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 6px; flex-wrap: wrap; pointer-events: none; }
+.chips span { background: rgba(20, 17, 12, .72); border: 1px solid var(--line); color: var(--gold); border-radius: 999px; padding: 1px 10px; font-size: 13px; font-weight: 700; }
+.toast { position: absolute; top: 16%; left: 0; right: 0; text-align: center; font-family: var(--display); font-size: clamp(20px, 5vw, 28px); color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, .8); pointer-events: none; padding: 0 12px; }
+.overlay { position: absolute; inset: 0; display: flex; overflow: auto; background: rgba(20, 17, 12, .86); padding: 12px; }
+.ovin { margin: auto; display: grid; gap: 6px; text-align: center; width: 100%; justify-items: center; }
+.overlay h2 { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 6vw, 36px); margin: 0; }
+.overlay p { margin: 0; color: var(--muted); font-size: 15px; }
+.newbest { color: var(--gold); font-weight: 700; }
+.ok { color: var(--leaf); font-weight: 700; }
+.btn { font: inherit; font-weight: 700; background: var(--saffron); color: #1a1205; border: 0; border-radius: 8px; padding: 10px 28px; cursor: pointer; }
+.btn:focus-visible, .pad button:focus-visible, .small:focus-visible, .chars button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 3px; }
+.chars { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.chars button { font: inherit; font-size: 14px; background: var(--ink-2); color: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.chars button.on { border-color: var(--saffron); color: var(--saffron); }
+.chars button:disabled { opacity: .5; cursor: not-allowed; }
+.board { list-style: none; margin: 0; padding: 0; width: min(260px, 100%); font-variant-numeric: tabular-nums; font-size: 14px; text-align: left; }
+.board li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; border-bottom: 1px dashed var(--line); }
+.board li.me { color: var(--gold); }
+.board span:last-child { color: var(--muted); font-size: 12px; }
+.pad { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.pad button { font: inherit; font-size: 19px; font-weight: 700; padding: 16px 8px; background: var(--ink-2); color: var(--paper); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; touch-action: manipulation; }
+.pad button:active { background: var(--line); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.small { font: inherit; font-size: 15px; background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+.help { color: var(--muted); font-size: 15px; margin: 0; }
+</style>
+
+<div class="wrap">
+  <h1>Laddoo Dash</h1>
+
+  <div class="hud">
+    <div><small>Score</small><b id="sc">0</b></div>
+    <div><small>Best</small><b id="hi">0</b></div>
+    <div><small>Level</small><b id="lvl">1</b></div>
+    <div><small>Lives</small><b id="lv">♥♥♥</b></div>
+    <div><small>Combo</small><b id="cb">x1</b></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-label="3D game view"></canvas>
+    <div class="chips" id="chips"></div>
+    <div class="toast" id="toast" hidden></div>
+    <div class="overlay" id="ov">
+      <div class="ovin">
+        <h2 id="ovt">Laddoo Dash</h2>
+        <p id="ovp">Collect laddoos. Dodge chilies. Jump hurdles.</p>
+        <p id="mis"></p>
+        <p id="stt"></p>
+        <div class="chars" id="chars"></div>
+        <ol class="board" id="board"></ol>
+        <button class="btn" id="go" type="button">Start game</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pad">
+    <button type="button" id="bl" aria-label="Move left">◀ Left</button>
+    <button type="button" id="jp" aria-label="Jump">▲ Jump</button>
+    <button type="button" id="br" aria-label="Move right">Right ▶</button>
+  </div>
+  <div class="row">
+    <button class="small" type="button" id="pz">Pause</button>
+    <button class="small" type="button" id="mu">Sound: on</button>
+    <button class="small" type="button" id="ms">Music: on</button>
+    <button class="small" type="button" id="rs">Reset scores</button>
+  </div>
+  <p class="help">Keys: arrows or A and D to move, Up, W or Space to jump, P to pause. On a phone, use the buttons or swipe on the game (up to jump). Laddoo = 10 points, golden = 50. Every 3 laddoos in a row raises your combo up to x5. Hurdles are jumped, walls are dodged. Pick up a shield, magnet or x2. Every 10 laddoos is a new level and the world changes every 3 levels. Every 5th level has a boss. Your top 5 scores, unlocked characters and daily mission are saved on this device.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $('stage'), canvas = $('gl'), ov = $('ov'), ovt = $('ovt'), ovp = $('ovp'), goBtn = $('go');
+  var boardEl = $('board'), misEl = $('mis'), sttEl = $('stt'), charsEl = $('chars'), chipsEl = $('chips'), toastEl = $('toast');
+  var scEl = $('sc'), hiEl = $('hi'), lvlEl = $('lvl'), livesEl = $('lv'), cbEl = $('cb');
+  var pzBtn = $('pz'), muBtn = $('mu'), msBtn = $('ms');
+
+  /* ---------- saved data (localStorage, always guarded) ---------- */
+  var K = { scores: 'laddooDash.scores', mute: 'laddooDash.muted', music: 'laddooDash.music', ch: 'laddooDash.char', mission: 'laddooDash.mission', stats: 'laddooDash.stats', bonus: 'laddooDash.bonus', top: 'laddooDash.top' };
+  function load(key, fb) { try { var v = localStorage.getItem(key); return v === null ? fb : JSON.parse(v); } catch (e) { return fb; } }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+  var scores = load(K.scores, []); if (!Array.isArray(scores)) scores = [];
+  var muted = load(K.mute, false) === true;
+  var musicOn = load(K.music, true) !== false;
+  var stats = load(K.stats, null); if (!stats || typeof stats.games !== 'number') stats = { games: 0, laddoos: 0 };
+  var charIdx = parseInt(load(K.ch, 0), 10) || 0;
+  var mission = load(K.mission, null);
+  function best() { return scores.length ? scores[0].s : 0; }
+  var top = Math.max(parseInt(load(K.top, 0), 10) || 0, best());
+
+  var CHARS = [{ name: 'Thali', min: 0 }, { name: 'Handi', min: 300 }, { name: 'Tiffin', min: 800 }, { name: 'Gold Thali', min: 1500 }];
+  function unlocked(i) { return top >= CHARS[i].min; }
+  if (charIdx < 0 || charIdx >= CHARS.length || !unlocked(charIdx)) charIdx = 0;
+
+  var MISSIONS = [
+    { type: 'laddoos', target: 30, text: 'Collect 30 laddoos today' },
+    { type: 'level', target: 4, text: 'Reach level 4 in one game' },
+    { type: 'score', target: 600, text: 'Score 600 points in one game' }
+  ];
+  function todayKey() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function missionIndex() { var d = new Date(); return (d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate()) % 3; }
+  function ensureMission() {
+    if (!mission || mission.date !== todayKey() || typeof mission.p !== 'number') { mission = { date: todayKey(), p: 0, done: false }; save(K.mission, mission); }
+  }
+  function saveMission() { ensureMission(); save(K.mission, mission); }
+  function missionText() {
+    ensureMission();
+    var m = MISSIONS[missionIndex()];
+    return 'Daily mission: ' + m.text + (mission.done ? '  ✓ Done, next game starts with a shield' : '  (' + Math.min(mission.p, m.target) + '/' + m.target + ')');
+  }
+  function updateMission(kind, val) {
+    ensureMission();
+    if (mission.done) return false;
+    var m = MISSIONS[missionIndex()];
+    if (m.type === 'laddoos' && kind === 'laddoos') mission.p += val;
+    else if (m.type === kind && (kind === 'level' || kind === 'score')) mission.p = Math.max(mission.p, val);
+    else return false;
+    if (mission.p >= m.target) { mission.done = true; save(K.bonus, true); save(K.mission, mission); return true; }
+    return false;
+  }
+
+  function renderBoard(highlight) {
+    boardEl.innerHTML = '';
+    scores.forEach(function (e, i) {
+      var li = document.createElement('li');
+      if (highlight && e === highlight) li.className = 'me';
+      var a = document.createElement('span'); a.textContent = (i + 1) + '.  ' + e.s;
+      var b = document.createElement('span'); b.textContent = e.d;
+      li.appendChild(a); li.appendChild(b); boardEl.appendChild(li);
+    });
+  }
+  function addScore(s) {
+    var d = new Date();
+    var e = { s: s, d: d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) };
+    scores.push(e);
+    scores.sort(function (a, b) { return b.s - a.s; });
+    scores = scores.slice(0, 5);
+    save(K.scores, scores);
+    return scores.indexOf(e) >= 0 ? e : null;
+  }
+  hiEl.textContent = best();
+  muBtn.textContent = 'Sound: ' + (muted ? 'off' : 'on');
+  msBtn.textContent = 'Music: ' + (musicOn ? 'on' : 'off');
+
+  if (!window.THREE) { ovt.textContent = 'Game could not load'; ovp.textContent = 'Reload the page and try again.'; goBtn.hidden = true; return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true }); }
+  catch (e) { ovt.textContent = 'This game needs 3D support'; ovp.textContent = 'Turn on hardware acceleration in your browser and reload.'; goBtn.hidden = true; return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- sound and music ---------- */
+  var ac = null;
+  function tone(freq, dur, type, vol) {
+    try {
+      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = type || 'sine'; o.frequency.value = freq;
+      g.gain.value = vol || 0.08;
+      g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + dur);
+      o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + dur);
+    } catch (e) {}
+  }
+  function beep(f, d, t, v) { if (!muted) tone(f, d, t, v); }
+  var SCALE = [262, 294, 330, 392, 440, 523, 587, 659, 784];
+  var MEL = [0, 2, 4, 2, 5, 4, 2, 1, 0, 2, 4, 7, 5, 4, 2, 0, 1, 3, 5, 3, 6, 5, 3, 2, 0, 2, 4, 8, 7, 5, 4, 2];
+  var musicStep = 0, musicTimer = null, musicRunning = false;
+  function musicTick() {
+    if (!musicRunning) return;
+    if (musicOn) {
+      tone(SCALE[MEL[musicStep % MEL.length]], 0.18, 'triangle', 0.035);
+      if (musicStep % 4 === 0) tone(SCALE[0] / 2, 0.35, 'sine', 0.05);
+    }
+    musicStep++;
+    musicTimer = setTimeout(musicTick, Math.max(130, 260 - level * 10 - (bossActive ? 40 : 0)));
+  }
+  function startMusic() { if (musicRunning) return; musicRunning = true; musicTick(); }
+  function stopMusic() { musicRunning = false; clearTimeout(musicTimer); }
+
+  /* ---------- scene ---------- */
+  var THEMES = [
+    { name: 'Morning', bg: 0xe9b46a, road: 0x6a5738, dash: 0xfff3d6, post: 0x8a5a2b, awn: 0xff9a2e, amb: 0.95, sun: 1.0 },
+    { name: 'Market', bg: 0xb5523a, road: 0x4a3326, dash: 0xf2c27a, post: 0x5a3a2a, awn: 0xe5412d, amb: 0.75, sun: 0.8 },
+    { name: 'Night', bg: 0x0b1026, road: 0x1b2038, dash: 0x5b6aa8, post: 0x2a3358, awn: 0xffd54a, amb: 0.5, sun: 0.55 }
+  ];
+  THEMES.forEach(function (t) { ['bg', 'road', 'dash', 'post', 'awn'].forEach(function (k) { t[k] = new THREE.Color(t[k]); }); });
+  var themeIdx = 0;
+  var cur = { bg: THEMES[0].bg.clone(), road: THEMES[0].road.clone(), dash: THEMES[0].dash.clone(), post: THEMES[0].post.clone(), awn: THEMES[0].awn.clone(), amb: THEMES[0].amb, sun: THEMES[0].sun };
+  var tmpC = new THREE.Color(), redC = new THREE.Color(0x7a1a10);
+
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xe9b46a);
+  scene.fog = new THREE.Fog(0xe9b46a, 14, 52);
+  var camera = new THREE.PerspectiveCamera(60, 4 / 3, 0.1, 100);
+  camera.position.set(0, 3.6, 6.5);
+  var baseFov = 60;
+
+  var ambient = new THREE.AmbientLight(0xffffff, 0.95);
+  scene.add(ambient);
+  var sun = new THREE.DirectionalLight(0xffffff, 1.0);
+  sun.position.set(3, 8, 5);
+  scene.add(sun);
+
+  var LANE = 2.2;
+  var roadMat = new THREE.MeshStandardMaterial({ color: 0x6a5738, roughness: 1 });
+  var road = new THREE.Mesh(new THREE.PlaneGeometry(LANE * 3 + 1.2, 140), roadMat);
+  road.rotation.x = -Math.PI / 2; road.position.z = -45;
+  scene.add(road);
+  var groundMat = new THREE.MeshStandardMaterial({ color: 0xb08a50, roughness: 1 });
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 140), groundMat);
+  ground.rotation.x = -Math.PI / 2; ground.position.set(0, -0.02, -45);
+  scene.add(ground);
+
+  var dashMat = new THREE.MeshBasicMaterial({ color: 0xfff3d6 });
+  var dashes = [];
+  [-1, 1].forEach(function (l) {
+    for (var k = 0; k < 14; k++) {
+      var d = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 1.6), dashMat);
+      d.rotation.x = -Math.PI / 2; d.position.set(l * LANE / 2, 0.01, -k * 5);
+      scene.add(d); dashes.push(d);
+    }
+  });
+
+  var postMat = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.9 });
+  var awnMat = new THREE.MeshStandardMaterial({ color: 0xff9a2e, roughness: 0.8 });
+  var posts = [];
+  [-1, 1].forEach(function (side) {
+    for (var k = 0; k < 12; k++) {
+      var g = new THREE.Group();
+      var p = new THREE.Mesh(new THREE.BoxGeometry(0.35, 2.4, 0.35), postMat); p.position.y = 1.2; g.add(p);
+      var a = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.18, 1.5), awnMat); a.position.set(-side * 0.6, 2.5, 0); g.add(a);
+      g.position.set(side * 5.1, 0, -k * 6);
+      scene.add(g); posts.push(g);
+    }
+  });
+  function scrollWorld(v, dt) {
+    dashes.forEach(function (d) { d.position.z += v * dt; if (d.position.z > 6) d.position.z -= 70; });
+    posts.forEach(function (p) { p.position.z += v * dt; if (p.position.z > 8) p.position.z -= 72; });
+  }
+
+  /* ---------- hero (selectable characters) ---------- */
+  var hero = new THREE.Group(); scene.add(hero);
+  var heroBody = null, thaliMesh = null, rolling = false;
+  var shieldMesh = new THREE.Mesh(new THREE.SphereGeometry(0.95, 20, 16), new THREE.MeshBasicMaterial({ color: 0x4aa3ff, transparent: true, opacity: 0.28 }));
+  shieldMesh.position.y = 0.7; shieldMesh.visible = false; hero.add(shieldMesh);
+  function buildHero() {
+    if (heroBody) hero.remove(heroBody);
+    heroBody = new THREE.Group(); hero.add(heroBody);
+    rolling = false; thaliMesh = null;
+    if (charIdx === 0 || charIdx === 3) {
+      var gold = charIdx === 3;
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.14, 40),
+        new THREE.MeshStandardMaterial(gold ? { color: 0xffd54a, metalness: 0.9, roughness: 0.2, emissive: 0x5a4000 } : { color: 0xd8dbe0, metalness: 0.8, roughness: 0.25 }));
+      m.rotation.z = Math.PI / 2; m.position.y = 0.65;
+      heroBody.add(m); thaliMesh = m; rolling = true;
+    } else if (charIdx === 1) {
+      var pts = [[0.001, 0], [0.34, 0], [0.5, 0.25], [0.56, 0.55], [0.42, 0.78], [0.5, 0.84], [0.001, 0.84]].map(function (p) { return new THREE.Vector2(p[0], p[1]); });
+      var l = new THREE.Mesh(new THREE.LatheGeometry(pts, 24), new THREE.MeshStandardMaterial({ color: 0xb5562c, roughness: 0.8, side: THREE.DoubleSide }));
+      l.position.y = 0.15; heroBody.add(l);
+    } else {
+      for (var i = 0; i < 3; i++) {
+        var c = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.28, 28), new THREE.MeshStandardMaterial({ color: 0xcfd3da, metalness: 0.85, roughness: 0.3 }));
+        c.position.y = 0.3 + i * 0.3; heroBody.add(c);
+      }
+      var h = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 8, 20), new THREE.MeshStandardMaterial({ color: 0x8a8f99, metalness: 0.8, roughness: 0.3 }));
+      h.position.y = 1.2; heroBody.add(h);
+    }
+  }
+
+  /* ---------- items ---------- */
+  var ladduGeo = new THREE.SphereGeometry(0.42, 20, 16);
+  var ladduMat = new THREE.MeshStandardMaterial({ color: 0xf0a020, roughness: 0.7 });
+  var goldMat = new THREE.MeshStandardMaterial({ color: 0xffd54a, emissive: 0x7a5a00, metalness: 0.6, roughness: 0.3 });
+  var chiliGeo = new THREE.ConeGeometry(0.34, 1.3, 14);
+  var chiliMat = new THREE.MeshStandardMaterial({ color: 0xe5412d, roughness: 0.5 });
+  var blockGeo = new THREE.BoxGeometry(LANE * 0.96, 2.2, 0.6);
+  var blockMat = new THREE.MeshStandardMaterial({ color: 0x9a4a30, roughness: 0.9 });
+  var stripeGeo = new THREE.BoxGeometry(LANE * 0.96, 0.22, 0.62);
+  var stripeMat = new THREE.MeshStandardMaterial({ color: 0xffd54a, roughness: 0.6 });
+  var barGeo = new THREE.BoxGeometry(1.9, 0.18, 0.3);
+  var barMat = new THREE.MeshStandardMaterial({ color: 0xe5412d, roughness: 0.6 });
+  var legGeo = new THREE.BoxGeometry(0.12, 0.5, 0.12);
+  var legMat = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.9 });
+  var puGeo = {
+    shield: new THREE.IcosahedronGeometry(0.4, 0),
+    magnet: new THREE.TorusGeometry(0.28, 0.1, 10, 20),
+    double: new THREE.OctahedronGeometry(0.42, 0)
+  };
+  var puMat = {
+    shield: new THREE.MeshStandardMaterial({ color: 0x4aa3ff, emissive: 0x1a4cc0, roughness: 0.4 }),
+    magnet: new THREE.MeshStandardMaterial({ color: 0xe5412d, emissive: 0x7a1a10, roughness: 0.4 }),
+    double: new THREE.MeshStandardMaterial({ color: 0xa05cff, emissive: 0x4a1a99, roughness: 0.4 })
+  };
+  var partGeo = new THREE.SphereGeometry(0.09, 6, 6);
+  var partMats = { good: new THREE.MeshBasicMaterial({ color: 0xffc04d }), gold: new THREE.MeshBasicMaterial({ color: 0xfff08a }), bad: new THREE.MeshBasicMaterial({ color: 0xff5a45 }), power: new THREE.MeshBasicMaterial({ color: 0x8fd0ff }) };
+
+  /* ---------- boss ---------- */
+  var bossMesh = new THREE.Group();
+  var bossBody = new THREE.Mesh(new THREE.ConeGeometry(0.34, 1.3, 16), chiliMat);
+  bossBody.scale.set(4, 4, 4); bossBody.rotation.x = Math.PI / 2;
+  bossMesh.add(bossBody);
+  var bossStem = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 10), new THREE.MeshStandardMaterial({ color: 0x3f8f3a, roughness: 0.7 }));
+  bossStem.position.z = -2.8; bossMesh.add(bossStem);
+  bossMesh.position.set(0, 3.2, -44); bossMesh.visible = false;
+  scene.add(bossMesh);
+
+  /* ---------- game state ---------- */
+  var items = [], parts = [];
+  var lane = 0, state = 'ready', score = 0, collected = 0, level = 1, lives = 3, combo = 1, streak = 0;
+  var speed = 9, spawnT = 0, last = 0, invuln = 0, flash = 0, shake = 0, time = 0;
+  var jy = 0, jv = 0;
+  var shield = false, magnetT = 0, doubleT = 0;
+  var bossActive = false, bossT = 0;
+
+  function hud() {
+    scEl.textContent = score; lvlEl.textContent = level;
+    var s = ''; for (var i = 0; i < Math.max(3, lives); i++) s += i < lives ? '♥' : '♡';
+    livesEl.textContent = s;
+    cbEl.textContent = 'x' + combo; cbEl.className = combo >= 3 ? 'hot' : '';
+  }
+  var lastChips = '';
+  function renderChips() {
+    var a = [];
+    if (shield) a.push('Shield');
+    if (magnetT > 0) a.push('Magnet ' + Math.ceil(magnetT) + 's');
+    if (doubleT > 0) a.push('x2 ' + Math.ceil(doubleT) + 's');
+    if (bossActive) a.push('Boss ' + Math.ceil(bossT) + 's');
+    var key = a.join('|');
+    if (key === lastChips) return;
+    lastChips = key; chipsEl.innerHTML = '';
+    a.forEach(function (t) { var s = document.createElement('span'); s.textContent = t; chipsEl.appendChild(s); });
+  }
+  var toastTimer = null;
+  function toast(msg, ms) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, ms || 1400);
+  }
+  function burst(x, y, z, kind) {
+    for (var i = 0; i < 10; i++) {
+      var m = new THREE.Mesh(partGeo, partMats[kind] || partMats.good);
+      m.position.set(x, y, z);
+      m.userData = { vx: (Math.random() - 0.5) * 5, vy: Math.random() * 4 + 1, vz: (Math.random() - 0.5) * 5, life: 0.6 };
+      scene.add(m); parts.push(m);
+    }
+  }
+
+  function addItem(kind, ln, y) {
+    var m;
+    if (kind === 'bad') { m = new THREE.Mesh(chiliGeo, chiliMat); m.rotation.x = Math.PI / 2; y = 0.7; }
+    else if (kind === 'good') { m = new THREE.Mesh(ladduGeo, ladduMat); y = y || 0.55; }
+    else if (kind === 'gold') { m = new THREE.Mesh(ladduGeo, goldMat); y = y || 0.55; }
+    else if (kind === 'block') {
+      m = new THREE.Mesh(blockGeo, blockMat);
+      var st = new THREE.Mesh(stripeGeo, stripeMat); st.position.y = 1.2; m.add(st);
+      y = 1.1;
+    } else if (kind === 'hurdle') {
+      m = new THREE.Group();
+      var bar = new THREE.Mesh(barGeo, barMat); bar.position.y = 0.55; m.add(bar);
+      var l1 = new THREE.Mesh(legGeo, legMat); l1.position.set(-0.85, 0.25, 0); m.add(l1);
+      var l2 = new THREE.Mesh(legGeo, legMat); l2.position.set(0.85, 0.25, 0); m.add(l2);
+      y = 0;
+    } else { m = new THREE.Mesh(puGeo[kind], puMat[kind]); y = 1.0; }
+    m.position.set(ln * LANE, y, -60);
+    m.userData = { kind: kind };
+    scene.add(m); items.push(m);
+    return m;
+  }
+  function otherLane(ln) { var a = [-1, 0, 1].filter(function (x) { return x !== ln; }); return a[Math.floor(Math.random() * 2)]; }
+  function wall() {
+    var free = Math.floor(Math.random() * 3) - 1;
+    [-1, 0, 1].forEach(function (l) { if (l !== free) addItem('block', l); });
+    addItem(Math.random() < 0.3 ? 'gold' : 'good', free);
+  }
+  function hurdle(ln) { addItem('hurdle', ln); addItem('good', ln, 1.9); }
+  function spawnPattern() {
+    var r = Math.random(), ln = Math.floor(Math.random() * 3) - 1;
+    if (bossActive) {
+      if (r < 0.4) wall();
+      else if (r < 0.7) hurdle(ln);
+      else { addItem('bad', ln); addItem(Math.random() < 0.4 ? 'gold' : 'good', otherLane(ln)); }
+      return;
+    }
+    var hu = level >= 2 ? 0.12 : 0, wa = level >= 3 ? 0.10 : 0;
+    if (r < 0.06) { addItem(['shield', 'magnet', 'double'][Math.floor(Math.random() * 3)], ln); }
+    else if (r < 0.06 + hu) hurdle(ln);
+    else if (r < 0.06 + hu + wa) wall();
+    else {
+      var r2 = Math.random();
+      addItem(r2 < 0.36 ? 'bad' : (r2 < 0.44 ? 'gold' : 'good'), ln);
+    }
+  }
+  function clearAll() {
+    items.forEach(function (m) { scene.remove(m); }); items = [];
+    parts.forEach(function (m) { scene.remove(m); }); parts = [];
+  }
+
+  /* ---------- rules ---------- */
+  function startBoss() {
+    bossActive = true; bossT = 14; bossMesh.visible = true;
+    toast('BOSS: Chili King! Survive 14 seconds', 2600);
+    beep(110, 0.6, 'sawtooth', 0.1);
+  }
+  function endBoss() {
+    bossActive = false; bossMesh.visible = false;
+    score += 300; lives = Math.min(5, lives + 1);
+    toast('Boss beaten! +300 points and +1 life', 2600);
+    [523, 659, 784, 1047].forEach(function (f, i) { setTimeout(function () { beep(f, 0.18, 'triangle', 0.1); }, i * 110); });
+    hud(); applyLevel();
+  }
+  function applyLevel() {
+    var nl = 1 + Math.floor(collected / 10);
+    if (bossActive || nl <= level) return;
+    level = nl;
+    var t = Math.floor((level - 1) / 3) % 3;
+    var msg = 'Level ' + level;
+    if (t !== themeIdx) { themeIdx = t; msg += ' · ' + THEMES[t].name; }
+    toast(msg);
+    beep(880, 0.25, 'triangle', 0.1);
+    if (updateMission('level', level)) toast('Daily mission complete!', 2400);
+    hud();
+    if (level % 5 === 0) startBoss();
+  }
+  function collect(m, k) {
+    streak++; combo = Math.min(5, 1 + Math.floor(streak / 3));
+    score += (k === 'gold' ? 50 : 10) * combo * (doubleT > 0 ? 2 : 1);
+    collected++;
+    if (updateMission('laddoos', 1)) toast('Daily mission complete!', 2400);
+    burst(m.position.x, m.position.y, 0, k);
+    beep(k === 'gold' ? 990 : 660, 0.1, 'triangle');
+    hud(); applyLevel();
+  }
+  function power(m, k) {
+    if (k === 'shield') { shield = true; shieldMesh.visible = true; toast('Shield ready'); }
+    else if (k === 'magnet') { magnetT = 8; toast('Magnet: laddoos fly to you'); }
+    else { doubleT = 10; toast('Double points'); }
+    burst(m.position.x, m.position.y, 0, 'power');
+    beep(760, 0.2, 'sine', 0.1);
+  }
+  function hurt(m) {
+    if (invuln > 0) return 'ignored';
+    burst(m.position.x, 0.8, 0, 'bad');
+    if (shield) {
+      shield = false; shieldMesh.visible = false; invuln = 1; shake = 0.2;
+      beep(240, 0.2, 'square', 0.08); toast('Shield blocked it!');
+      return 'shield';
+    }
+    lives--; combo = 1; streak = 0; invuln = 1.5; flash = 0.25; shake = 0.45;
+    beep(160, 0.3, 'sawtooth', 0.1);
+    try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {}
+    if (lives <= 0) { end(); return 'dead'; }
+    toast(lives + (lives === 1 ? ' life left' : ' lives left'));
+    return 'life';
+  }
+
+  /* ---------- menus ---------- */
+  function renderChars() {
+    charsEl.innerHTML = '';
+    CHARS.forEach(function (c, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      var ok = unlocked(i);
+      b.textContent = c.name + (ok ? '' : ' · ' + c.min + ' pts');
+      b.disabled = !ok;
+      b.className = i === charIdx ? 'on' : '';
+      b.setAttribute('aria-pressed', i === charIdx ? 'true' : 'false');
+      b.addEventListener('click', function () { charIdx = i; save(K.ch, i); buildHero(); renderChars(); });
+      charsEl.appendChild(b);
+    });
+  }
+  function openMenu(mode) {
+    var full = mode !== 'paused';
+    charsEl.hidden = !full; sttEl.hidden = !full; boardEl.hidden = !full || scores.length === 0;
+    misEl.textContent = missionText();
+    sttEl.textContent = 'Games played ' + stats.games + ' · Laddoos collected ' + stats.laddoos;
+    if (full) { renderChars(); }
+    ov.hidden = false; goBtn.focus();
+  }
+  function start() {
+    clearAll();
+    lane = 0; score = 0; collected = 0; level = 1; lives = 3; combo = 1; streak = 0;
+    speed = 9; spawnT = 0.4; invuln = 0; jy = 0; jv = 0;
+    shield = false; magnetT = 0; doubleT = 0; bossActive = false; bossMesh.visible = false;
+    themeIdx = 0; state = 'play';
+    if (load(K.bonus, false) === true) { shield = true; save(K.bonus, false); toast('Mission bonus: you start with a shield', 2000); }
+    shieldMesh.visible = shield;
+    hero.visible = true; pzBtn.textContent = 'Pause';
+    hud(); ov.hidden = true;
+    beep(520, 0.12, 'triangle');
+    startMusic();
+  }
+  function end() {
+    state = 'over'; stopMusic();
+    bossActive = false; bossMesh.visible = false; hero.visible = true;
+    var prevBest = best(), prevTop = top;
+    var entry = score > 0 ? addScore(score) : null;
+    if (score > top) { top = score; save(K.top, top); }
+    stats.games++; stats.laddoos += collected; save(K.stats, stats);
+    var missionDone = updateMission('score', score);
+    saveMission();
+    hiEl.textContent = best();
+
+    ovt.textContent = 'Game over';
+    ovp.innerHTML = '';
+    function line(text, cls) { var d = document.createElement('div'); if (cls) d.className = cls; d.textContent = text; ovp.appendChild(d); }
+    line('Score ' + score + '  ·  Level ' + level);
+    if (score > prevBest && score > 0) line('New best score!', 'newbest');
+    CHARS.forEach(function (c) { if (c.min > prevTop && c.min <= top) line('Unlocked: ' + c.name, 'newbest'); });
+    if (missionDone) line('Daily mission complete!', 'ok');
+    renderBoard(entry);
+    goBtn.textContent = 'Play again';
+    pzBtn.textContent = 'Pause';
+    shieldMesh.visible = false;
+    openMenu('over');
+    beep(180, 0.5, 'sawtooth', 0.1);
+  }
+  function pause() {
+    if (state !== 'play') return;
+    state = 'paused'; stopMusic(); saveMission();
+    ovt.textContent = 'Paused'; ovp.textContent = 'Take a breath.';
+    goBtn.textContent = 'Resume'; pzBtn.textContent = 'Resume';
+    openMenu('paused');
+  }
+  function resume() {
+    if (state !== 'paused') return;
+    state = 'play'; ov.hidden = true; pzBtn.textContent = 'Pause'; last = performance.now();
+    startMusic();
+  }
+  function move(dir) {
+    if (state !== 'play') return;
+    var n = Math.max(-1, Math.min(1, lane + dir));
+    if (n !== lane) { lane = n; beep(300, 0.05, 'square', 0.03); }
+  }
+  function jump() {
+    if (state !== 'play' || jy > 0.001) return;
+    jv = 10; jy = 0.001; beep(420, 0.12, 'sine', 0.07);
+  }
+
+  goBtn.addEventListener('click', function () { if (state === 'paused') resume(); else start(); });
+  $('bl').addEventListener('click', function () { move(-1); });
+  $('br').addEventListener('click', function () { move(1); });
+  $('jp').addEventListener('click', jump);
+  pzBtn.addEventListener('click', function () { if (state === 'play') pause(); else if (state === 'paused') resume(); });
+  muBtn.addEventListener('click', function () { muted = !muted; save(K.mute, muted); muBtn.textContent = 'Sound: ' + (muted ? 'off' : 'on'); });
+  msBtn.addEventListener('click', function () { musicOn = !musicOn; save(K.music, musicOn); msBtn.textContent = 'Music: ' + (musicOn ? 'on' : 'off'); });
+  $('rs').addEventListener('click', function () {
+    scores = []; save(K.scores, scores); hiEl.textContent = 0; renderBoard(); boardEl.hidden = true;
+  });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) pause(); });
+  window.addEventListener('keydown', function (e) {
+    var k = e.key.toLowerCase();
+    if (k === 'arrowleft' || k === 'a') { move(-1); e.preventDefault(); }
+    else if (k === 'arrowright' || k === 'd') { move(1); e.preventDefault(); }
+    else if (k === 'arrowup' || k === 'w') { jump(); e.preventDefault(); }
+    else if (k === ' ') {
+      if (state === 'play') jump();
+      else if (document.activeElement !== goBtn) { if (state === 'paused') resume(); else start(); }
+      e.preventDefault();
+    }
+    else if (k === 'enter' && state !== 'play' && document.activeElement !== goBtn) { if (state === 'paused') resume(); else start(); e.preventDefault(); }
+    else if (k === 'p' || k === 'escape') { if (state === 'play') pause(); else if (state === 'paused') resume(); }
+  });
+  var sx = null, sy = null;
+  stage.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; });
+  stage.addEventListener('pointerup', function (e) {
+    if (sx === null) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy; sx = null; sy = null;
+    if (dy < -30 && Math.abs(dy) > Math.abs(dx)) jump();
+    else if (Math.abs(dx) > 30) move(dx > 0 ? 1 : -1);
+  });
+
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    baseFov = camera.aspect < 1.1 ? 72 : 60;
+    camera.fov = baseFov;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  buildHero();
+  renderChars();
+  renderBoard();
+  openMenu('over');
+  hud();
+
+  /* ---------- main loop ---------- */
+  function frame(t) {
+    var dt = Math.min((t - last) / 1000, 0.05); last = t; time += dt;
+    var hx = hero.position.x, hcy = 0.65 + jy;
+
+    if (state === 'play') {
+      invuln = Math.max(0, invuln - dt); magnetT = Math.max(0, magnetT - dt); doubleT = Math.max(0, doubleT - dt);
+      var target = Math.min(24, 9 + (level - 1) * 1.1) + (bossActive ? 3 : 0);
+      speed += (target - speed) * Math.min(1, dt * 2);
+      if (jy > 0) { jv -= 28 * dt; jy += jv * dt; if (jy <= 0) { jy = 0; jv = 0; } }
+      if (bossActive) { bossT -= dt; if (bossT <= 0) endBoss(); }
+      spawnT -= dt;
+      if (spawnT <= 0) { spawnPattern(); spawnT = Math.max(0.32, 0.95 - speed * 0.025) * (bossActive ? 0.65 : 1); }
+
+      for (var i = items.length - 1; i >= 0; i--) {
+        var m = items[i], k = m.userData.kind;
+        m.position.z += speed * dt;
+        if (k === 'good' || k === 'gold') {
+          m.rotation.y += dt * 3;
+          if (magnetT > 0 && m.position.z > -18) {
+            m.position.x += (hx - m.position.x) * Math.min(1, dt * 5);
+            m.position.y += (hcy - m.position.y) * Math.min(1, dt * 2.5);
+          }
+        } else if (k === 'shield' || k === 'magnet' || k === 'double') { m.rotation.y += dt * 2.5; }
+        var z = m.position.z, dx = Math.abs(m.position.x - hx);
+        if (z > -0.9 && z < 0.9) {
+          if ((k === 'good' || k === 'gold') && dx < 0.95 && Math.abs(m.position.y - hcy) < 0.9) {
+            collect(m, k); scene.remove(m); items.splice(i, 1); continue;
+          }
+          if ((k === 'shield' || k === 'magnet' || k === 'double') && dx < 1.0 && Math.abs(m.position.y - hcy) < 1.2) {
+            power(m, k); scene.remove(m); items.splice(i, 1); continue;
+          }
+          var hit = (k === 'bad' && dx < 0.85) || (k === 'hurdle' && dx < 1.2 && jy < 0.7) || (k === 'block' && dx < 1.55);
+          if (hit) {
+            var res = hurt(m);
+            if (res !== 'ignored') {
+              scene.remove(m); items.splice(i, 1); hud();
+              if (res === 'dead') break;
+              continue;
+            }
+          }
+        }
+        if (z > 8) {
+          if (k === 'good' || k === 'gold') { streak = 0; if (combo !== 1) { combo = 1; hud(); } }
+          scene.remove(m); items.splice(i, 1);
+        }
+      }
+      scrollWorld(speed, dt);
+      hero.visible = invuln <= 0 || Math.floor(invuln * 10) % 2 === 0;
+    } else if (state !== 'paused') {
+      scrollWorld(2, dt);
+    }
+
+    /* hero motion */
+    hero.position.x += (lane * LANE - hero.position.x) * Math.min(1, dt * 14);
+    hero.position.y = jy;
+    if (rolling && thaliMesh) { if (state === 'play') thaliMesh.rotation.x -= speed * dt * 1.2; }
+    else if (heroBody) { heroBody.rotation.z = Math.sin(time * 9) * 0.07; heroBody.position.y = Math.abs(Math.sin(time * 9)) * 0.05; }
+    shieldMesh.rotation.y += dt;
+    shieldMesh.scale.setScalar(1 + Math.sin(time * 5) * 0.04);
+
+    /* boss */
+    if (bossMesh.visible) {
+      bossMesh.rotation.z = Math.sin(time * 3) * 0.2;
+      bossMesh.position.y = 3.2 + Math.sin(time * 2) * 0.4;
+      bossMesh.position.x = Math.sin(time * 1.2) * 1.5;
+    }
+
+    /* particles */
+    for (var j = parts.length - 1; j >= 0; j--) {
+      var p = parts[j], v = p.userData;
+      v.life -= dt; v.vy -= 12 * dt;
+      p.position.x += v.vx * dt; p.position.y += v.vy * dt; p.position.z += v.vz * dt;
+      p.scale.setScalar(Math.max(0.01, v.life / 0.6));
+      if (v.life <= 0) { scene.remove(p); parts.splice(j, 1); }
+    }
+
+    /* world theme */
+    var th = THEMES[themeIdx], kk = Math.min(1, dt * 1.5);
+    cur.bg.lerp(th.bg, kk); cur.road.lerp(th.road, kk); cur.dash.lerp(th.dash, kk); cur.post.lerp(th.post, kk); cur.awn.lerp(th.awn, kk);
+    cur.amb += (th.amb - cur.amb) * kk; cur.sun += (th.sun - cur.sun) * kk;
+    flash = Math.max(0, flash - dt);
+    tmpC.copy(cur.bg).lerp(redC, Math.min(1, flash * 2));
+    scene.background.copy(tmpC); scene.fog.color.copy(tmpC);
+    groundMat.color.copy(tmpC).multiplyScalar(0.82);
+    roadMat.color.copy(cur.road); dashMat.color.copy(cur.dash); postMat.color.copy(cur.post); awnMat.color.copy(cur.awn);
+    ambient.intensity = cur.amb; sun.intensity = cur.sun;
+
+    /* camera: widens and leans with speed, shakes on hits */
+    var boost = Math.max(0, Math.min(14, (speed - 9) * 0.9));
+    camera.fov += (baseFov + (state === 'play' ? boost : 0) - camera.fov) * Math.min(1, dt * 3);
+    camera.updateProjectionMatrix();
+    shake = Math.max(0, shake - dt);
+    var sh = reduceMotion ? 0 : shake;
+    camera.position.set(hero.position.x * 0.35 + (Math.random() - 0.5) * sh, 3.6 + (Math.random() - 0.5) * sh, 6.5 - Math.min(1.2, Math.max(0, (speed - 9) * 0.08)));
+    camera.lookAt(hero.position.x * 0.25, 0.8, -6);
+
+    renderChips();
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
