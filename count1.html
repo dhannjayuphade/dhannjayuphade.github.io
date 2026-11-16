@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Object Counter</title>
+<style>
+:root{
+  --bg:#f6f3f0; --card:#ffffff; --fg:#2a1d17; --muted:#7a6a60; --line:#e4dbd4;
+  --accent:#5a2d1c; --accent-fg:#ffffff; --ok:#2f7d4f; --warn:#b4531f;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#17110e; --card:#241a15; --fg:#f3e9e2; --muted:#a8968a; --line:#3a2c25; --accent:#d9925f; --accent-fg:#1b0f09; --ok:#6fcf97; --warn:#f2a36b; }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);
+  padding:max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  max-width:560px;margin:0 auto}
+h1{font-size:20px;margin:4px 0 10px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;font-size:15px}
+.tabs button.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.video{position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:4/3}
+video{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.65);color:#fff;padding:4px 10px;border-radius:20px;font-size:14px}
+input[type=text]{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font-size:16px}
+.btn{padding:11px 14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-fg);font-size:15px;font-weight:600}
+.btn.sec{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{min-width:0}
+.grow{flex:1}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.name{flex:1;font-weight:600;overflow-wrap:anywhere}
+.sub{color:var(--muted);font-size:13px}
+.count{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+.small{padding:6px 10px;font-size:14px;border-radius:8px}
+.msg{color:var(--warn);font-size:14px;margin:6px 0}
+.ok{color:var(--ok)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<h1>Object Counter</h1>
+<div class="tabs">
+  <button id="tabAdd" class="on">1. Add vastu</button>
+  <button id="tabCount">2. Count</button>
+</div>
+
+<div class="card video">
+  <video id="cam" playsinline muted autoplay></video>
+  <div class="badge" id="badge">Camera off</div>
+</div>
+<div class="msg" id="msg"></div>
+
+<section id="addView">
+  <div class="card">
+    <div class="sub" style="margin-bottom:8px">Step 1: ek-ek vastu cha nav lihaa (udaharan bottle, pen, chocolate), camera samor dhara ani "Capture" daba. 20 photos auto ghetle jatat. Vastu halvun veglya angle-ne dakhva.</div>
+    <input type="text" id="nameIn" placeholder="Vastu cha nav (udaharan Pen)" maxlength="40">
+    <div class="row" style="margin-top:8px">
+      <button class="btn grow" id="capBtn">Capture 20 photos</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sec grow" id="bgBtn">Capture "Khali camera" (kahi nahi)</button>
+    </div>
+    <div class="sub" style="margin-top:6px">"Khali camera" ek-veli neet kara (kahi vastu nasatana). Tyamule app la kalte ki vastu gelii.</div>
+  </div>
+  <div class="card" id="listCard">
+    <div id="classList"></div>
+  </div>
+</section>
+
+<section id="countView" hidden>
+  <div class="card">
+    <div class="row">
+      <button class="btn grow" id="runBtn">Start counting</button>
+      <button class="btn sec" id="resetBtn">Reset</button>
+    </div>
+    <div class="sub" style="margin-top:8px">Ek-ek vastu camera samorun nya. Ekach vastu mage mage count honar nahi; don vastunchya madhye camera khali dyava.</div>
+    <div class="sub" id="live" style="margin-top:6px">Ata disat ahe: -</div>
+  </div>
+  <div class="card"><div id="counts"></div>
+    <div class="row" style="margin-top:8px;justify-content:space-between"><div class="sub">Ekun</div><div class="count" id="total">0</div></div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/knn-classifier@1.2.4/dist/knn-classifier.min.js"></script>
+<script>
+const BG = "__empty__";
+const $ = id => document.getElementById(id);
+const video = $("cam"), badge = $("badge"), msg = $("msg");
+let net = null, knn = null, running = false, counts = {}, lastCounted = null;
+let streak = {label:null, n:0};
+
+function safeGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function safeSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+function setMsg(t){ msg.textContent = t || ""; }
+
+async function startCamera(){
+  if(video.srcObject) return;
+  try{
+    const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+    video.srcObject = s; await video.play();
+    badge.textContent = "Camera on";
+  }catch(e){
+    setMsg("Camera suru hot nahi. Page HTTPS var kiva localhost var ughda ani camera permission dya.");
+    throw e;
+  }
+}
+
+async function loadModel(){
+  if(net) return;
+  badge.textContent = "Model load hot ahe...";
+  if(typeof tf === "undefined" || typeof mobilenet === "undefined" || typeof knnClassifier === "undefined"){
+    setMsg("Model load jhala nahi. Internet check kara ani page punha ughda.");
+    throw new Error("libs missing");
+  }
+  await tf.ready();
+  net = await mobilenet.load({version:2, alpha:1.0});
+  knn = knnClassifier.create();
+  loadSaved();
+  badge.textContent = "Camera on";
+  renderAll();
+}
+
+function embed(){
+  return tf.tidy(() => net.infer(video, true));
+}
+
+/* ---- saving / loading ---- */
+function saveAll(){
+  try{
+    const ds = knn.getClassifierDataset();
+    const out = {};
+    Object.keys(ds).forEach(k => { out[k] = {shape: ds[k].shape, data: Array.from(ds[k].dataSync())}; });
+    safeSet("choc_ds", JSON.stringify(out));
+  }catch(e){}
+  safeSet("choc_counts", JSON.stringify(counts));
+}
+function loadSaved(){
+  const raw = safeGet("choc_ds");
+  if(raw){
+    try{
+      const o = JSON.parse(raw), ds = {};
+      Object.keys(o).forEach(k => { ds[k] = tf.tensor(o[k].data, o[k].shape); });
+      if(Object.keys(ds).length) knn.setClassifierDataset(ds);
+    }catch(e){}
+  }
+  try{ counts = JSON.parse(safeGet("choc_counts") || "{}"); }catch(e){ counts = {}; }
+}
+
+/* ---- adding samples ---- */
+async function capture(label, btn){
+  if(!label){ setMsg("Adhi nav lihaa."); return; }
+  setMsg("");
+  try{ await startCamera(); await loadModel(); }catch(e){ return; }
+  const old = btn.textContent; btn.disabled = true;
+  for(let i=1;i<=20;i++){
+    const e = embed();
+    knn.addExample(e, label);
+    e.dispose();
+    btn.textContent = "Capturing " + i + "/20";
+    await new Promise(r => setTimeout(r, 150));
+  }
+  btn.textContent = old; btn.disabled = false;
+  if(label !== BG && !(label in counts)) counts[label] = 0;
+  saveAll(); renderAll();
+}
+
+$("capBtn").onclick = () => {
+  const n = $("nameIn").value.trim();
+  if(n === BG){ setMsg("Ha nav vaparu naka."); return; }
+  capture(n, $("capBtn")).then(() => { $("nameIn").value = ""; });
+};
+$("bgBtn").onclick = () => capture(BG, $("bgBtn"));
+
+function removeClass(label){
+  knn.clearClass(label);
+  delete counts[label];
+  saveAll(); renderAll();
+}
+
+/* ---- rendering ---- */
+function renderAll(){
+  const cl = $("classList");
+  cl.innerHTML = "";
+  const n = knn ? knn.getClassExampleCount() : {};
+  const labels = Object.keys(n);
+  if(!labels.length){
+    cl.innerHTML = '<div class="sub">Ajun kahi add kele nahi.</div>';
+  }
+  labels.sort((a,b)=> (a===BG)-(b===BG) || a.localeCompare(b)).forEach(l => {
+    const d = document.createElement("div"); d.className = "item";
+    const nm = document.createElement("div"); nm.className = "name";
+    nm.textContent = l === BG ? "Khali camera" : l;
+    const s = document.createElement("div"); s.className = "sub"; s.textContent = n[l] + " photos";
+    const b = document.createElement("button"); b.className = "btn sec small"; b.textContent = "Delete";
+    b.onclick = () => removeClass(l);
+    d.append(nm, s, b); cl.appendChild(d);
+  });
+
+  const ct = $("counts"); ct.innerHTML = "";
+  const names = Object.keys(counts);
+  if(!names.length) ct.innerHTML = '<div class="sub">Pahilya vastu add kara.</div>';
+  let total = 0;
+  names.sort().forEach(l => {
+    total += counts[l];
+    const d = document.createElement("div"); d.className = "item";
+    const nm = document.createElement("div"); nm.className = "name"; nm.textContent = l;
+    const minus = document.createElement("button"); minus.className = "btn sec small"; minus.textContent = "-";
+    minus.onclick = () => { counts[l] = Math.max(0, counts[l]-1); saveAll(); renderAll(); };
+    const c = document.createElement("div"); c.className = "count"; c.textContent = counts[l];
+    const plus = document.createElement("button"); plus.className = "btn sec small"; plus.textContent = "+";
+    plus.onclick = () => { counts[l]++; saveAll(); renderAll(); };
+    d.append(nm, minus, c, plus); ct.appendChild(d);
+  });
+  $("total").textContent = total;
+}
+
+/* ---- counting loop ---- */
+async function loop(){
+  while(running){
+    try{
+      const n = knn.getClassExampleCount();
+      const names = Object.keys(n);
+      if(names.length < 2 || !n[BG]){
+        $("live").textContent = !n[BG]
+          ? "'Khali camera' add kela nahi. Add tab madhye camera khali thevun to capture kara."
+          : "Kamit kami ek vastu add kara.";
+      }else{
+        const e = embed();
+        const res = await knn.predictClass(e, Math.min(5, Math.max(1, Math.floor(n[BG]/2))));
+        e.dispose();
+        const conf = res.confidences[res.label] || 0;
+        const label = conf >= 0.6 ? res.label : null;
+        if(label && label === streak.label) streak.n++; else streak = {label, n: label ? 1 : 0};
+        const shown = res.label === BG ? "kahi nahi" : res.label;
+        $("live").textContent = "Ata disat ahe: " + shown + " (" + Math.round(conf*100) + "%)";
+        if(streak.n >= 2){
+          if(label === BG){ lastCounted = null; }
+          else if(label !== lastCounted){
+            counts[label] = (counts[label] || 0) + 1;
+            lastCounted = label;
+            saveAll(); renderAll();
+            if(navigator.vibrate) navigator.vibrate(60);
+          }
+        }
+      }
+    }catch(err){
+      $("live").textContent = "Error: " + (err && err.message ? err.message : err);
+    }
+    await new Promise(r => setTimeout(r, 150));
+  }
+}
+
+$("runBtn").onclick = async () => {
+  if(running){ running = false; $("runBtn").textContent = "Start counting"; return; }
+  setMsg("");
+  try{ await startCamera(); await loadModel(); }catch(e){ return; }
+  running = true; lastCounted = null; streak = {label:null,n:0};
+  $("runBtn").textContent = "Stop";
+  loop();
+};
+$("resetBtn").onclick = () => {
+  Object.keys(counts).forEach(k => counts[k] = 0);
+  lastCounted = null; saveAll(); renderAll();
+};
+
+/* ---- tabs ---- */
+function show(tab){
+  $("addView").hidden = tab !== "add";
+  $("countView").hidden = tab !== "count";
+  $("tabAdd").classList.toggle("on", tab === "add");
+  $("tabCount").classList.toggle("on", tab === "count");
+  if(tab === "add" && running){ running = false; $("runBtn").textContent = "Start counting"; }
+}
+$("tabAdd").onclick = () => show("add");
+$("tabCount").onclick = () => show("count");
+
+/* camera + saved data as soon as the page opens */
+startCamera().then(loadModel).catch(()=>{});
+renderAll();
+</script>
+</body>
+</html>
