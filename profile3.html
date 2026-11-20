@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>My Profile – Dhananjay website</title>
+<meta name="theme-color" content="#00ffcc">
+<style>
+:root{--bg:#050a0f;--card:rgba(12,22,30,.72);--line:rgba(0,255,204,.22);--neon:#00ffcc;--neon2:#7a5cff;
+  --text:#e6fff9;--muted:#8fb5ad;--err:#ff4d6d;--ok:#00e68a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,-apple-system,'Noto Sans Devanagari',sans-serif;background:var(--bg);
+  color:var(--text);min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg::before{content:"";position:absolute;inset:-50%;
+  background-image:linear-gradient(rgba(0,255,204,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,204,.06) 1px,transparent 1px);
+  background-size:44px 44px;transform:perspective(500px) rotateX(60deg) translateY(-10%);animation:grid 14s linear infinite}
+@keyframes grid{to{background-position:0 44px}}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:drift 12s ease-in-out infinite}
+.o1{width:280px;height:280px;background:var(--neon);top:-80px;left:-80px}
+.o2{width:320px;height:320px;background:var(--neon2);bottom:-100px;right:-100px;animation-delay:-5s}
+@keyframes drift{50%{transform:translate(40px,30px) scale(1.12)}}
+#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:5}
+.ring{width:56px;height:56px;border-radius:50%;border:3px solid transparent;border-top-color:var(--neon);
+  border-right-color:var(--neon2);animation:sp 1s linear infinite;box-shadow:0 0 22px var(--neon)}
+@keyframes sp{to{transform:rotate(360deg)}}
+main{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:16px 16px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:14px}
+.top a{color:var(--neon);text-decoration:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 14px 40px rgba(0,0,0,.4);
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+h2{font-size:15px;color:var(--neon);font-family:monospace;letter-spacing:1px;margin-bottom:14px}
+h2::before{content:"> ";opacity:.6}
+.hero{text-align:center}
+.avatar{position:relative;display:block;width:116px;height:116px;margin:0 auto 14px;border-radius:50%;padding:4px;cursor:pointer;
+  background:conic-gradient(var(--neon),var(--neon2),var(--neon));box-shadow:0 0 32px rgba(0,255,204,.4)}
+.avatar .in{width:100%;height:100%;border-radius:50%;background:#0a141c;display:grid;place-items:center;overflow:hidden;
+  font-size:44px;font-weight:700;color:var(--neon)}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.cam{position:absolute;right:-2px;bottom:-2px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));font-size:16px;border:3px solid var(--bg)}
+.hero h1{font-size:22px;word-break:break-word}
+.vt{display:inline-block;width:22px;height:22px;vertical-align:middle;margin-left:6px}
+.hero p{color:var(--muted);font-size:14px;margin-top:4px;word-break:break-all}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.badge{font-size:12px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+.badge.ok{color:var(--ok);border-color:var(--ok)}
+.badge.warn{color:#ffb020;border-color:#ffb020}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.4px}
+.field input,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(0,0,0,.28);color:var(--text);font-size:15px;outline:none;font-family:inherit;transition:.25s}
+.field input:focus,.field textarea:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,255,204,.15)}
+.field input[readonly]{opacity:.65}
+.field textarea{resize:vertical;min-height:80px}
+.btn{width:100%;padding:14px;border:0;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;color:#021;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));transition:.2s}
+.btn:hover{box-shadow:0 0 26px rgba(0,255,204,.5)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.7;cursor:wait}
+.btn.ghost{background:transparent;color:var(--neon);border:1px solid var(--neon)}
+.btn.out{background:transparent;color:var(--err);border:1px solid var(--err);margin-top:6px}
+.btn.small{width:auto;padding:9px 14px;font-size:13px;margin-top:8px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+.row:last-child{border:0}
+.row span:first-child{color:var(--muted)}
+.row span:last-child{text-align:right;word-break:break-all}
+ul{list-style:none}
+.dev{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+.dev:last-child{border:0}
+.dev small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.dev .me{font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:10px;padding:2px 8px;white-space:nowrap}
+.note{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.5}
+#toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-80px);z-index:30;padding:11px 18px;border-radius:12px;
+  background:var(--neon);color:#021;font-weight:600;font-size:14px;transition:transform .4s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#proto{display:none;position:fixed;bottom:12px;left:12px;right:12px;z-index:40;padding:12px 14px;border-radius:12px;
+  background:var(--err);color:#fff;font-size:13px;text-align:center}
+#consent{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(3,8,12,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.cbox{width:100%;max-width:420px;background:#0c161e;border:1px solid var(--line);border-radius:20px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(0,255,204,.12)}
+.cbox h2{font-size:18px;margin-bottom:10px}
+.cbox p{font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.clinks{display:flex;gap:10px;flex-wrap:wrap}
+.clinks a{flex:1;min-width:150px;text-align:center;padding:11px;border:1px solid var(--line);border-radius:12px;color:var(--neon);text-decoration:none;font-size:14px}
+.cchk{display:flex;gap:10px;align-items:flex-start;margin:6px 0 14px;font-size:14px;cursor:pointer}
+.cchk input{width:20px;height:20px;margin-top:2px;accent-color:#00ffcc;flex:none}
+.acc{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:14px;border:1px solid transparent;cursor:pointer;transition:.2s}
+.acc:hover{background:rgba(0,255,204,.06)}
+.acc.cur{border-color:var(--line);background:rgba(0,255,204,.07);cursor:default}
+.acc .av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex:none;display:grid;place-items:center;font-weight:700;color:#021;background:linear-gradient(135deg,var(--neon),var(--neon2))}
+.acc .av img{width:100%;height:100%;object-fit:cover;display:block}
+.acc .tx{flex:1;min-width:0}
+.acc .tx b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc .tx small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc .tag{font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:10px;padding:2px 8px;white-space:nowrap}
+.acc .rm{background:none;border:0;color:var(--muted);font-size:16px;padding:6px 8px;cursor:pointer;border-radius:8px}
+.acc .rm:hover{color:var(--err)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="proto">⚠️ Local file detected. Open this page on the website: https://dhannjayuphade.github.io/profile.html</div>
+<div id="loading"><div class="ring"></div></div>
+
+<main id="app" hidden>
+  <div class="top">
+    <a href="index.html">← Home</a>
+    <a href="admin2.html" id="adminLink" hidden>🛡️ Admin panel</a>
+  </div>
+
+  <section class="card hero">
+    <label class="avatar" for="photoIn" title="Change photo">
+      <div class="in"><img id="avImg" alt="" hidden><span id="avLetter">?</span></div>
+      <span class="cam">📷</span>
+    </label>
+    <input type="file" id="photoIn" accept="image/*" hidden>
+    <h1><span id="dName">…</span><svg id="tick" class="vt" viewBox="0 0 24 24" hidden aria-label="Verified"><title>Verified</title><path fill="#1d9bf0" d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.66-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.68-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"/></svg></h1>
+    <p id="dEmail"></p>
+    <div class="badges"><span class="badge" id="vBadge"></span><span class="badge" id="pBadge"></span></div>
+    <button class="btn ghost small" id="verifyBtn" hidden>📧 Send verification email</button>
+  </section>
+
+  <section class="card">
+    <h2>edit_profile</h2>
+    <form id="form" novalidate>
+      <div class="field"><label for="fName">FULL NAME</label><input id="fName" type="text" maxlength="80" autocomplete="name"></div>
+      <div class="field"><label for="fEmail">EMAIL (cannot be changed)</label><input id="fEmail" type="email" readonly></div>
+      <div class="field"><label for="fBio">ABOUT YOU</label><textarea id="fBio" maxlength="300" placeholder="Write something about yourself…"></textarea></div>
+      <button class="btn" type="submit" id="saveBtn">💾 Save changes</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>account</h2>
+    <div class="row"><span>Member since</span><span id="aSince">–</span></div>
+    <div class="row"><span>Last login</span><span id="aLast">–</span></div>
+    <div class="row"><span>Login method</span><span id="aProv">–</span></div>
+    <div class="row"><span>User ID</span><span id="aUid" style="font-size:11px">–</span></div>
+  </section>
+
+  <section class="card">
+    <h2>logged_in_devices</h2>
+    <ul id="devs"></ul>
+    <p class="note">You can stay logged in on many phones and computers at the same time. Your profile syncs live on all of them.</p>
+  </section>
+
+  <section class="card">
+    <h2>accounts</h2>
+    <ul id="accs"></ul>
+    <p class="note" style="margin:10px 0 8px">Add another account:</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost small" id="addG" style="flex:1;margin:0">＋ Google</button>
+      <button class="btn ghost small" id="addH" style="flex:1;margin:0">＋ GitHub</button>
+    </div>
+    <p class="note">Switch between your accounts on this device, like Google. Tap an account to switch to it.</p>
+  </section>
+
+  <section class="card">
+    <h2>delete_account</h2>
+    <p class="note" style="margin:0 0 12px">This permanently deletes your login, name, email, photo and login history from this website. It cannot be undone.</p>
+    <button class="btn out" id="delBtn" style="margin-top:0">🗑 Delete my account and data</button>
+  </section>
+
+  <button class="btn out" id="logout">⎋ Logout from this device</button>
+  <p style="text-align:center;font-size:13px;margin-top:18px;color:#8fb5ad"><a href="privacy.html" style="color:#00ffcc">Privacy Policy</a> · <a href="terms.html" style="color:#00ffcc">Terms of Use</a></p>
+</main>
+
+<div id="consent" hidden role="dialog" aria-modal="true" aria-labelledby="cTitle">
+  <div class="cbox">
+    <h2 id="cTitle">Before you continue</h2>
+    <p>Please read our Terms of Use and Privacy Policy. You need to accept them to use your account.</p>
+    <p class="clinks"><a href="terms.html" target="_blank" rel="noopener">📄 Terms of Use</a><a href="privacy.html" target="_blank" rel="noopener">🔒 Privacy Policy</a></p>
+    <label class="cchk"><input type="checkbox" id="cChk"><span>I have read and I accept the Terms of Use and the Privacy Policy.</span></label>
+    <button class="btn" id="cBtn" disabled>Continue →</button>
+    <button class="btn out" id="cNo" type="button">I do not accept — Logout</button>
+  </div>
+</div>
+<script>addEventListener('DOMContentLoaded',function(){var t=document.getElementById('tick');if(!t)return;function chk(){if(t.hasAttribute('hidden'))return;setTimeout(function(){var k='tickSeen_'+document.getElementById('aUid').textContent;try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1')}catch(e){}var d=document.createElement('div');d.textContent='🎉 अभिनंदन! तुम्हाला Verified निळा टिक मिळाला आहे ✔';d.style.cssText='position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:99;padding:14px 18px;border-radius:14px;background:#1d9bf0;color:#fff;font-weight:700;font-size:15px;text-align:center;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.5)';document.body.appendChild(d);setTimeout(function(){d.remove()},7000)},1500)}new MutationObserver(chk).observe(t,{attributes:true,attributeFilter:['hidden']});chk()});</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updateProfile, sendEmailVerification, deleteUser,
+  reauthenticateWithCredential, reauthenticateWithPopup, EmailAuthProvider, GoogleAuthProvider, GithubAuthProvider, signInWithPopup }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getSlotApp, accounts, activeSlot, setActive, newSlot, remember, removeAccount, nextSlot } from "./accounts.js";
+import { getDatabase, ref, get, set, update, remove, onValue, serverTimestamp, increment }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDz443NrLvqfceSGMzNPThMS3vuJ2z0vPY",
+  authDomain: "dhannjay-website.firebaseapp.com",
+  databaseURL: "https://dhannjay-website-default-rtdb.firebaseio.com",
+  projectId: "dhannjay-website",
+  storageBucket: "dhannjay-website.firebasestorage.app",
+  messagingSenderId: "73314948186",
+  appId: "1:73314948186:web:e7d64f04ba3221a21df463",
+  measurementId: "G-Y76NHS7ZV8"
+};
+const app = getSlotApp();   // the app of the account that is active in this browser
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const $ = s => document.querySelector(s);
+if(!/^https?:$/.test(location.protocol)) $('#proto').style.display='block';
+
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+const fmt = ts => ts ? new Date(ts).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : '–';
+const safeImg = u => typeof u==='string' && (/^data:image\/(jpeg|png|webp);base64,/.test(u) || /^https:\/\//.test(u)) ? u : '';
+
+/* ---- this device ---- */
+function deviceId(){
+  try{
+    let id = localStorage.getItem('devId');
+    if(!id){ id = (crypto.randomUUID ? crypto.randomUUID() : Date.now()+Math.random().toString(36).slice(2)).replace(/[^a-z0-9]/gi,'').slice(0,20);
+             localStorage.setItem('devId', id); }
+    return id;
+  }catch(e){ return 'nostorage'; }
+}
+function deviceLabel(){
+  const ua = navigator.userAgent; let os='Device', br='Browser';
+  if(/Android/i.test(ua)) os='Android'; else if(/iPhone|iPad/i.test(ua)) os='iOS'; else if(/Windows/i.test(ua)) os='Windows';
+  else if(/Mac/i.test(ua)) os='Mac'; else if(/Linux/i.test(ua)) os='Linux';
+  if(/Edg/i.test(ua)) br='Edge'; else if(/OPR|Opera/i.test(ua)) br='Opera'; else if(/Chrome/i.test(ua)) br='Chrome';
+  else if(/Firefox/i.test(ua)) br='Firefox'; else if(/Safari/i.test(ua)) br='Safari';
+  return os+' • '+br;
+}
+
+/* ---- create / refresh the profile record ---- */
+const CONSENT_VERSION = '2026-11-02';
+function signupConsent(){ try{ const v = sessionStorage.getItem('consentOnSignup')==='1'; sessionStorage.removeItem('consentOnSignup'); return v; }catch(e){ return false; } }
+let dbStep = '';
+async function ensureProfile(user){
+  const pRef = ref(db,'users/'+user.uid);
+  dbStep = 'read profile';
+  const snap = await get(pRef);
+  const pid = (user.providerData[0] && user.providerData[0].providerId) || (user.isAnonymous ? 'anonymous' : 'password');
+  const social = !!user.email && pid!=='password' && pid!=='anonymous';   // Google, GitHub etc. already verify the email
+  const base = { email:user.email||'', emailVerified:!!user.emailVerified || social, lastLogin:serverTimestamp(), provider:pid };
+  const sKey = 'lg_'+user.uid;
+  let counted = false;
+  try{ counted = !!sessionStorage.getItem(sKey); sessionStorage.setItem(sKey,'1'); }catch(e){}
+  dbStep = 'save profile';
+  if(!snap.exists()){
+    await set(pRef, { ...base, uid:user.uid,
+      name: user.displayName || (user.email||'User').split('@')[0],
+      photo:'',
+      createdAt:serverTimestamp(), loginCount:1, recent:[serverTimestamp()],
+      ...(signupConsent() ? { consentAt:serverTimestamp(), consentVersion:CONSENT_VERSION } : {}) });
+  } else {
+    const upd = { ...base, phone:null, city:null };   // phone and city are no longer collected; clear old values
+    if(!counted){   // count one login per browser session, keep the last 10 times
+      const old = snap.val().recent;
+      const prev = (Array.isArray(old) ? old : Object.values(old||{})).filter(n=>typeof n==='number');
+      upd.loginCount = increment(1);
+      upd.recent = [serverTimestamp(), ...prev].slice(0,10);
+    }
+    await update(pRef, upd);
+  }
+  dbStep = 'save device';
+  await update(ref(db,'users/'+user.uid+'/devices/'+deviceId()), { label:deviceLabel(), lastSeen:serverTimestamp() });
+}
+
+/* ---- render ---- */
+let uid = null, lastSig = '';
+function render(user, d){
+  $('#consent').hidden = !!d.consentAt;   // show the Terms / Privacy popup until the user has accepted once
+  const name = d.name || user.displayName || 'User';
+  $('#dName').textContent = name;
+  $('#dEmail').textContent = d.email || user.email || '';
+  const img = safeImg(d.photo) || safeImg(user.photoURL);
+  if(img){ $('#avImg').src = img; $('#avImg').hidden=false; $('#avLetter').hidden=true; }
+  else { $('#avImg').hidden=true; $('#avLetter').hidden=false; $('#avLetter').textContent = name.trim().charAt(0).toUpperCase() || '?'; }
+
+  // use the REAL login type of this session, not the old value saved in the database
+  const livePid = (user.providerData[0] && user.providerData[0].providerId) || '';
+  const prov = livePid ? livePid.replace('.com','') : (user.isAnonymous ? 'anonymous' : (d.provider||'password').replace('.com',''));
+  const hasEmail = !!(user.email || d.email);
+  const v = !!user.emailVerified || (prov!=='password' && prov!=='anonymous' && hasEmail);   // Google etc. already verify the email
+  const vb = $('#vBadge');
+  vb.textContent = !hasEmail ? 'No email on this account' : (v ? '✔ Email verified' : '⚠ Email not verified');
+  vb.className = 'badge '+(!hasEmail ? '' : (v ? 'ok' : 'warn'));
+  $('#pBadge').textContent = prov==='password' ? '🔑 Email login' : prov==='anonymous' ? '👤 Guest login' : '🌐 '+prov;
+  $('#verifyBtn').hidden = v || prov!=='password' || !hasEmail;
+
+  // fill form only for fields the user is not currently typing in
+  const set_ = (id,val)=>{ const el=$(id); if(document.activeElement!==el) el.value = val||''; };
+  set_('#fName', d.name); set_('#fEmail', d.email||user.email); set_('#fBio', d.bio);
+
+  $('#aSince').textContent = fmt(d.createdAt);
+  $('#aLast').textContent  = fmt(d.lastLogin);
+  $('#aProv').textContent  = prov==='password' ? 'Email & password' : prov;
+  $('#aUid').textContent   = user.uid;
+
+  // remember this account for the switcher (only when something changed)
+  const sig = name+'|'+(d.email||user.email||'')+'|'+(d.photo||'').length;
+  if(sig !== lastSig){ lastSig = sig; remember({ uid:user.uid, name, email:d.email||user.email||'', photo:img }).then(renderAccounts); }
+
+  const ul = $('#devs'); ul.replaceChildren();
+  const me = deviceId();
+  Object.entries(d.devices||{}).sort((a,b)=>(b[1].lastSeen||0)-(a[1].lastSeen||0)).forEach(([id,dv])=>{
+    const li = document.createElement('li'); li.className='dev';
+    const box = document.createElement('div');
+    const t = document.createElement('div'); t.textContent = dv.label || 'Device';
+    const s = document.createElement('small'); s.textContent = 'Last active: '+fmt(dv.lastSeen);
+    box.append(t,s); li.append(box);
+    if(id===me){ const m=document.createElement('span'); m.className='me'; m.textContent='This device'; li.append(m); }
+    ul.append(li);
+  });
+}
+
+/* ---- auth gate ---- */
+let unsub = null, unsubBadge = null, leaving = false;
+onAuthStateChanged(auth, async user=>{
+  if(!user){ if(!leaving) location.replace('login.html'); return; }
+  uid = user.uid;
+  try{ await user.reload(); }catch(e){}   // refresh verified status after clicking the email link
+  try{ await ensureProfile(user); }
+  catch(e){ toast('Database error at "'+dbStep+'": '+(e.code||e.message)); }
+  if(unsub) unsub();
+  unsub = onValue(ref(db,'users/'+user.uid), snap=>{ const d=snap.val(); if(d) render(auth.currentUser||user, d); },
+                  e=>toast('Cannot read profile: '+(e.code||e.message)));
+  try{ const a = await get(ref(db,'admins/'+user.uid)); if(a.val()===true) $('#adminLink').hidden=false; }catch(e){}
+  if(unsubBadge) unsubBadge();
+  unsubBadge = onValue(ref(db,'badges/'+user.uid), s=>{ $('#tick').toggleAttribute('hidden', s.val()!==true); }, ()=>{});   // blue tick is given by the admin only
+  $('#loading').hidden = true; $('#app').hidden = false;
+});
+
+/* ---- save profile ---- */
+$('#form').onsubmit = async e=>{
+  e.preventDefault();
+  const name=$('#fName').value.trim(), bio=$('#fBio').value.trim();
+  if(name.length<2) return toast('Please enter your name');
+  const b=$('#saveBtn'); b.disabled=true;
+  try{
+    await update(ref(db,'users/'+uid), {name,bio,phone:null,city:null});
+    await updateProfile(auth.currentUser, {displayName:name});
+    toast('Saved ✅');
+  }catch(err){ toast('Could not save: '+(err.code||err.message)); }
+  b.disabled=false;
+};
+
+/* ---- profile photo: crop to a square, shrink, store as a small data URL ---- */
+function toSquareDataURL(file, size){
+  return new Promise((res,rej)=>{
+    const img=new Image(), u=URL.createObjectURL(file);
+    img.onload=()=>{
+      URL.revokeObjectURL(u);
+      const c=document.createElement('canvas'); c.width=c.height=size;
+      const s=Math.min(img.width,img.height);
+      c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,size,size);
+      let q=.85, out=c.toDataURL('image/jpeg',q);
+      while(out.length>120000 && q>.3){ q-=.1; out=c.toDataURL('image/jpeg',q); }
+      out.length>140000 ? rej(new Error('Image too large')) : res(out);
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error('Cannot read this image')); };
+    img.src=u;
+  });
+}
+$('#photoIn').onchange = async e=>{
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  if(!/^image\//.test(f.type)) return toast('Please choose an image');
+  try{
+    toast('Uploading…');
+    const url = await toSquareDataURL(f,256);
+    await update(ref(db,'users/'+uid), {photo:url});
+    toast('Photo updated ✅');
+  }catch(err){ toast('Photo failed: '+(err.message||err.code)); }
+};
+
+/* ---- multiple accounts ---- */
+function renderAccounts(){
+  const ul = $('#accs'); ul.replaceChildren();
+  const cur = activeSlot();
+  accounts().forEach(a=>{
+    const li = document.createElement('li'); li.className = 'acc'+(a.slot===cur ? ' cur' : '');
+    const av = document.createElement('span'); av.className = 'av';
+    if(safeImg(a.photo)){ const im = document.createElement('img'); im.src = a.photo; im.alt = ''; av.append(im); }
+    else av.textContent = (a.name||a.email||'?').trim().charAt(0).toUpperCase() || '?';
+    const tx = document.createElement('span'); tx.className = 'tx';
+    const n = document.createElement('b'); n.textContent = a.name || 'Account';
+    const m = document.createElement('small'); m.textContent = a.email || 'No email';
+    tx.append(n, m); li.append(av, tx);
+    if(a.slot===cur){
+      const t = document.createElement('span'); t.className = 'tag'; t.textContent = 'Active'; li.append(t);
+    } else {
+      li.onclick = ()=>{ setActive(a.slot); location.reload(); };
+      const x = document.createElement('button'); x.className = 'rm'; x.type = 'button'; x.textContent = '✕'; x.title = 'Logout and remove from this device';
+      x.onclick = async e=>{
+        e.stopPropagation();
+        if(!confirm('Logout '+(a.email||a.name||'this account')+' and remove it from this device?')) return;
+        await removeAccount(a.slot); renderAccounts();
+      };
+      li.append(x);
+    }
+    ul.append(li);
+  });
+}
+renderAccounts();
+/* add another account: sign it in on a fresh slot right here, then switch to it */
+async function addWith(provider){
+  const slot = 'a' + Date.now().toString(36);
+  try{
+    await signInWithPopup(getAuth(getSlotApp(slot)), provider);
+    setActive(slot); location.reload();
+  }catch(err){
+    const c = err && err.code;
+    toast(c==='auth/popup-closed-by-user' || c==='auth/cancelled-popup-request' ? 'Cancelled'
+        : c==='auth/popup-blocked' ? 'Popup blocked. Allow popups and try again'
+        : c==='auth/account-exists-with-different-credential' ? 'This email already uses another login method'
+        : 'Could not add account ('+(c||err.message)+')');
+  }
+}
+$('#addG').onclick = ()=>{ const g = new GoogleAuthProvider(); g.setCustomParameters({ prompt:'select_account' }); addWith(g); };
+$('#addH').onclick = ()=>addWith(new GithubAuthProvider());
+
+/* leave the active account (logout or delete): go to another saved account, or to the login page */
+async function leaveActive(){
+  await removeAccount(activeSlot());
+  setActive(nextSlot());
+  location.replace(accounts().length ? 'profile.html' : 'login.html');
+}
+
+/* ---- Terms / Privacy consent popup ---- */
+$('#cChk').onchange = ()=>{ $('#cBtn').disabled = !$('#cChk').checked; };
+$('#cBtn').onclick = async ()=>{
+  const b=$('#cBtn'); b.disabled=true;
+  try{
+    await update(ref(db,'users/'+uid), {consentAt:serverTimestamp(), consentVersion:CONSENT_VERSION});
+    $('#consent').hidden = true; toast('Thank you ✅');
+  }catch(err){ b.disabled=false; toast('Could not save: '+(err.code||err.message)); }
+};
+$('#cNo').onclick = ()=> $('#logout').click();
+
+/* ---- verify email / logout ---- */
+$('#verifyBtn').onclick = async ()=>{
+  try{ await sendEmailVerification(auth.currentUser); toast('Verification email sent 📧'); }
+  catch(err){ toast(err.code==='auth/too-many-requests' ? 'Please wait a bit and try again' : 'Could not send email ('+(err.code||err.message)+')'); }
+};
+$('#logout').onclick = async ()=>{
+  leaving = true;
+  try{ await remove(ref(db,'users/'+uid+'/devices/'+deviceId())); }catch(e){}
+  if(unsub){ unsub(); unsub=null; }
+  await leaveActive();
+};
+
+/* ---- delete account: confirm, re-check identity, erase profile data, then delete the login ---- */
+$('#delBtn').onclick = async ()=>{
+  const user = auth.currentUser; if(!user) return;
+  if(prompt('This will permanently delete your account and all your profile data.\nType DELETE to confirm:') !== 'DELETE') return toast('Cancelled');
+  const b = $('#delBtn'); b.disabled = true; leaving = true;
+  try{
+    const pid = user.providerData[0] && user.providerData[0].providerId;
+    if(pid==='password'){
+      const pw = prompt('Enter your password to confirm:');
+      if(!pw){ b.disabled=false; leaving=false; return toast('Cancelled'); }
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, pw));
+    } else if(pid==='google.com'){
+      await reauthenticateWithPopup(user, new GoogleAuthProvider());
+    } else if(pid==='github.com'){
+      await reauthenticateWithPopup(user, new GithubAuthProvider());
+    }
+    if(unsub){ unsub(); unsub=null; }
+    await remove(ref(db,'users/'+user.uid));   // profile, login history and devices
+    await deleteUser(user);                    // the login itself
+    try{ sessionStorage.clear(); localStorage.removeItem('devId'); }catch(e){}
+    toast('Your account was deleted');
+    await leaveActive();
+  }catch(err){
+    b.disabled = false; leaving = false;
+    const c = err && err.code;
+    toast(c==='auth/wrong-password' || c==='auth/invalid-credential' ? 'Wrong password'
+        : c==='auth/requires-recent-login' ? 'Please logout, login again and retry'
+        : c==='auth/popup-closed-by-user' ? 'Cancelled'
+        : 'Could not delete ('+(c||err.message)+')');
+  }
+};
+</script>
+</body>
+</html>
